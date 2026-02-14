@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Editor - AI Phone Receptionist</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>📝 Prompt Editor</h1>
+    </div>
+  </header>
+
+  <nav>
+    <div class="container">
+      <ul></ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>Edit AI Prompts</h2>
+      <p class="text-muted mb-2">Customize how the AI receptionist behaves and responds to callers.</p>
+      <div id="promptsContainer">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+  <script>
+    const { apiFetch, Toast, renderNav, escapeHtml, showError } = window.AdminUI;
+
+    // Set active nav
+    renderNav('prompts.html');
+
+    // Load prompts
+    async function loadPrompts() {
+      const container = document.getElementById('promptsContainer');
+      
+      try {
+        const data = await apiFetch('/admin/api/prompts');
+        
+        if (!data.prompts || data.prompts.length === 0) {
+          showError(container, 'No prompts found');
+          return;
+        }
+
+        container.innerHTML = data.prompts.map(prompt => `
+          <div class="form-group">
+            <label for="prompt-${escapeHtml(prompt.filename)}">
+              ${escapeHtml(prompt.name)}
+              <span class="text-muted" style="font-weight: normal; font-size: 0.875rem;">(${escapeHtml(prompt.filename)})</span>
+            </label>
+            <textarea 
+              id="prompt-${escapeHtml(prompt.filename)}" 
+              data-filename="${escapeHtml(prompt.filename)}"
+              rows="8"
+            >${escapeHtml(prompt.content)}</textarea>
+            <button 
+              onclick="savePrompt('${escapeHtml(prompt.filename)}')" 
+              class="btn-success"
+              id="save-${escapeHtml(prompt.filename)}"
+            >
+              💾 Save ${escapeHtml(prompt.name)}
+            </button>
+          </div>
+        `).join('');
+      } catch (error) {
+        showError(container, 'Failed to load prompts: ' + error.message);
+        Toast.error('Failed to load prompts: ' + error.message);
+      }
+    }
+
+    // Save prompt
+    async function savePrompt(filename) {
+      const textarea = document.querySelector(`textarea[data-filename="${filename}"]`);
+      const btn = document.getElementById(`save-${filename}`);
+      const content = textarea.value;
+
+      // Validate content
+      if (!content || content.trim().length === 0) {
+        Toast.error('Prompt content cannot be empty or whitespace only');
+        return;
+      }
+
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = '⏳ Saving...';
+
+      try {
+        await apiFetch(`/admin/api/prompts/${filename}`, {
+          method: 'PUT',
+          body: JSON.stringify({ content })
+        });
+        Toast.success(`Prompt "${filename}" saved successfully`);
+      } catch (error) {
+        Toast.error('Save failed: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    // Make savePrompt available globally
+    window.savePrompt = savePrompt;
+
+    // Load prompts on page load
+    loadPrompts();
+  </script>
+</body>
+</html>

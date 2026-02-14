@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Availability Editor - AI Phone Receptionist</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>📅 Provider Availability</h1>
+    </div>
+  </header>
+
+  <nav>
+    <div class="container">
+      <ul></ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>Manage Provider Availability</h2>
+      <p class="text-muted mb-2">Edit provider availability markdown files. These are included in the AI context during calls.</p>
+      
+      <div class="btn-group mb-2">
+        <button onclick="showNewFileForm()" class="btn-success">➕ New Availability File</button>
+        <button onclick="reloadAvailability()" id="reloadBtn">🔄 Reload from Disk</button>
+      </div>
+
+      <!-- New file form (hidden by default) -->
+      <div id="newFileForm" class="hidden" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <h3>Create New Availability File</h3>
+        <div class="form-group">
+          <label for="newFilename">Filename (e.g., dr-smith.md)</label>
+          <input type="text" id="newFilename" placeholder="provider-name.md">
+        </div>
+        <div class="form-group">
+          <label for="newContent">Content</label>
+          <textarea id="newContent" rows="8" placeholder="# Dr. Smith's Availability&#10;&#10;Available Monday-Friday 9am-5pm"></textarea>
+        </div>
+        <div class="btn-group">
+          <button onclick="createNewFile()" class="btn-success">Create File</button>
+          <button onclick="hideNewFileForm()" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+
+      <div id="availabilityContainer">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+  <script>
+    const { apiFetch, Toast, renderNav, escapeHtml, showError } = window.AdminUI;
+
+    // Set active nav
+    renderNav('availability.html');
+
+    // Load availability files
+    async function loadAvailability() {
+      const container = document.getElementById('availabilityContainer');
+      
+      try {
+        const data = await apiFetch('/admin/api/availability');
+        
+        if (!data.files || data.files.length === 0) {
+          container.innerHTML = '<p class="text-muted text-center">No availability files found. Create one to get started.</p>';
+          return;
+        }
+
+        container.innerHTML = data.files.map(file => `
+          <div class="form-group">
+            <label for="avail-${escapeHtml(file.filename)}">
+              ${escapeHtml(file.filename)}
+            </label>
+            <textarea 
+              id="avail-${escapeHtml(file.filename)}" 
+              data-filename="${escapeHtml(file.filename)}"
+              rows="10"
+            >${escapeHtml(file.content)}</textarea>
+            <button 
+              onclick="saveAvailability('${escapeHtml(file.filename)}')" 
+              class="btn-success"
+              id="save-${escapeHtml(file.filename)}"
+            >
+              💾 Save ${escapeHtml(file.filename)}
+            </button>
+          </div>
+        `).join('');
+      } catch (error) {
+        showError(container, 'Failed to load availability files: ' + error.message);
+        Toast.error('Failed to load availability files: ' + error.message);
+      }
+    }
+
+    // Save availability file
+    async function saveAvailability(filename) {
+      const textarea = document.querySelector(`textarea[data-filename="${filename}"]`);
+      const btn = document.getElementById(`save-${filename}`);
+      const content = textarea.value;
+
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = '⏳ Saving...';
+
+      try {
+        await apiFetch(`/admin/api/availability/${filename}`, {
+          method: 'PUT',
+          body: JSON.stringify({ content })
+        });
+        Toast.success(`Availability file "${filename}" saved successfully`);
+      } catch (error) {
+        Toast.error('Save failed: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    // Reload availability from disk
+    async function reloadAvailability() {
+      const btn = document.getElementById('reloadBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Reloading...';
+
+      try {
+        await apiFetch('/admin/api/reload', { method: 'POST' });
+        Toast.success('Availability data reloaded from disk');
+        await loadAvailability();
+      } catch (error) {
+        Toast.error('Reload failed: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔄 Reload from Disk';
+      }
+    }
+
+    // Show new file form
+    function showNewFileForm() {
+      document.getElementById('newFileForm').classList.remove('hidden');
+      document.getElementById('newFilename').focus();
+    }
+
+    // Hide new file form
+    function hideNewFileForm() {
+      document.getElementById('newFileForm').classList.add('hidden');
+      document.getElementById('newFilename').value = '';
+      document.getElementById('newContent').value = '';
+    }
+
+    // Create new availability file
+    async function createNewFile() {
+      const filename = document.getElementById('newFilename').value.trim();
+      const content = document.getElementById('newContent').value;
+
+      // Validate filename
+      if (!filename) {
+        Toast.error('Please enter a filename');
+        return;
+      }
+
+      if (!filename.endsWith('.md')) {
+        Toast.error('Filename must end with .md');
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9-_.]+$/.test(filename)) {
+        Toast.error('Filename can only contain letters, numbers, hyphens, underscores, and dots');
+        return;
+      }
+
+      try {
+        await apiFetch(`/admin/api/availability/${filename}`, {
+          method: 'PUT',
+          body: JSON.stringify({ content })
+        });
+        Toast.success(`File "${filename}" created successfully`);
+        hideNewFileForm();
+        await loadAvailability();
+      } catch (error) {
+        Toast.error('Create failed: ' + error.message);
+      }
+    }
+
+    // Make functions available globally
+    window.saveAvailability = saveAvailability;
+    window.reloadAvailability = reloadAvailability;
+    window.showNewFileForm = showNewFileForm;
+    window.hideNewFileForm = hideNewFileForm;
+    window.createNewFile = createNewFile;
+
+    // Load availability on page load
+    loadAvailability();
+  </script>
+</body>
+</html>

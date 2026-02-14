@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RTC Website - Chat Widget Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    h1 { color: #667eea; }
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 40px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+    }
+    .content {
+      margin-bottom: 40px;
+    }
+    .code-block {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+    code {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+  </style>
+  
+  <!-- STEP 1: Configure the widget (optional) -->
+  <script>
+    window.RTCChatConfig = {
+      apiUrl: 'http://localhost:3000',  // Your server URL
+      position: 'bottom-right',          // or 'bottom-left'
+      primaryColor: '#667eea',           // Your brand color
+      title: 'Chat with us'              // Widget title
+    };
+  </script>
+  
+  <!-- STEP 2: Include the widget script -->
+  <script src="/chat-widget.js"></script>
+</head>
+<body>
+  <div class="hero">
+    <h1>Relational Therapy Collective</h1>
+    <p>Welcome to our practice. We're here to help you on your journey.</p>
+  </div>
+  
+  <div class="content">
+    <h2>About This Page</h2>
+    <p>This is an example page showing how the AI chat widget appears on your website. The chat button is in the bottom-right corner.</p>
+    
+    <h2>How to Add the Widget to Your Website</h2>
+    <p>Add these two code snippets to your website's HTML, just before the closing <code>&lt;/body&gt;</code> tag:</p>
+    
+    <div class="code-block">
+      <code>&lt;!-- Configure the widget (optional) --&gt;<br>
+&lt;script&gt;<br>
+&nbsp;&nbsp;window.RTCChatConfig = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;apiUrl: 'https://your-server-url.com',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;position: 'bottom-right',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;primaryColor: '#667eea',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;title: 'Chat with us'<br>
+&nbsp;&nbsp;};<br>
+&lt;/script&gt;<br>
+<br>
+&lt;!-- Include the widget script --&gt;<br>
+&lt;script src="https://your-server-url.com/chat-widget.js"&gt;&lt;/script&gt;</code>
+    </div>
+    
+    <h2>Configuration Options</h2>
+    <ul>
+      <li><strong>apiUrl</strong>: Your server URL (required in production)</li>
+      <li><strong>position</strong>: 'bottom-right' or 'bottom-left'</li>
+      <li><strong>primaryColor</strong>: Hex color code for the widget theme</li>
+      <li><strong>title</strong>: Text shown in the widget header</li>
+    </ul>
+    
+    <h2>Features</h2>
+    <ul>
+      <li>✅ Floating chat button in corner</li>
+      <li>✅ Expandable chat window</li>
+      <li>✅ Same AI receptionist as phone system</li>
+      <li>✅ Customizable colors and position</li>
+      <li>✅ Mobile responsive</li>
+      <li>✅ Easy to embed with 2 lines of code</li>
+    </ul>
+    
+    <p style="margin-top: 40px; padding: 20px; background: #fff3cd; border-radius: 8px;">
+      <strong>💡 Try it now!</strong> Click the chat button in the bottom-right corner to test the widget.
+    </p>
+  </div>
+</body>
+</html>

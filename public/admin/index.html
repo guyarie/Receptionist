@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - AI Phone Receptionist</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>🤖 AI Phone Receptionist - Admin Dashboard</h1>
+    </div>
+  </header>
+
+  <nav>
+    <div class="container">
+      <ul></ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- System Status -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">Server Uptime</div>
+        <div class="stat-value" id="uptime">--</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Active Calls</div>
+        <div class="stat-value" id="activeCalls">--</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">AI Model</div>
+        <div class="stat-value" id="model" style="font-size: 1rem;">--</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Phone Number</div>
+        <div class="stat-value" id="phone" style="font-size: 1rem;">--</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <h2>Quick Actions</h2>
+      <div class="btn-group">
+        <button onclick="reloadAll()" id="reloadBtn">🔄 Reload All</button>
+        <button onclick="refreshWebsite()" id="refreshBtn">🌐 Refresh Website Data</button>
+      </div>
+    </div>
+
+    <!-- Recent Errors -->
+    <div class="card">
+      <h2>Recent Errors</h2>
+      <ul class="error-list" id="errorList">
+        <li class="text-muted text-center">Loading...</li>
+      </ul>
+    </div>
+
+    <!-- System Info -->
+    <div class="card">
+      <h2>System Information</h2>
+      <p><strong>Prompts Loaded:</strong> <span id="promptCount">--</span></p>
+      <p><strong>Availability Files:</strong> <span id="availCount">--</span></p>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+  <script>
+    const { apiFetch, Toast, renderNav, formatUptime, formatTimestamp, escapeHtml } = window.AdminUI;
+
+    // Set active nav
+    renderNav('index.html');
+
+    // Load dashboard data
+    async function loadDashboard() {
+      try {
+        const data = await apiFetch('/admin/api/status');
+        
+        // Update stats
+        document.getElementById('uptime').textContent = formatUptime(data.uptime);
+        document.getElementById('activeCalls').textContent = data.activeCalls || 0;
+        document.getElementById('model').textContent = data.model || 'Unknown';
+        document.getElementById('phone').textContent = data.phoneNumber || 'Not configured';
+        document.getElementById('promptCount').textContent = data.promptCount || 0;
+        document.getElementById('availCount').textContent = data.availabilityCount || 0;
+
+        // Update errors
+        const errorList = document.getElementById('errorList');
+        if (data.recentErrors && data.recentErrors.length > 0) {
+          errorList.innerHTML = data.recentErrors.map(err => `
+            <li class="error-item">
+              <div class="error-time">${formatTimestamp(err.timestamp)}</div>
+              <div class="error-message">${escapeHtml(err.message)}</div>
+              ${err.context ? `<div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Context: ${escapeHtml(err.context)}</div>` : ''}
+            </li>
+          `).join('');
+        } else {
+          errorList.innerHTML = '<li class="text-muted text-center">No recent errors</li>';
+        }
+      } catch (error) {
+        Toast.error('Failed to load dashboard: ' + error.message);
+      }
+    }
+
+    // Reload all data
+    async function reloadAll() {
+      const btn = document.getElementById('reloadBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Reloading...';
+
+      try {
+        await apiFetch('/admin/api/reload', { method: 'POST' });
+        Toast.success('All data reloaded successfully');
+        await loadDashboard();
+      } catch (error) {
+        Toast.error('Reload failed: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔄 Reload All';
+      }
+    }
+
+    // Refresh website data
+    async function refreshWebsite() {
+      const btn = document.getElementById('refreshBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Refreshing...';
+
+      try {
+        await apiFetch('/admin/api/refresh-website', { method: 'POST' });
+        Toast.success('Website data refreshed successfully');
+      } catch (error) {
+        Toast.error('Refresh failed: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🌐 Refresh Website Data';
+      }
+    }
+
+    // Auto-refresh every 30 seconds
+    loadDashboard();
+    setInterval(loadDashboard, 30000);
+  </script>
+</body>
+</html>

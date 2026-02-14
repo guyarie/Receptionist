@@ -1,0 +1,30 @@
+{
+  "name": "receptionist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test-ai": "node src/test-ai.js",
+    "chat": "node src/test-chat.js",
+    "test": "vitest --run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.13.5",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "openai": "^6.18.0",
+    "twilio": "^5.12.1",
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "fast-check": "^4.5.3",
+    "vitest": "^4.0.18"
+  }
+}
