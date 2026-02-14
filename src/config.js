@@ -27,6 +27,13 @@ const config = {
     apiKey: process.env.OPENROUTER_API_KEY,
     model: process.env.OPENROUTER_MODEL || 'openai/gpt-4'
   },
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY || null,
+    realtimeVoice: process.env.OPENAI_REALTIME_VOICE || 'alloy'
+  },
+  realtime: {
+    provider: process.env.REALTIME_AI_PROVIDER || 'openai'
+  },
   server: {
     port: parseInt(process.env.PORT || '3000', 10)
   }
@@ -34,5 +41,10 @@ const config = {
 
 // Validate on load
 validateConfig();
+
+// Warn if OpenAI API key is not set (realtime voice streaming will be unavailable)
+if (!config.openai.apiKey) {
+  console.warn('⚠️ OPENAI_API_KEY not set — real-time voice streaming unavailable, using Gather fallback');
+}
 
 module.exports = config;

@@ -7,7 +7,8 @@ AI-powered phone receptionist for Relational Therapy Collective (RTC).
 ### Prerequisites
 - Node.js installed (v18 or higher)
 - Twilio account with a phone number
-- OpenRouter API key
+- OpenRouter API key (for text chat and call summaries)
+- OpenAI API key (optional, for real-time voice streaming)
 - Cloudflare Tunnel (cloudflared)
 
 ### Step 1: Install Dependencies
@@ -24,11 +25,21 @@ npm install
 
 2. Edit `.env` and fill in your credentials:
    ```env
+   # Required - Twilio Configuration
    TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxx
    TWILIO_AUTH_TOKEN=your_auth_token
    TWILIO_PHONE_NUMBER=+1234567890
+   
+   # Required - OpenRouter Configuration (for text chat and call summaries)
    OPENROUTER_API_KEY=sk-or-xxxxxxxxxxxxx
    OPENROUTER_MODEL=openai/gpt-4
+   
+   # Optional - Realtime Voice Streaming (enables low-latency conversational AI)
+   OPENAI_API_KEY=sk-xxxxxxxxxxxxx
+   OPENAI_REALTIME_VOICE=alloy
+   REALTIME_AI_PROVIDER=openai
+   
+   # Server Configuration
    PORT=3000
    ```
 
@@ -36,6 +47,13 @@ npm install
 - **Twilio credentials**: [Twilio Console](https://console.twilio.com/) → Account Info
 - **Twilio phone number**: [Twilio Console](https://console.twilio.com/) → Phone Numbers → Buy a number
 - **OpenRouter API key**: [OpenRouter](https://openrouter.ai/) → Keys
+- **OpenAI API key** (optional): [OpenAI Platform](https://platform.openai.com/api-keys) → Create new secret key
+
+**Voice Streaming Mode:**
+- **With `OPENAI_API_KEY` set**: Uses real-time bidirectional audio streaming (low latency, natural interruptions)
+- **Without `OPENAI_API_KEY`**: Falls back to turn-by-turn speech recognition (Gather-based, still works great!)
+
+**Available voices for realtime streaming**: `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`
 
 ### Step 3: Test AI Integration (Optional)
 
@@ -57,6 +75,15 @@ You should see:
 ```
 🚀 Server running on port 3000
 📞 Webhook URL: http://localhost:3000/incoming-call
+🎙️ Realtime voice streaming is available
+✅ Configuration loaded
+```
+
+Or if you didn't set `OPENAI_API_KEY`:
+```
+🚀 Server running on port 3000
+📞 Webhook URL: http://localhost:3000/incoming-call
+⚠️ OPENAI_API_KEY not set — real-time voice streaming unavailable, using Gather fallback
 ✅ Configuration loaded
 ```
 
@@ -159,39 +186,75 @@ The AI will respond naturally to your questions!
 ```
 .
 ├── src/
-│   ├── server.js         # Main Express server with Twilio webhooks
-│   ├── config.js         # Configuration loader
-│   ├── ai-client.js      # OpenRouter AI integration
-│   ├── call-handler.js   # Call session management
-│   └── test-ai.js        # AI testing script
-├── .env                  # Environment variables (not in git)
-├── .env.example          # Example environment variables
-├── package.json          # Node.js dependencies
-└── README.md            # This file
+│   ├── server.js              # Main Express server with Twilio webhooks
+│   ├── config.js              # Configuration loader
+│   ├── ai-client.js           # OpenRouter AI integration
+│   ├── call-handler.js        # Call session management (Gather mode)
+│   ├── call-summary.js        # Call summary generation
+│   ├── realtime/              # Real-time voice streaming components
+│   │   ├── provider-adapter.js    # Base class for AI providers
+│   │   ├── provider-factory.js    # Provider adapter factory
+│   │   ├── openai-adapter.js      # OpenAI Realtime API adapter
+│   │   ├── relay-service.js       # Audio relay between Twilio and provider
+│   │   └── session-manager.js     # Active session tracking
+│   └── test-ai.js             # AI testing script
+├── prompts/                   # Editable AI prompts
+├── public/                    # Web chat interface and admin UI
+├── .env                       # Environment variables (not in git)
+├── .env.example               # Example environment variables
+├── package.json               # Node.js dependencies
+└── README.md                  # This file
 ```
 
 ## How It Works
 
+### Real-Time Voice Streaming Mode (with OPENAI_API_KEY)
+
 1. **Caller dials** your Twilio number
 2. **Twilio sends webhook** to `/incoming-call`
-3. **Server returns TwiML** with greeting and speech recognition
+3. **Server returns TwiML** with `<Connect><Stream>` to open bidirectional audio WebSocket
+4. **Twilio streams audio** to server via WebSocket at `/media-stream`
+5. **Server relays audio** to OpenAI Realtime API
+6. **OpenAI processes audio** in real-time, generates responses with voice
+7. **Server streams audio back** to caller via Twilio
+8. **Natural conversation** with low latency and interruption support
+9. **Call summary generated** when call ends
+
+### Turn-by-Turn Mode (without OPENAI_API_KEY - fallback)
+
+1. **Caller dials** your Twilio number
+2. **Twilio sends webhook** to `/incoming-call`
+3. **Server returns TwiML** with greeting and speech recognition (`<Gather>`)
 4. **Caller speaks**, Twilio converts speech to text
 5. **Text sent to** `/handle-speech` endpoint
-6. **AI processes** the text and generates response
-7. **Server returns TwiML** with AI response as speech
+6. **AI processes** the text via OpenRouter and generates response
+7. **Server returns TwiML** with AI response as speech (`<Say>`)
 8. **Loop continues** until caller hangs up
+9. **Call summary generated** when call ends
+
+## Features
+
+- **Dual Voice Modes**: Real-time streaming (low latency) or turn-by-turn (fallback)
+- **Natural Conversations**: Context-aware responses with interruption support (streaming mode)
+- **Web Chat Interface**: Browser-based chat for testing and customer support
+- **Admin Dashboard**: View call logs, edit prompts, manage availability
+- **Call Summaries**: AI-generated summaries of all conversations
+- **Website Integration**: Automatically scrapes practice information
+- **Customizable Prompts**: Edit AI personality and responses without code changes
+- **Graceful Fallback**: Works without OpenAI API key using Gather-based speech
 
 ## Next Steps
 
-Now that you have a working demo, you can:
-- [ ] Add data integration (Excel files, website content)
-- [ ] Implement tool calling (insurance lookup, availability checking)
-- [ ] Add crisis detection
-- [ ] Implement appointment booking
-- [ ] Add proper error handling
-- [ ] Convert to TypeScript for better type safety
+Now that you have a working system, you can:
+- [ ] Test both voice modes (with and without OPENAI_API_KEY)
+- [ ] Customize prompts in the `prompts/` directory
+- [ ] Access the admin dashboard at `http://localhost:3000/admin`
+- [ ] Review call summaries and transcripts
+- [ ] Add custom availability schedules
+- [ ] Integrate with your practice management system
+- [ ] Deploy to production with systemd (see `docs/systemd-setup.md`)
 
-See `tasks.md` for the full implementation plan!
+See the `.kiro/specs/` directory for detailed feature specifications!
 
 ## Support
 

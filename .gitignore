@@ -9,3 +9,4 @@ coverage/
 # Vitest cache
 .vitest/
 
+call-summaries/

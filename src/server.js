@@ -11,9 +11,21 @@ const aiClient = require('./ai-client');
 const WebsiteScraper = require('./website-scraper');
 const availabilityLoader = require('./availability-loader');
 const errorBuffer = require('./error-buffer');
+const { createProviderAdapter } = require('./realtime/provider-factory');
+const SessionManager = require('./realtime/session-manager');
+const RelayService = require('./realtime/relay-service');
 
 const app = express();
+const sessionManager = new SessionManager();
 const server = http.createServer(app);
+
+// Check if realtime voice streaming is available
+const realtimeAvailable = createProviderAdapter(config.realtime.provider, config) !== null;
+if (realtimeAvailable) {
+  console.log('🎙️ Realtime voice streaming is available');
+} else {
+  console.log('⚠️ OPENAI_API_KEY not set — real-time voice streaming unavailable, using Gather fallback');
+}
 
 // Initialize website scraper
 const websiteScraper = new WebsiteScraper('https://www.rtcbellevue.com/');
@@ -347,13 +359,26 @@ app.post('/incoming-call', (req, res) => {
   const to = req.body.To;
   
   console.log(`📞 Incoming call: ${callSid} from ${from}`);
-  
-  // Start call session with caller info
-  callHandler.startCall(callSid, { from, to });
-  
-  // For the demo, we'll use a simpler approach with Gather (speech recognition)
-  // This avoids the complexity of real-time audio streaming for now
-  const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+
+  if (realtimeAvailable) {
+    // Use real-time bidirectional audio streaming via Twilio Media Streams
+    const host = req.headers.host;
+    console.log(`🎙️ Routing call ${callSid} to realtime streaming via wss://${host}/media-stream`);
+    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="wss://${host}/media-stream">
+      <Parameter name="callSid" value="${callSid}" />
+    </Stream>
+  </Connect>
+</Response>`;
+    res.type('text/xml');
+    res.send(twiml);
+  } else {
+    // Fallback: Gather-based speech recognition (turn-by-turn)
+    callHandler.startCall(callSid, { from, to });
+    
+    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="Polly.Joanna">${escapeXml(prompts.greeting)}</Say>
   <Gather input="speech" action="/handle-speech" timeout="5" speechTimeout="auto">
@@ -361,9 +386,9 @@ app.post('/incoming-call', (req, res) => {
   <Say voice="Polly.Joanna">I didn't hear anything. Goodbye!</Say>
   <Hangup/>
 </Response>`;
-
-  res.type('text/xml');
-  res.send(twiml);
+    res.type('text/xml');
+    res.send(twiml);
+  }
 });
 
 // Call status callback - triggered when call ends
@@ -523,51 +548,65 @@ function escapeXml(text) {
 const wss = new WebSocket.Server({ server, path: '/media-stream' });
 
 wss.on('connection', (ws) => {
-  console.log('🔌 WebSocket connection established');
-  
-  let streamSid = null;
-  
-  ws.on('message', (message) => {
+  console.log('🔌 Media stream WebSocket connected');
+  let relay = null;
+
+  ws.on('message', async (message) => {
     try {
       const data = JSON.parse(message);
-      
+
       switch (data.event) {
         case 'start':
-          streamSid = data.start.streamSid;
-          console.log('🎬 Media stream started:', streamSid);
-          callHandler.startCall(streamSid, data.start.callSid);
-          break;
+          const callSid = data.start.customParameters?.callSid || data.start.callSid;
+          const streamSid = data.start.streamSid;
+          console.log(`🎬 Media stream started: ${streamSid} for call ${callSid}`);
           
-        case 'media':
-          // Audio chunk received from caller
-          if (streamSid) {
-            callHandler.handleAudio(streamSid, data.media.payload);
+          const adapter = createProviderAdapter(config.realtime.provider, config);
+          if (!adapter) {
+            console.error('❌ Failed to create provider adapter');
+            ws.close();
+            return;
           }
-          break;
           
+          relay = new RelayService(ws, adapter, callSid, streamSid, {
+            from: data.start.customParameters?.from || 'unknown',
+            to: data.start.customParameters?.to || 'unknown'
+          });
+          relay.sessionManager = sessionManager;
+          sessionManager.addSession(streamSid, relay);
+          
+          await relay.initialize({
+            systemPrompt: prompts.systemPrompt,
+            websiteContext: websiteScraper.getAIContext(),
+            availabilityContext: availabilityLoader.getAIContext(),
+            greeting: prompts.greeting
+          });
+          break;
+
+        case 'media':
+          if (relay) relay.handleTwilioMedia(data.media.payload);
+          break;
+
         case 'stop':
           console.log('🛑 Media stream stopped');
-          if (streamSid) {
-            callHandler.endCall(streamSid);
-          }
+          if (relay) await relay.cleanup();
           break;
       }
     } catch (error) {
-      console.error('❌ Error processing message:', error);
+      console.error('❌ Error processing WebSocket message:', error);
       errorBuffer.add(error, 'websocket-message');
     }
   });
-  
-  ws.on('close', () => {
-    console.log('🔌 WebSocket connection closed');
-    if (streamSid) {
-      callHandler.endCall(streamSid);
-    }
+
+  ws.on('close', async () => {
+    console.log('🔌 Media stream WebSocket closed');
+    if (relay) await relay.cleanup();
   });
-  
+
   ws.on('error', (error) => {
     console.error('❌ WebSocket error:', error);
     errorBuffer.add(error, 'websocket-connection');
+    if (relay) relay.cleanup();
   });
 });
 
