@@ -29,6 +29,10 @@
 │   ├── custom-info.json   # Manual practice information (address, hours, etc.)
 │   └── website-cache.json # Cached website data
 ├── call-summaries/        # Call summary logs (generated)
+├── deployment/            # Deployment scripts and templates
+│   ├── start.sh          # Server startup script
+│   ├── install-service.sh # Systemd service installer
+│   └── ai-phone-receptionist.service.template # Systemd service template
 ├── docs/                  # User documentation
 │   ├── QUICK-START.md     # Getting started guide
 │   ├── CUSTOMIZATION-GUIDE.md # How to customize prompts

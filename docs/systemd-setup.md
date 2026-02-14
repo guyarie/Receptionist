@@ -5,82 +5,153 @@ This guide explains how to configure the AI Phone Receptionist to start automati
 ## Prerequisites
 
 - Linux system with systemd (Ubuntu, Debian, CentOS, etc.)
-- Node.js installed
+- Node.js and npm installed (see installation steps below)
+- Cloudflare Tunnel installed (for exposing server to Twilio webhooks)
 - Project deployed to a permanent location (e.g., `/opt/ai-phone-receptionist` or `/home/user/ai-phone-receptionist`)
 - `.env` file configured with your credentials
 
-## Step 1: Make the Startup Script Executable
+## Step 0: Install Node.js and Cloudflare Tunnel
 
-Navigate to your project directory and make the startup script executable:
+### Install Node.js 20 LTS (Recommended)
+
+The default `apt install nodejs` often installs an outdated version. Use NodeSource for the latest LTS:
+
+```bash
+# Download and run the NodeSource setup script for Node.js 20 LTS
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
+# Install Node.js and npm
+sudo apt-get install -y nodejs
+
+# Verify installation
+node --version  # Should show v20.x.x
+npm --version   # Should show 10.x.x or higher
+```
+
+**Alternative: Install Node.js 22 (Latest Stable)**
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+**For other Linux distributions:**
+- **RHEL/CentOS/Fedora**: Replace `apt-get` with `yum` or `dnf`
+- **Arch Linux**: `sudo pacman -S nodejs npm`
+
+### Install Cloudflare Tunnel
+
+Cloudflare Tunnel exposes your local server to the internet so Twilio can send webhook requests.
+
+**Option 1: Install via Package Manager (Recommended)**
+
+```bash
+# Add Cloudflare GPG key
+sudo mkdir -p --mode=0755 /usr/share/keyrings
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+
+# Add Cloudflare repository
+echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+
+# Update and install
+sudo apt-get update
+sudo apt-get install cloudflared
+
+# Verify installation
+cloudflared --version
+```
+
+**Option 2: Download Binary Directly**
+
+```bash
+# Download the latest cloudflared binary
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+
+# Make it executable
+chmod +x cloudflared-linux-amd64
+
+# Move to system path
+sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
+
+# Verify installation
+cloudflared --version
+```
+
+**Start Cloudflare Tunnel (for testing)**
+
+```bash
+# Run tunnel pointing to your local server
+cloudflared tunnel --url http://localhost:3000
+```
+
+This will output a public URL (e.g., `https://random-name.trycloudflare.com`) that you can use for Twilio webhooks.
+
+**Note**: For production, consider setting up a named Cloudflare Tunnel with authentication. See [Cloudflare Tunnel documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/) for details.
+
+## Quick Setup (Automated)
+
+The easiest way to set up the systemd service is using the provided installation script:
 
 ```bash
 cd /path/to/ai-phone-receptionist
-chmod +x start.sh
+
+# Make scripts executable
+chmod +x deployment/start.sh deployment/install-service.sh
+
+# Run the installation script
+./deployment/install-service.sh
 ```
 
-## Step 2: Create a Systemd Service File
+The script will:
+- Auto-detect your username and project path
+- Find the Node.js installation path
+- Create the systemd service file with correct paths
+- Install and enable the service
+- Show you the next steps
 
-Create a new service file for systemd:
+After running the script, start the service:
 
 ```bash
+sudo systemctl start ai-phone-receptionist
+```
+
+## Manual Setup (Alternative)
+
+If you prefer to set up manually or need to customize the service:
+
+### Step 1: Make the Startup Script Executable
+
+```bash
+cd /path/to/ai-phone-receptionist
+chmod +x deployment/start.sh
+```
+
+### Step 2: Create Service File from Template
+
+A template service file is provided at `deployment/ai-phone-receptionist.service.template`. Copy and customize it:
+
+```bash
+# Copy the template
+sudo cp deployment/ai-phone-receptionist.service.template /etc/systemd/system/ai-phone-receptionist.service
+
+# Edit the service file
 sudo nano /etc/systemd/system/ai-phone-receptionist.service
 ```
 
-Add the following content (replace `/path/to/ai-phone-receptionist` with your actual project path and `your-username` with your Linux username):
+Replace these placeholders:
+- **YOUR_USERNAME**: Your Linux username (e.g., `ubuntu`, `admin`)
+- **YOUR_PROJECT_PATH**: Full path to project (e.g., `/home/ubuntu/ai-phone-receptionist`)
 
-```ini
-[Unit]
-Description=AI Phone Receptionist
-After=network.target
-
-[Service]
-Type=simple
-User=your-username
-WorkingDirectory=/path/to/ai-phone-receptionist
-ExecStart=/usr/bin/node /path/to/ai-phone-receptionist/src/server.js
-Restart=on-failure
-RestartSec=10
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=ai-phone-receptionist
-
-# Environment variables (optional - if not using .env file)
-# Environment="PORT=3000"
-# Environment="TWILIO_ACCOUNT_SID=your_sid"
-# Environment="TWILIO_AUTH_TOKEN=your_token"
-# Environment="OPENROUTER_API_KEY=your_key"
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### Configuration Notes:
-
-- **User**: Replace `your-username` with the user account that should run the service
-- **WorkingDirectory**: Full path to your project directory
-- **ExecStart**: Full path to node and your server.js file
-- **Restart=on-failure**: Automatically restart if the service crashes
-- **RestartSec=10**: Wait 10 seconds before restarting
-
-## Step 3: Reload Systemd and Enable the Service
-
-Reload systemd to recognize the new service:
+### Step 3: Reload Systemd and Enable the Service
 
 ```bash
+# Reload systemd to recognize the new service
 sudo systemctl daemon-reload
-```
 
-Enable the service to start on boot:
-
-```bash
+# Enable service to start on boot
 sudo systemctl enable ai-phone-receptionist
-```
 
-## Step 4: Start the Service
-
-Start the service immediately:
-
-```bash
+# Start the service
 sudo systemctl start ai-phone-receptionist
 ```
 

@@ -1,0 +1,17 @@
+[Unit]
+Description=AI Phone Receptionist
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=YOUR_PROJECT_PATH
+ExecStart=/usr/bin/node YOUR_PROJECT_PATH/src/server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ai-phone-receptionist
+
+[Install]
+WantedBy=multi-user.target
