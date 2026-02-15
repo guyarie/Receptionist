@@ -55,6 +55,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// IP whitelist middleware for admin routes
+app.use('/admin', (req, res, next) => {
+  const allowedIps = config.server.adminAllowedIps;
+  
+  // If no IPs configured, allow all (log warning)
+  if (allowedIps.length === 0) {
+    console.warn('⚠️  Admin panel accessed without IP restrictions');
+    return next();
+  }
+  
+  // Get client IP (handles proxies/load balancers)
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0].trim() 
+    || req.headers['x-real-ip'] 
+    || req.socket.remoteAddress 
+    || req.connection.remoteAddress;
+  
+  // Check if IP is whitelisted
+  if (allowedIps.includes(clientIp)) {
+    return next();
+  }
+  
+  console.warn(`🚫 Admin access denied from IP: ${clientIp}`);
+  res.status(403).send('Access denied');
+});
+
 // Serve admin static files
 app.use('/admin', express.static('public/admin'));
 

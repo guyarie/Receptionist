@@ -79,41 +79,11 @@ async function generateSummaries(text) {
     }
   });
   
-  const prompt = `You are analyzing the website content for Relational Therapy Collective (RTC), a therapy practice.
-
-Your task is to extract and structure information about the practice and its providers into clean markdown summaries.
-
-Please analyze the following website content and return a JSON object with this structure:
-
-{
-  "practiceOverview": "markdown content for practice overview",
-  "providers": [
-    {
-      "name": "Provider Full Name",
-      "slug": "provider-slug",
-      "content": "markdown content for this provider"
-    }
-  ]
-}
-
-Guidelines:
-- For practiceOverview: Create a markdown document with sections like:
-  - "# Practice Name"
-  - "## About" - Practice description and mission
-  - "## Location" - Full address, city, state, zip code
-  - "## Contact" - Phone number, email, website
-  - "## Hours" - Office hours or note about scheduling
-  - "## Parking" - Parking information and directions
-  - "## Services" - List of services offered
-  - "## Insurance" - Insurance information if available
-- IMPORTANT: Extract the complete physical address, phone number, office hours, and parking details if present on the website
-- For each provider: Create a markdown document with sections like "# Provider Name, Credentials", "## About", "## Specialties", "## Approach", "## Contact"
-- Use the provider's full name with credentials for the heading (e.g., "# Miri Arie, LMFT")
-- Generate a kebab-case slug from the provider name (e.g., "miri-arie")
-- Extract all relevant information including specialties, therapeutic approaches, contact details
-- Format contact info as bullet points
-- Keep the tone professional and warm
-- If information is unclear or missing, omit that section rather than guessing
+  // Load scraping instructions from prompts file
+  const scrapingInstructions = prompts.scrapingInstructions || 
+    'Extract practice and provider information from the website content.';
+  
+  const prompt = `${scrapingInstructions}
 
 Website content:
 ${text}`;

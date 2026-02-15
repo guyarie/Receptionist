@@ -19,7 +19,8 @@ class PromptLoader {
       followUp: 'follow-up.txt',
       closing: 'closing.txt',
       noSpeechDetected: 'no-speech-detected.txt',
-      error: 'error.txt'
+      error: 'error.txt',
+      scrapingInstructions: 'scraping-instructions.txt'
     };
     
     for (const [key, filename] of Object.entries(files)) {
@@ -45,7 +46,8 @@ class PromptLoader {
       followUp: 'Is there anything else?',
       closing: 'Thank you for calling!',
       noSpeechDetected: 'I didn\'t catch that. Could you repeat?',
-      error: 'I apologize for the technical difficulty.'
+      error: 'I apologize for the technical difficulty.',
+      scrapingInstructions: 'Extract practice and provider information from the website content.'
     };
     return defaults[key] || '';
   }
@@ -69,7 +71,8 @@ class PromptLoader {
       followUp: { name: 'Follow-up', filename: 'follow-up.txt' },
       closing: { name: 'Closing', filename: 'closing.txt' },
       noSpeechDetected: { name: 'No Speech Detected', filename: 'no-speech-detected.txt' },
-      error: { name: 'Error', filename: 'error.txt' }
+      error: { name: 'Error', filename: 'error.txt' },
+      scrapingInstructions: { name: 'Scraping Instructions', filename: 'scraping-instructions.txt' }
     };
     
     return Object.entries(promptMap).map(([key, meta]) => ({
@@ -112,6 +115,7 @@ class PromptLoader {
   get closing() { return this.cache.closing; }
   get noSpeechDetected() { return this.cache.noSpeechDetected; }
   get error() { return this.cache.error; }
+  get scrapingInstructions() { return this.cache.scrapingInstructions; }
 }
 
 module.exports = new PromptLoader();

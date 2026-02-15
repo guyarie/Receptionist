@@ -37,7 +37,10 @@ const config = {
   server: {
     port: parseInt(process.env.PORT || '3000', 10),
     sslCert: process.env.SSL_CERT_PATH || null,
-    sslKey: process.env.SSL_KEY_PATH || null
+    sslKey: process.env.SSL_KEY_PATH || null,
+    adminAllowedIps: process.env.ADMIN_ALLOWED_IPS 
+      ? process.env.ADMIN_ALLOWED_IPS.split(',').map(ip => ip.trim()).filter(ip => ip)
+      : []
   }
 };
 
