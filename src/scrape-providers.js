@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
 const OpenAI = require('openai');
+const prompts = require('./prompts');
 require('dotenv').config();
 
 // Configuration
