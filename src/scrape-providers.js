@@ -7,7 +7,7 @@ const OpenAI = require('openai');
 require('dotenv').config();
 
 // Configuration
-const WEBSITE_URL = 'https://www.relationaltherapycollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'https://www.relationaltherapycollective.com';
 const PROVIDERS_DIR = path.join(__dirname, '..', 'data', 'providers');
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openai/gpt-4';
@@ -97,7 +97,16 @@ Please analyze the following website content and return a JSON object with this 
 }
 
 Guidelines:
-- For practiceOverview: Create a markdown document with sections like "# Practice Name", "## About", "## Location", "## Services", "## Insurance"
+- For practiceOverview: Create a markdown document with sections like:
+  - "# Practice Name"
+  - "## About" - Practice description and mission
+  - "## Location" - Full address, city, state, zip code
+  - "## Contact" - Phone number, email, website
+  - "## Hours" - Office hours or note about scheduling
+  - "## Parking" - Parking information and directions
+  - "## Services" - List of services offered
+  - "## Insurance" - Insurance information if available
+- IMPORTANT: Extract the complete physical address, phone number, office hours, and parking details if present on the website
 - For each provider: Create a markdown document with sections like "# Provider Name, Credentials", "## About", "## Specialties", "## Approach", "## Contact"
 - Use the provider's full name with credentials for the heading (e.g., "# Miri Arie, LMFT")
 - Generate a kebab-case slug from the provider name (e.g., "miri-arie")
@@ -110,6 +119,12 @@ Website content:
 ${text}`;
 
   try {
+    // Start a progress indicator
+    console.log(`⏳ Waiting for AI response (this may take 30-60 seconds)...`);
+    const progressInterval = setInterval(() => {
+      process.stdout.write('.');
+    }, 2000);
+    
     const response = await client.chat.completions.create({
       model: OPENROUTER_MODEL,
       messages: [
@@ -119,18 +134,34 @@ ${text}`;
         }
       ],
       temperature: 0.3,  // Lower temperature for more consistent extraction
-      max_tokens: 4000
+      max_tokens: 8000   // Increased to handle large responses
     });
+    
+    clearInterval(progressInterval);
+    process.stdout.write('\n');
     
     const content = response.choices[0].message.content;
     console.log(`✅ Received response from OpenRouter`);
     
-    // Parse JSON from response
-    // The AI might wrap JSON in markdown code blocks, so handle that
-    let jsonText = content;
-    const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
-    if (jsonMatch) {
-      jsonText = jsonMatch[1];
+    // Parse JSON from response - handle various formats the AI might return
+    let jsonText = content.trim();
+    
+    // Try to extract JSON from markdown code blocks: ```json\n{...}\n```
+    const codeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (codeBlockMatch) {
+      jsonText = codeBlockMatch[1].trim();
+    } else {
+      // No code block, might have backticks or "json" prefix directly
+      // Remove leading backticks
+      jsonText = jsonText.replace(/^`+/, '').trim();
+      
+      // Remove "json" prefix if present (case insensitive) - only if not in code block
+      if (jsonText.toLowerCase().startsWith('json')) {
+        jsonText = jsonText.substring(4).trim();
+      }
+      
+      // Remove trailing backticks
+      jsonText = jsonText.replace(/`+$/, '').trim();
     }
     
     const summaries = JSON.parse(jsonText);
@@ -147,6 +178,13 @@ ${text}`;
     console.error(`❌ Failed to generate summaries: ${error.message}`);
     if (error.response) {
       console.error(`   API response: ${JSON.stringify(error.response.data)}`);
+    }
+    // If JSON parse error, show the problematic content
+    if (error instanceof SyntaxError && jsonText) {
+      console.error(`\n📋 Problematic JSON (first 500 chars):`);
+      console.error(jsonText.substring(0, 500));
+      console.error(`\n📋 Problematic JSON (last 500 chars):`);
+      console.error(jsonText.substring(Math.max(0, jsonText.length - 500)));
     }
     process.exit(1);
   }

@@ -8,7 +8,6 @@ const config = require('./config');
 const callHandler = require('./call-handler');
 const prompts = require('./prompts');
 const aiClient = require('./ai-client');
-const WebsiteScraper = require('./website-scraper');
 const providerLoader = require('./provider-loader');
 const availabilityLoader = require('./availability-loader');
 const errorBuffer = require('./error-buffer');
@@ -27,9 +26,6 @@ if (realtimeAvailable) {
 } else {
   console.log('⚠️ OPENAI_API_KEY not set — real-time voice streaming unavailable, using Gather fallback');
 }
-
-// Initialize website scraper
-const websiteScraper = new WebsiteScraper('https://www.rtcbellevue.com/');
 
 // Middleware
 app.use(express.json());
@@ -144,25 +140,6 @@ app.post('/reload-prompts', (req, res) => {
     res.json({ success: true, message: 'Prompts reloaded successfully!' });
   } catch (error) {
     errorBuffer.add(error, 'reload-prompts');
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// View website data endpoint
-app.get('/website-data', (req, res) => {
-  const data = websiteScraper.getData();
-  res.json(data);
-});
-
-// Refresh website data endpoint
-app.post('/refresh-website', async (req, res) => {
-  try {
-    await websiteScraper.scrape();
-    const websiteContext = websiteScraper.getAIContext();
-    aiClient.setWebsiteContext(websiteContext);
-    res.json({ success: true, message: 'Website data refreshed successfully!' });
-  } catch (error) {
-    errorBuffer.add(error, 'refresh-website');
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -426,20 +403,6 @@ app.post('/admin/api/reload', (req, res) => {
   } catch (error) {
     errorBuffer.add(error, 'admin-reload-api');
     res.status(500).json({ error: 'Failed to reload data', details: error.message });
-  }
-});
-
-// Admin refresh website endpoint - re-scrape website data
-app.post('/admin/api/refresh-website', async (req, res) => {
-  try {
-    await websiteScraper.scrape();
-    const websiteContext = websiteScraper.getAIContext();
-    aiClient.setWebsiteContext(websiteContext);
-    
-    res.json({ success: true, message: 'Website data refreshed successfully' });
-  } catch (error) {
-    errorBuffer.add(error, 'admin-refresh-website-api');
-    res.status(500).json({ error: 'Failed to refresh website data', details: error.message });
   }
 });
 
