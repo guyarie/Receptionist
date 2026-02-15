@@ -2,52 +2,52 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * AvailabilityLoader manages provider availability markdown files.
+ * ProviderLoader manages provider profile markdown files.
  * Loads all .md files from a directory and provides them to the AI context.
  */
-class AvailabilityLoader {
-  constructor(availabilityDir = null) {
-    this.availabilityDir = availabilityDir || path.join(__dirname, '..', 'data', 'availability');
+class ProviderLoader {
+  constructor(providerDir = null) {
+    this.providerDir = providerDir || path.join(__dirname, '..', 'data', 'providers');
     this.files = new Map(); // Map<filename, content>
   }
 
   /**
-   * Ensures the availability directory exists, creates it if missing
+   * Ensures the provider directory exists, creates it if missing
    */
   ensureDirectory() {
-    if (!fs.existsSync(this.availabilityDir)) {
-      fs.mkdirSync(this.availabilityDir, { recursive: true });
-      console.log(`📁 Created availability directory: ${this.availabilityDir}`);
+    if (!fs.existsSync(this.providerDir)) {
+      fs.mkdirSync(this.providerDir, { recursive: true });
+      console.log(`📁 Created provider directory: ${this.providerDir}`);
     }
   }
 
   /**
-   * Loads all .md files from the availability directory into memory
+   * Loads all .md files from the provider directory into memory
    */
   loadAll() {
     this.ensureDirectory();
     
     try {
-      const files = fs.readdirSync(this.availabilityDir);
+      const files = fs.readdirSync(this.providerDir);
       const mdFiles = files.filter(file => file.endsWith('.md'));
       
       this.files.clear();
       
       for (const filename of mdFiles) {
-        const filePath = path.join(this.availabilityDir, filename);
+        const filePath = path.join(this.providerDir, filename);
         const content = fs.readFileSync(filePath, 'utf-8');
         this.files.set(filename, content);
       }
       
-      console.log(`📋 Loaded ${this.files.size} availability file(s)`);
+      console.log(`📋 Loaded ${this.files.size} provider profile(s)`);
     } catch (error) {
-      console.error('❌ Error loading availability files:', error.message);
+      console.error('❌ Error loading provider files:', error.message);
       throw error;
     }
   }
 
   /**
-   * Returns all availability files as a map
+   * Returns all provider files as a map
    * @returns {Object} Map of filename to content
    */
   getAll() {
@@ -59,7 +59,7 @@ class AvailabilityLoader {
   }
 
   /**
-   * Returns combined availability content as a single string for AI context
+   * Returns combined provider content as a single string for AI context
    * @returns {string} Combined markdown content
    */
   getAIContext() {
@@ -93,12 +93,12 @@ class AvailabilityLoader {
     this.ensureDirectory();
     
     try {
-      const filePath = path.join(this.availabilityDir, filename);
+      const filePath = path.join(this.providerDir, filename);
       fs.writeFileSync(filePath, content, 'utf-8');
       this.files.set(filename, content);
-      console.log(`💾 Saved availability file: ${filename}`);
+      console.log(`💾 Saved provider file: ${filename}`);
     } catch (error) {
-      console.error(`❌ Error saving availability file ${filename}:`, error.message);
+      console.error(`❌ Error saving provider file ${filename}:`, error.message);
       throw error;
     }
   }
@@ -107,11 +107,11 @@ class AvailabilityLoader {
    * Reloads all files from disk
    */
   reload() {
-    console.log('🔄 Reloading availability files...');
+    console.log('🔄 Reloading provider files...');
     this.loadAll();
   }
 }
 
 // Export singleton instance
-const availabilityLoader = new AvailabilityLoader();
-module.exports = availabilityLoader;
+const providerLoader = new ProviderLoader();
+module.exports = providerLoader;

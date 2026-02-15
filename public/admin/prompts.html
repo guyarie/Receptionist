@@ -31,46 +31,46 @@
 
   <script src="admin.js"></script>
   <script>
-    const { apiFetch, Toast, renderNav, escapeHtml, showError } = window.AdminUI;
+    const UI = window.AdminUI;
 
     // Set active nav
-    renderNav('prompts.html');
+    UI.renderNav('prompts.html');
 
     // Load prompts
     async function loadPrompts() {
       const container = document.getElementById('promptsContainer');
       
       try {
-        const data = await apiFetch('/admin/api/prompts');
+        const data = await UI.apiFetch('/admin/api/prompts');
         
         if (!data.prompts || data.prompts.length === 0) {
-          showError(container, 'No prompts found');
+          UI.showError(container, 'No prompts found');
           return;
         }
 
         container.innerHTML = data.prompts.map(prompt => `
           <div class="form-group">
-            <label for="prompt-${escapeHtml(prompt.filename)}">
-              ${escapeHtml(prompt.name)}
-              <span class="text-muted" style="font-weight: normal; font-size: 0.875rem;">(${escapeHtml(prompt.filename)})</span>
+            <label for="prompt-${UI.escapeHtml(prompt.filename)}">
+              ${UI.escapeHtml(prompt.name)}
+              <span class="text-muted" style="font-weight: normal; font-size: 0.875rem;">(${UI.escapeHtml(prompt.filename)})</span>
             </label>
             <textarea 
-              id="prompt-${escapeHtml(prompt.filename)}" 
-              data-filename="${escapeHtml(prompt.filename)}"
+              id="prompt-${UI.escapeHtml(prompt.filename)}" 
+              data-filename="${UI.escapeHtml(prompt.filename)}"
               rows="8"
-            >${escapeHtml(prompt.content)}</textarea>
+            >${UI.escapeHtml(prompt.content)}</textarea>
             <button 
-              onclick="savePrompt('${escapeHtml(prompt.filename)}')" 
+              onclick="savePrompt('${UI.escapeHtml(prompt.filename)}')" 
               class="btn-success"
-              id="save-${escapeHtml(prompt.filename)}"
+              id="save-${UI.escapeHtml(prompt.filename)}"
             >
-              💾 Save ${escapeHtml(prompt.name)}
+              💾 Save ${UI.escapeHtml(prompt.name)}
             </button>
           </div>
         `).join('');
       } catch (error) {
-        showError(container, 'Failed to load prompts: ' + error.message);
-        Toast.error('Failed to load prompts: ' + error.message);
+        UI.showError(container, 'Failed to load prompts: ' + error.message);
+        UI.Toast.error('Failed to load prompts: ' + error.message);
       }
     }
 
@@ -82,7 +82,7 @@
 
       // Validate content
       if (!content || content.trim().length === 0) {
-        Toast.error('Prompt content cannot be empty or whitespace only');
+        UI.Toast.error('Prompt content cannot be empty or whitespace only');
         return;
       }
 
@@ -91,13 +91,13 @@
       btn.textContent = '⏳ Saving...';
 
       try {
-        await apiFetch(`/admin/api/prompts/${filename}`, {
+        await UI.apiFetch(`/admin/api/prompts/${filename}`, {
           method: 'PUT',
           body: JSON.stringify({ content })
         });
-        Toast.success(`Prompt "${filename}" saved successfully`);
+        UI.Toast.success(`Prompt "${filename}" saved successfully`);
       } catch (error) {
-        Toast.error('Save failed: ' + error.message);
+        UI.Toast.error('Save failed: ' + error.message);
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;

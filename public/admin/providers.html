@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Availability Editor - AI Phone Receptionist</title>
+  <title>Provider Profiles - AI Phone Receptionist</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
   <header>
     <div class="container">
-      <h1>📅 Provider Availability</h1>
+      <h1>👥 Provider Profiles</h1>
     </div>
   </header>
 
@@ -21,24 +21,24 @@
 
   <div class="container">
     <div class="card">
-      <h2>Manage Provider Availability</h2>
-      <p class="text-muted mb-2">Edit provider availability markdown files. These are included in the AI context during calls.</p>
+      <h2>Manage Provider Profiles</h2>
+      <p class="text-muted mb-2">Edit provider profile markdown files. These are included in the AI context during calls.</p>
       
       <div class="btn-group mb-2">
-        <button onclick="showNewFileForm()" class="btn-success">➕ New Availability File</button>
-        <button onclick="reloadAvailability()" id="reloadBtn">🔄 Reload from Disk</button>
+        <button onclick="showNewFileForm()" class="btn-success">➕ New Provider Profile</button>
+        <button onclick="reloadProviders()" id="reloadBtn">🔄 Reload from Disk</button>
       </div>
 
       <!-- New file form (hidden by default) -->
       <div id="newFileForm" class="hidden" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
-        <h3>Create New Availability File</h3>
+        <h3>Create New Provider Profile</h3>
         <div class="form-group">
           <label for="newFilename">Filename (e.g., dr-smith.md)</label>
           <input type="text" id="newFilename" placeholder="provider-name.md">
         </div>
         <div class="form-group">
           <label for="newContent">Content</label>
-          <textarea id="newContent" rows="8" placeholder="# Dr. Smith's Availability&#10;&#10;Available Monday-Friday 9am-5pm"></textarea>
+          <textarea id="newContent" rows="8" placeholder="# Dr. Smith, PhD&#10;&#10;## About&#10;Brief bio and background."></textarea>
         </div>
         <div class="btn-group">
           <button onclick="createNewFile()" class="btn-success">Create File</button>
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <div id="availabilityContainer">
+      <div id="providersContainer">
         <div class="spinner"></div>
       </div>
     </div>
@@ -57,32 +57,32 @@
     const UI = window.AdminUI;
 
     // Set active nav
-    UI.renderNav('availability.html');
+    UI.renderNav('providers.html');
 
-    // Load availability files
-    async function loadAvailability() {
-      const container = document.getElementById('availabilityContainer');
+    // Load provider profile files
+    async function loadProviders() {
+      const container = document.getElementById('providersContainer');
       
       try {
-        const data = await UI.apiFetch('/admin/api/availability');
+        const data = await UI.apiFetch('/admin/api/providers');
         
         if (!data.files || data.files.length === 0) {
-          container.innerHTML = '<p class="text-muted text-center">No availability files found. Create one to get started.</p>';
+          container.innerHTML = '<p class="text-muted text-center">No provider profile files found. Create one to get started.</p>';
           return;
         }
 
         container.innerHTML = data.files.map(file => `
           <div class="form-group">
-            <label for="avail-${UI.escapeHtml(file.filename)}">
+            <label for="provider-${UI.escapeHtml(file.filename)}">
               ${UI.escapeHtml(file.filename)}
             </label>
             <textarea 
-              id="avail-${UI.escapeHtml(file.filename)}" 
+              id="provider-${UI.escapeHtml(file.filename)}" 
               data-filename="${UI.escapeHtml(file.filename)}"
               rows="10"
             >${UI.escapeHtml(file.content)}</textarea>
             <button 
-              onclick="saveAvailability('${UI.escapeHtml(file.filename)}')" 
+              onclick="saveProvider('${UI.escapeHtml(file.filename)}')" 
               class="btn-success"
               id="save-${UI.escapeHtml(file.filename)}"
             >
@@ -91,13 +91,13 @@
           </div>
         `).join('');
       } catch (error) {
-        UI.showError(container, 'Failed to load availability files: ' + error.message);
-        UI.Toast.error('Failed to load availability files: ' + error.message);
+        UI.showError(container, 'Failed to load provider profiles: ' + error.message);
+        UI.Toast.error('Failed to load provider profiles: ' + error.message);
       }
     }
 
-    // Save availability file
-    async function saveAvailability(filename) {
+    // Save provider profile file
+    async function saveProvider(filename) {
       const textarea = document.querySelector(`textarea[data-filename="${filename}"]`);
       const btn = document.getElementById(`save-${filename}`);
       const content = textarea.value;
@@ -107,11 +107,11 @@
       btn.textContent = '⏳ Saving...';
 
       try {
-        await UI.apiFetch(`/admin/api/availability/${filename}`, {
+        await UI.apiFetch(`/admin/api/providers/${filename}`, {
           method: 'PUT',
           body: JSON.stringify({ content })
         });
-        UI.Toast.success(`Availability file "${filename}" saved successfully`);
+        UI.Toast.success(`Provider profile "${filename}" saved successfully`);
       } catch (error) {
         UI.Toast.error('Save failed: ' + error.message);
       } finally {
@@ -120,16 +120,16 @@
       }
     }
 
-    // Reload availability from disk
-    async function reloadAvailability() {
+    // Reload provider profiles from disk
+    async function reloadProviders() {
       const btn = document.getElementById('reloadBtn');
       btn.disabled = true;
       btn.textContent = '⏳ Reloading...';
 
       try {
-        await UI.apiFetch('/admin/api/reload', { method: 'POST' });
-        UI.Toast.success('Availability data reloaded from disk');
-        await loadAvailability();
+        await UI.apiFetch('/admin/api/refresh-providers', { method: 'POST' });
+        UI.Toast.success('Provider profiles reloaded from disk');
+        await loadProviders();
       } catch (error) {
         UI.Toast.error('Reload failed: ' + error.message);
       } finally {
@@ -151,7 +151,7 @@
       document.getElementById('newContent').value = '';
     }
 
-    // Create new availability file
+    // Create new provider profile file
     async function createNewFile() {
       const filename = document.getElementById('newFilename').value.trim();
       const content = document.getElementById('newContent').value;
@@ -173,27 +173,27 @@
       }
 
       try {
-        await UI.apiFetch(`/admin/api/availability/${filename}`, {
+        await UI.apiFetch(`/admin/api/providers/${filename}`, {
           method: 'PUT',
           body: JSON.stringify({ content })
         });
         UI.Toast.success(`File "${filename}" created successfully`);
         hideNewFileForm();
-        await loadAvailability();
+        await loadProviders();
       } catch (error) {
         UI.Toast.error('Create failed: ' + error.message);
       }
     }
 
     // Make functions available globally
-    window.saveAvailability = saveAvailability;
-    window.reloadAvailability = reloadAvailability;
+    window.saveProvider = saveProvider;
+    window.reloadProviders = reloadProviders;
     window.showNewFileForm = showNewFileForm;
     window.hideNewFileForm = hideNewFileForm;
     window.createNewFile = createNewFile;
 
-    // Load availability on page load
-    loadAvailability();
+    // Load provider profiles on page load
+    loadProviders();
   </script>
 </body>
 </html>

@@ -55,6 +55,30 @@ npm install
 
 **Available voices for realtime streaming**: `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`
 
+### Step 2.5: Setup Data Folder
+
+The `data/` folder contains practice-specific information and is not included in git. You need to set it up:
+
+```bash
+# Create data folder structure
+mkdir data\practice data\providers data\availability
+
+# Copy and customize practice info template
+copy examples\data\custom-info.json data\practice\custom-info.json
+```
+
+Edit `data/practice/custom-info.json` with your practice's actual address, hours, and parking information.
+
+Then generate provider profiles by scraping your website:
+
+```bash
+npm run scrape-providers
+```
+
+This will create markdown files in `data/providers/` with AI-generated summaries of your practice and providers.
+
+See `examples/data/README.md` for more details on the data folder structure.
+
 ### Step 3: Test AI Integration (Optional)
 
 Before setting up the phone system, test that your OpenRouter API key works:

@@ -31,10 +31,10 @@
 
   <script src="admin.js"></script>
   <script>
-    const { apiFetch, Toast, renderNav, formatTimestamp, escapeHtml, showError } = window.AdminUI;
+    const UI = window.AdminUI;
 
     // Set active nav
-    renderNav('calls.html');
+    UI.renderNav('calls.html');
 
     let currentPage = 1;
     const pageSize = 20;
@@ -45,10 +45,10 @@
       container.innerHTML = '<div class="spinner"></div>';
       
       try {
-        const data = await apiFetch(`/admin/api/calls?page=${page}&limit=${pageSize}`);
+        const data = await UI.apiFetch(`/admin/api/calls?page=${page}&limit=${pageSize}`);
         
         if (!data.calls || data.calls.length === 0) {
-          showError(container, 'No call logs found');
+          UI.showError(container, 'No call logs found');
           document.getElementById('pagination').innerHTML = '';
           return;
         }
@@ -70,23 +70,23 @@
             <tbody>
               ${data.calls.map(call => `
                 <tr>
-                  <td>${formatTimestamp(call.startTime)}</td>
-                  <td>${escapeHtml(call.callerPhone)}</td>
-                  <td>${escapeHtml(call.duration)}</td>
+                  <td>${UI.formatTimestamp(call.startTime)}</td>
+                  <td>${UI.escapeHtml(call.callerPhone)}</td>
+                  <td>${UI.escapeHtml(call.duration)}</td>
                   <td>
                     <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                      ${escapeHtml(call.summary || 'No summary available')}
+                      ${UI.escapeHtml(call.summary || 'No summary available')}
                     </div>
                   </td>
                   <td>
-                    <span class="expand-toggle" onclick="toggleTranscript('${escapeHtml(call.id)}')">
+                    <span class="expand-toggle" onclick="toggleTranscript('${UI.escapeHtml(call.id)}')">
                       View Details
                     </span>
                   </td>
                 </tr>
-                <tr id="transcript-${escapeHtml(call.id)}" class="hidden">
+                <tr id="transcript-${UI.escapeHtml(call.id)}" class="hidden">
                   <td colspan="5">
-                    <div class="expandable" id="content-${escapeHtml(call.id)}">
+                    <div class="expandable" id="content-${UI.escapeHtml(call.id)}">
                       <div class="spinner"></div>
                     </div>
                   </td>
@@ -99,8 +99,8 @@
         // Render pagination
         renderPagination(data.page, data.totalPages);
       } catch (error) {
-        showError(container, 'Failed to load call logs: ' + error.message);
-        Toast.error('Failed to load call logs: ' + error.message);
+        UI.showError(container, 'Failed to load call logs: ' + error.message);
+        UI.Toast.error('Failed to load call logs: ' + error.message);
       }
     }
 
@@ -116,26 +116,26 @@
         // Load full call details if not already loaded
         if (content.innerHTML.includes('spinner')) {
           try {
-            const call = await apiFetch(`/admin/api/calls/${callId}`);
+            const call = await UI.apiFetch(`/admin/api/calls/${callId}`);
             content.innerHTML = `
               <h3>Call Details</h3>
-              <p><strong>Call SID:</strong> ${escapeHtml(call.callSid)}</p>
-              <p><strong>Caller:</strong> ${escapeHtml(call.callerPhone)}</p>
-              <p><strong>Twilio Number:</strong> ${escapeHtml(call.twilioNumber || 'N/A')}</p>
-              <p><strong>Start Time:</strong> ${formatTimestamp(call.startTime)}</p>
-              <p><strong>End Time:</strong> ${formatTimestamp(call.endTime)}</p>
-              <p><strong>Duration:</strong> ${escapeHtml(call.duration)}</p>
+              <p><strong>Call SID:</strong> ${UI.escapeHtml(call.callSid)}</p>
+              <p><strong>Caller:</strong> ${UI.escapeHtml(call.callerPhone)}</p>
+              <p><strong>Twilio Number:</strong> ${UI.escapeHtml(call.twilioNumber || 'N/A')}</p>
+              <p><strong>Start Time:</strong> ${UI.formatTimestamp(call.startTime)}</p>
+              <p><strong>End Time:</strong> ${UI.formatTimestamp(call.endTime)}</p>
+              <p><strong>Duration:</strong> ${UI.escapeHtml(call.duration)}</p>
               
               <h3 style="margin-top: 1rem;">Summary</h3>
-              <p>${escapeHtml(call.summary || 'No summary available')}</p>
+              <p>${UI.escapeHtml(call.summary || 'No summary available')}</p>
               
               <h3 style="margin-top: 1rem;">Full Transcript</h3>
               <div style="background: white; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto;">
                 ${call.fullTranscript && call.fullTranscript.length > 0 
                   ? call.fullTranscript.map(msg => `
                       <p style="margin-bottom: 0.5rem;">
-                        <strong>${escapeHtml(msg.role === 'user' ? 'Caller' : 'AI')}:</strong> 
-                        ${escapeHtml(msg.content)}
+                        <strong>${UI.escapeHtml(msg.role === 'user' ? 'Caller' : 'AI')}:</strong> 
+                        ${UI.escapeHtml(msg.content)}
                       </p>
                     `).join('')
                   : '<p class="text-muted">No transcript available</p>'
@@ -143,7 +143,7 @@
               </div>
             `;
           } catch (error) {
-            content.innerHTML = `<p class="text-muted">Failed to load call details: ${escapeHtml(error.message)}</p>`;
+            content.innerHTML = `<p class="text-muted">Failed to load call details: ${UI.escapeHtml(error.message)}</p>`;
           }
         }
       } else {

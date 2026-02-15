@@ -67,18 +67,18 @@
 
   <script src="admin.js"></script>
   <script>
-    const { apiFetch, Toast, renderNav, formatUptime, formatTimestamp, escapeHtml } = window.AdminUI;
+    const UI = window.AdminUI;
 
     // Set active nav
-    renderNav('index.html');
+    UI.renderNav('index.html');
 
     // Load dashboard data
     async function loadDashboard() {
       try {
-        const data = await apiFetch('/admin/api/status');
+        const data = await UI.apiFetch('/admin/api/status');
         
         // Update stats
-        document.getElementById('uptime').textContent = formatUptime(data.uptime);
+        document.getElementById('uptime').textContent = UI.formatUptime(data.uptime);
         document.getElementById('activeCalls').textContent = data.activeCalls || 0;
         document.getElementById('model').textContent = data.model || 'Unknown';
         document.getElementById('phone').textContent = data.phoneNumber || 'Not configured';
@@ -90,16 +90,16 @@
         if (data.recentErrors && data.recentErrors.length > 0) {
           errorList.innerHTML = data.recentErrors.map(err => `
             <li class="error-item">
-              <div class="error-time">${formatTimestamp(err.timestamp)}</div>
-              <div class="error-message">${escapeHtml(err.message)}</div>
-              ${err.context ? `<div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Context: ${escapeHtml(err.context)}</div>` : ''}
+              <div class="error-time">${UI.formatTimestamp(err.timestamp)}</div>
+              <div class="error-message">${UI.escapeHtml(err.message)}</div>
+              ${err.context ? `<div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Context: ${UI.escapeHtml(err.context)}</div>` : ''}
             </li>
           `).join('');
         } else {
           errorList.innerHTML = '<li class="text-muted text-center">No recent errors</li>';
         }
       } catch (error) {
-        Toast.error('Failed to load dashboard: ' + error.message);
+        UI.Toast.error('Failed to load dashboard: ' + error.message);
       }
     }
 
@@ -110,11 +110,11 @@
       btn.textContent = '⏳ Reloading...';
 
       try {
-        await apiFetch('/admin/api/reload', { method: 'POST' });
-        Toast.success('All data reloaded successfully');
+        await UI.apiFetch('/admin/api/reload', { method: 'POST' });
+        UI.Toast.success('All data reloaded successfully');
         await loadDashboard();
       } catch (error) {
-        Toast.error('Reload failed: ' + error.message);
+        UI.Toast.error('Reload failed: ' + error.message);
       } finally {
         btn.disabled = false;
         btn.textContent = '🔄 Reload All';
@@ -128,10 +128,10 @@
       btn.textContent = '⏳ Refreshing...';
 
       try {
-        await apiFetch('/admin/api/refresh-website', { method: 'POST' });
-        Toast.success('Website data refreshed successfully');
+        await UI.apiFetch('/admin/api/refresh-website', { method: 'POST' });
+        UI.Toast.success('Website data refreshed successfully');
       } catch (error) {
-        Toast.error('Refresh failed: ' + error.message);
+        UI.Toast.error('Refresh failed: ' + error.message);
       } finally {
         btn.disabled = false;
         btn.textContent = '🌐 Refresh Website Data';

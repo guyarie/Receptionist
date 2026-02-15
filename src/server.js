@@ -9,6 +9,7 @@ const callHandler = require('./call-handler');
 const prompts = require('./prompts');
 const aiClient = require('./ai-client');
 const WebsiteScraper = require('./website-scraper');
+const providerLoader = require('./provider-loader');
 const availabilityLoader = require('./availability-loader');
 const errorBuffer = require('./error-buffer');
 const { createProviderAdapter } = require('./realtime/provider-factory');
@@ -182,16 +183,42 @@ app.get('/admin/api/status', (req, res) => {
     const activeCalls = callHandler.getActiveCallCount ? callHandler.getActiveCallCount() : 0;
     const recentErrors = errorBuffer.getAll().slice(0, 10); // Last 10 errors
     
+    // Get prompts count
+    let promptCount = 0;
+    try {
+      promptCount = prompts.getAll().length;
+    } catch (err) {
+      console.error('Error getting prompts:', err);
+    }
+    
+    // Get availability count
+    let availabilityCount = 0;
+    try {
+      availabilityCount = Object.keys(availabilityLoader.getAll()).length;
+    } catch (err) {
+      console.error('Error getting availability:', err);
+    }
+    
+    // Get provider count
+    let providerCount = 0;
+    try {
+      providerCount = Object.keys(providerLoader.getAll()).length;
+    } catch (err) {
+      console.error('Error getting providers:', err);
+    }
+    
     res.json({
       uptime: Math.round(uptime),
       activeCalls: activeCalls,
       model: config.openRouter.model,
       phoneNumber: config.twilio.phoneNumber,
       recentErrors: recentErrors,
-      promptCount: prompts.getAll().length,
-      availabilityCount: Object.keys(availabilityLoader.getAll()).length
+      promptCount: promptCount,
+      availabilityCount: availabilityCount,
+      providerCount: providerCount
     });
   } catch (error) {
+    console.error('❌ Admin status API error:', error);
     errorBuffer.add(error, 'admin-status-api');
     res.status(500).json({ error: 'Failed to retrieve status', details: error.message });
   }
@@ -311,7 +338,69 @@ app.put('/admin/api/availability/:filename', (req, res) => {
   }
 });
 
-// Admin reload endpoint - reload prompts and availability
+// Admin provider profiles list endpoint
+app.get('/admin/api/providers', (req, res) => {
+  try {
+    const filesMap = providerLoader.getAll();
+    const files = Object.entries(filesMap).map(([filename, content]) => ({
+      filename,
+      content
+    }));
+    
+    res.json({ files });
+  } catch (error) {
+    errorBuffer.add(error, 'admin-providers-list-api');
+    res.status(500).json({ error: 'Failed to retrieve provider files', details: error.message });
+  }
+});
+
+// Admin provider profile save endpoint
+app.put('/admin/api/providers/:filename', (req, res) => {
+  try {
+    const { filename } = req.params;
+    const { content } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ error: 'Content is required' });
+    }
+    
+    // Ensure filename ends with .md
+    const sanitizedFilename = filename.endsWith('.md') ? filename : `${filename}.md`;
+    
+    // Save provider file
+    providerLoader.saveFile(sanitizedFilename, content);
+    
+    // Update AI context with new provider data
+    const providerContext = providerLoader.getAIContext();
+    aiClient.setWebsiteContext(providerContext);
+    
+    res.json({ success: true, message: `Provider file ${sanitizedFilename} saved successfully` });
+  } catch (error) {
+    errorBuffer.add(error, 'admin-provider-save-api');
+    res.status(500).json({ error: 'Failed to save provider file', details: error.message });
+  }
+});
+
+// Admin refresh providers endpoint - reload from disk
+app.post('/admin/api/refresh-providers', (req, res) => {
+  try {
+    // Reload provider profiles
+    providerLoader.reload();
+    const providerContext = providerLoader.getAIContext();
+    aiClient.setWebsiteContext(providerContext);
+    
+    res.json({ 
+      success: true, 
+      message: 'Provider profiles reloaded successfully',
+      providerCount: Object.keys(providerLoader.getAll()).length
+    });
+  } catch (error) {
+    errorBuffer.add(error, 'admin-refresh-providers-api');
+    res.status(500).json({ error: 'Failed to reload provider profiles', details: error.message });
+  }
+});
+
+// Admin reload endpoint - reload prompts, availability, and provider profiles
 app.post('/admin/api/reload', (req, res) => {
   try {
     // Reload prompts
@@ -322,11 +411,17 @@ app.post('/admin/api/reload', (req, res) => {
     const availabilityContext = availabilityLoader.getAIContext();
     aiClient.setAvailabilityContext(availabilityContext);
     
+    // Reload provider profiles
+    providerLoader.reload();
+    const websiteContext = providerLoader.getAIContext();
+    aiClient.setWebsiteContext(websiteContext);
+    
     res.json({ 
       success: true, 
-      message: 'Prompts and availability reloaded successfully',
+      message: 'Prompts, availability, and provider profiles reloaded successfully',
       promptCount: prompts.getAll().length,
-      availabilityCount: Object.keys(availabilityLoader.getAll()).length
+      availabilityCount: Object.keys(availabilityLoader.getAll()).length,
+      providerCount: Object.keys(providerLoader.getAll()).length
     });
   } catch (error) {
     errorBuffer.add(error, 'admin-reload-api');
@@ -577,7 +672,7 @@ wss.on('connection', (ws) => {
           
           await relay.initialize({
             systemPrompt: prompts.systemPrompt,
-            websiteContext: websiteScraper.getAIContext(),
+            websiteContext: providerLoader.getAIContext(),
             availabilityContext: availabilityLoader.getAIContext(),
             greeting: prompts.greeting
           });
@@ -613,18 +708,18 @@ wss.on('connection', (ws) => {
 // Start server
 const PORT = config.server.port;
 
-// Scrape website and load availability before starting server
+// Load provider profiles and availability before starting server
 (async () => {
   try {
+    // Load provider profiles
+    providerLoader.loadAll();
+    const providerContext = providerLoader.getAIContext();
+    aiClient.setWebsiteContext(providerContext);
+    
     // Load availability files
     availabilityLoader.loadAll();
     const availabilityContext = availabilityLoader.getAIContext();
     aiClient.setAvailabilityContext(availabilityContext);
-    
-    // Scrape website
-    await websiteScraper.scrape();
-    const websiteContext = websiteScraper.getAIContext();
-    aiClient.setWebsiteContext(websiteContext);
     
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
@@ -633,7 +728,7 @@ const PORT = config.server.port;
       console.log(`\n✅ Configuration loaded:`);
       console.log(`   - Twilio Account: ${config.twilio.accountSid.substring(0, 10)}...`);
       console.log(`   - OpenRouter Model: ${config.openRouter.model}`);
-      console.log(`   - Website: https://www.rtcbellevue.com/`);
+      console.log(`   - Provider Profiles: ${Object.keys(providerLoader.getAll()).length} loaded`);
       console.log(`\n📝 Next steps:`);
       console.log(`   1. Fill in your .env file with credentials`);
       console.log(`   2. Run: cloudflared tunnel --url http://localhost:${PORT}`);

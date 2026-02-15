@@ -59,7 +59,8 @@ function renderNav(activePage) {
     { name: 'Dashboard', path: 'index.html' },
     { name: 'Prompts', path: 'prompts.html' },
     { name: 'Call Logs', path: 'calls.html' },
-    { name: 'Availability', path: 'availability.html' }
+    { name: 'Availability', path: 'availability.html' },
+    { name: 'Provider Profiles', path: 'providers.html' }
   ];
 
   nav.innerHTML = pages.map(page => {

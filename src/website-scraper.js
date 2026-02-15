@@ -15,7 +15,7 @@ class WebsiteScraper {
       insurance: [],
       rawContent: ''
     };
-    this.cacheFile = path.join(__dirname, '..', 'data', 'website-cache.json');
+    this.cacheFile = path.join(__dirname, '..', 'data', 'practice', 'website-cache.json');
   }
   
   /**
@@ -217,7 +217,7 @@ class WebsiteScraper {
     
     // Load custom info (address, hours, etc.)
     try {
-      const customInfoPath = path.join(__dirname, '..', 'data', 'custom-info.json');
+      const customInfoPath = path.join(__dirname, '..', 'data', 'practice', 'custom-info.json');
       if (fs.existsSync(customInfoPath)) {
         const customInfo = JSON.parse(fs.readFileSync(customInfoPath, 'utf-8'));
         

@@ -10,3 +10,6 @@ coverage/
 .vitest/
 
 call-summaries/
+
+# Ignore all data files (managed via admin dashboard or generated)
+data/
