@@ -168,28 +168,34 @@ function nameToSlug(name) {
  * Write provider files to disk
  */
 async function writeProviderFiles(summaries) {
-  console.log(`📝 Writing provider files to ${PROVIDERS_DIR}`);
+  console.log(`📝 Writing provider files`);
   
   try {
-    // Ensure directory exists
+    // Ensure directories exist
+    const practiceDir = path.join(__dirname, '..', 'data', 'practice');
+    if (!fs.existsSync(practiceDir)) {
+      fs.mkdirSync(practiceDir, { recursive: true });
+      console.log(`📁 Created directory: ${practiceDir}`);
+    }
+    
     if (!fs.existsSync(PROVIDERS_DIR)) {
       fs.mkdirSync(PROVIDERS_DIR, { recursive: true });
       console.log(`📁 Created directory: ${PROVIDERS_DIR}`);
     }
     
-    // Write practice overview
-    const overviewPath = path.join(PROVIDERS_DIR, 'practice-overview.md');
+    // Write practice overview to data/practice/
+    const overviewPath = path.join(practiceDir, 'practice-overview.md');
     fs.writeFileSync(overviewPath, summaries.practiceOverview, 'utf-8');
-    console.log(`✅ Wrote practice-overview.md`);
+    console.log(`✅ Wrote practice-overview.md to data/practice/`);
     
-    // Write provider files
+    // Write provider files to data/providers/
     for (const provider of summaries.providers) {
       const slug = provider.slug || nameToSlug(provider.name);
       const filename = `${slug}.md`;
       const filepath = path.join(PROVIDERS_DIR, filename);
       
       fs.writeFileSync(filepath, provider.content, 'utf-8');
-      console.log(`✅ Wrote ${filename}`);
+      console.log(`✅ Wrote ${filename} to data/providers/`);
     }
     
     console.log(`🎉 Successfully wrote ${summaries.providers.length + 1} files`);
