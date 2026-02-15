@@ -4,6 +4,8 @@
 const express = require('express');
 const WebSocket = require('ws');
 const http = require('http');
+const https = require('https');
+const fs = require('fs');
 const config = require('./config');
 const callHandler = require('./call-handler');
 const prompts = require('./prompts');
@@ -16,8 +18,29 @@ const SessionManager = require('./realtime/session-manager');
 const RelayService = require('./realtime/relay-service');
 
 const app = express();
+app.set('trust proxy', true); // Trust X-Forwarded-* headers from reverse proxies/tunnels
 const sessionManager = new SessionManager();
-const server = http.createServer(app);
+
+// Create HTTPS server if SSL certs are configured, otherwise fall back to HTTP
+let server;
+let useSSL = false;
+if (config.server.sslCert && config.server.sslKey) {
+  try {
+    const sslOptions = {
+      cert: fs.readFileSync(config.server.sslCert),
+      key: fs.readFileSync(config.server.sslKey)
+    };
+    server = https.createServer(sslOptions, app);
+    useSSL = true;
+    console.log('🔒 SSL certificates loaded — HTTPS enabled');
+  } catch (err) {
+    console.error('❌ Failed to load SSL certificates:', err.message);
+    console.log('⚠️  Falling back to HTTP');
+    server = http.createServer(app);
+  }
+} else {
+  server = http.createServer(app);
+}
 
 // Check if realtime voice streaming is available
 const realtimeAvailable = createProviderAdapter(config.realtime.provider, config) !== null;
@@ -421,8 +444,12 @@ app.post('/incoming-call', (req, res) => {
   if (realtimeAvailable) {
     // Use real-time bidirectional audio streaming via Twilio Media Streams
     const host = req.headers.host;
-    // Use ws:// for HTTP, wss:// for HTTPS
-    const protocol = req.protocol === 'https' ? 'wss' : 'ws';
+    // Use wss:// when SSL is enabled or behind a TLS-terminating proxy
+    const isSecure = useSSL
+      || req.headers['x-forwarded-proto'] === 'https' 
+      || req.protocol === 'https'
+      || !host.includes('localhost');
+    const protocol = isSecure ? 'wss' : 'ws';
     console.log(`🎙️ Routing call ${callSid} to realtime streaming via ${protocol}://${host}/media-stream`);
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -693,18 +720,19 @@ const PORT = config.server.port;
     aiClient.setAvailabilityContext(availabilityContext);
     
     server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📞 Webhook URL: http://localhost:${PORT}/incoming-call`);
-      console.log(`🔌 WebSocket URL: ws://localhost:${PORT}/media-stream`);
+      const scheme = useSSL ? 'https' : 'http';
+      const wsScheme = useSSL ? 'wss' : 'ws';
+      console.log(`🚀 Server running on port ${PORT} (${useSSL ? 'HTTPS' : 'HTTP'})`);
+      console.log(`📞 Webhook URL: ${scheme}://localhost:${PORT}/incoming-call`);
+      console.log(`🔌 WebSocket URL: ${wsScheme}://localhost:${PORT}/media-stream`);
       console.log(`\n✅ Configuration loaded:`);
       console.log(`   - Twilio Account: ${config.twilio.accountSid.substring(0, 10)}...`);
       console.log(`   - OpenRouter Model: ${config.openRouter.model}`);
       console.log(`   - Provider Profiles: ${Object.keys(providerLoader.getAll()).length} loaded`);
-      console.log(`\n📝 Next steps:`);
-      console.log(`   1. Fill in your .env file with credentials`);
-      console.log(`   2. Run: cloudflared tunnel --url http://localhost:${PORT}`);
-      console.log(`   3. Configure Twilio webhook with the tunnel URL`);
-      console.log(`   4. Call your Twilio number to test!`);
+      if (!useSSL) {
+        console.log(`\n⚠️  Running without SSL — Twilio Media Streams requires HTTPS/WSS`);
+        console.log(`   Set SSL_CERT_PATH and SSL_KEY_PATH in .env for production`);
+      }
     });
   } catch (error) {
     console.error('❌ Failed to initialize server:', error.message);

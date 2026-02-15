@@ -28,9 +28,9 @@ npm run test-ai    # Test OpenRouter API integration
 
 ### Setup
 ```bash
-npm install                                    # Install dependencies
-copy .env.example .env                         # Create environment file
-cloudflared tunnel --url http://localhost:3000 # Expose server publicly
+npm install                # Install dependencies
+copy .env.example .env     # Create environment file
+npm start                  # Start the server
 ```
 
 ## Configuration

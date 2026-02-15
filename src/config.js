@@ -35,7 +35,9 @@ const config = {
     provider: process.env.REALTIME_AI_PROVIDER || 'openai'
   },
   server: {
-    port: parseInt(process.env.PORT || '3000', 10)
+    port: parseInt(process.env.PORT || '3000', 10),
+    sslCert: process.env.SSL_CERT_PATH || null,
+    sslKey: process.env.SSL_KEY_PATH || null
   }
 };
 

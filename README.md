@@ -9,7 +9,7 @@ AI-powered phone receptionist for Relational Therapy Collective (RTC).
 - Twilio account with a phone number
 - OpenRouter API key (for text chat and call summaries)
 - OpenAI API key (optional, for real-time voice streaming)
-- Cloudflare Tunnel (cloudflared)
+- Domain name with SSL certificate (for production deployment)
 
 ### Step 1: Install Dependencies
 ```bash
@@ -111,54 +111,21 @@ Or if you didn't set `OPENAI_API_KEY`:
 ✅ Configuration loaded
 ```
 
-### Step 5: Setup Cloudflare Tunnel
+### Step 5: Expose Your Server
 
-**Option A: Quick Test (Temporary URL)**
+For local testing, use a tunnel service to expose your server:
 
-In a **separate terminal**, run:
+**Option A: Cloudflare Tunnel (Quick Test)**
 ```bash
 cloudflared tunnel --url http://localhost:3000
 ```
 
-This will give you a temporary public URL like:
+**Option B: ngrok**
+```bash
+ngrok http 3000
 ```
-https://abc-def-123.trycloudflare.com
-```
 
-**Option B: Permanent Tunnel (Recommended for production)**
-
-1. Install cloudflared: Download from [Cloudflare](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/)
-
-2. Authenticate:
-   ```bash
-   cloudflared tunnel login
-   ```
-
-3. Create a tunnel:
-   ```bash
-   cloudflared tunnel create rtc-receptionist
-   ```
-
-4. Configure the tunnel (create `config.yml`):
-   ```yaml
-   tunnel: rtc-receptionist
-   credentials-file: C:\Users\YourUser\.cloudflared\UUID.json
-   
-   ingress:
-     - hostname: voice.yourdomain.com
-       service: http://localhost:3000
-     - service: http_status:404
-   ```
-
-5. Route DNS:
-   ```bash
-   cloudflared tunnel route dns rtc-receptionist voice.yourdomain.com
-   ```
-
-6. Run the tunnel:
-   ```bash
-   cloudflared tunnel run rtc-receptionist
-   ```
+For production deployment with SSL, see [DIGITALOCEAN-DEPLOYMENT.md](docs/DIGITALOCEAN-DEPLOYMENT.md).
 
 ### Step 6: Configure Twilio Webhook
 

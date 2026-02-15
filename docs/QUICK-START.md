@@ -65,10 +65,18 @@ When you start the server, look for:
 npm start
 ```
 
-**Terminal 2 - Cloudflare Tunnel:**
+**Terminal 2 - Expose Server (for local testing):**
+
+For local development, use a tunnel service like ngrok or Cloudflare Tunnel:
 ```bash
-& "C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel --url http://localhost:3000
+# Example with ngrok
+ngrok http 3000
+
+# Or with Cloudflare Tunnel
+cloudflared tunnel --url http://localhost:3000
 ```
+
+For production deployment with SSL, see [DIGITALOCEAN-DEPLOYMENT.md](DIGITALOCEAN-DEPLOYMENT.md).
 
 ### Stop Everything
 
