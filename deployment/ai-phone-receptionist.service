@@ -1,0 +1,25 @@
+[Unit]
+Description=AI Phone Receptionist
+After=network.target
+
+[Service]
+Type=simple
+User=receptionist
+Group=receptionist
+WorkingDirectory=/root/rtc/Receptionist
+ExecStart=/usr/bin/node /root/rtc/Receptionist/src/server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ai-phone-receptionist
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/root/rtc/Receptionist/call-summaries /root/rtc/Receptionist/data
+
+[Install]
+WantedBy=multi-user.target

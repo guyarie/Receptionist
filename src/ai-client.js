@@ -38,10 +38,21 @@ class AIClient {
   
   /**
    * Initialize a new conversation session
+   * @param {string} sessionId - Session identifier
+   * @param {Object} metadata - Optional metadata (e.g., caller phone number)
    */
-  initSession(sessionId) {
+  initSession(sessionId, metadata = {}) {
     // Build system prompt with website context
     let systemContent = prompts.systemPrompt;
+    
+    // Add caller information if available
+    if (metadata.callerPhone) {
+      systemContent += '\n\n' + '='.repeat(50);
+      systemContent += '\nCALLER INFORMATION:\n';
+      systemContent += '='.repeat(50);
+      systemContent += `\n\nThe caller's phone number is: ${metadata.callerPhone}`;
+      systemContent += '\nIf the caller asks for their callback number or the number they\'re calling from, you can provide this information.';
+    }
     
     if (this.websiteContext) {
       systemContent += '\n\n' + '='.repeat(50);

@@ -421,12 +421,16 @@ app.post('/incoming-call', (req, res) => {
   if (realtimeAvailable) {
     // Use real-time bidirectional audio streaming via Twilio Media Streams
     const host = req.headers.host;
-    console.log(`🎙️ Routing call ${callSid} to realtime streaming via wss://${host}/media-stream`);
+    // Use ws:// for HTTP, wss:// for HTTPS
+    const protocol = req.protocol === 'https' ? 'wss' : 'ws';
+    console.log(`🎙️ Routing call ${callSid} to realtime streaming via ${protocol}://${host}/media-stream`);
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Connect>
-    <Stream url="wss://${host}/media-stream">
+    <Stream url="${protocol}://${host}/media-stream">
       <Parameter name="callSid" value="${callSid}" />
+      <Parameter name="from" value="${escapeXml(from)}" />
+      <Parameter name="to" value="${escapeXml(to)}" />
     </Stream>
   </Connect>
 </Response>`;
@@ -617,7 +621,10 @@ wss.on('connection', (ws) => {
         case 'start':
           const callSid = data.start.customParameters?.callSid || data.start.callSid;
           const streamSid = data.start.streamSid;
-          console.log(`🎬 Media stream started: ${streamSid} for call ${callSid}`);
+          const callerPhone = data.start.customParameters?.from || 'unknown';
+          const twilioNumber = data.start.customParameters?.to || 'unknown';
+          
+          console.log(`🎬 Media stream started: ${streamSid} for call ${callSid} from ${callerPhone}`);
           
           const adapter = createProviderAdapter(config.realtime.provider, config);
           if (!adapter) {
@@ -627,8 +634,8 @@ wss.on('connection', (ws) => {
           }
           
           relay = new RelayService(ws, adapter, callSid, streamSid, {
-            from: data.start.customParameters?.from || 'unknown',
-            to: data.start.customParameters?.to || 'unknown'
+            from: callerPhone,
+            to: twilioNumber
           });
           relay.sessionManager = sessionManager;
           sessionManager.addSession(streamSid, relay);
@@ -637,7 +644,8 @@ wss.on('connection', (ws) => {
             systemPrompt: prompts.systemPrompt,
             websiteContext: providerLoader.getAIContext(),
             availabilityContext: availabilityLoader.getAIContext(),
-            greeting: prompts.greeting
+            greeting: prompts.greeting,
+            callerPhone: callerPhone
           });
           break;
 

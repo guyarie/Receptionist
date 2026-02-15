@@ -23,7 +23,7 @@ class OpenAIAdapter extends ProviderAdapter {
    * Resolves when connection is open and session.update has been sent.
    */
   async connect(options) {
-    const { systemPrompt, websiteContext, availabilityContext } = options || {};
+    const { systemPrompt, websiteContext, availabilityContext, callerPhone } = options || {};
 
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(OPENAI_REALTIME_URL, {
@@ -35,9 +35,28 @@ class OpenAIAdapter extends ProviderAdapter {
 
       this.ws.on('open', () => {
         // Build combined instructions from all context sources
-        const instructions = [systemPrompt, websiteContext, availabilityContext]
-          .filter(Boolean)
-          .join('\n\n');
+        const instructionParts = [systemPrompt];
+        
+        // Add caller information if available
+        if (callerPhone) {
+          instructionParts.push(
+            '='.repeat(50) + '\n' +
+            'CALLER INFORMATION:\n' +
+            '='.repeat(50) + '\n' +
+            `The caller's phone number is: ${callerPhone}\n` +
+            'If the caller asks for their callback number or the number they\'re calling from, you can provide this information.'
+          );
+        }
+        
+        // Add website and availability context
+        if (websiteContext) {
+          instructionParts.push(websiteContext);
+        }
+        if (availabilityContext) {
+          instructionParts.push(availabilityContext);
+        }
+        
+        const instructions = instructionParts.filter(Boolean).join('\n\n');
 
         // Send session.update with voice, audio format, VAD, transcription, and instructions
         const sessionUpdate = {

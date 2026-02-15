@@ -21,8 +21,8 @@ class CallHandler {
     
     this.activeCalls.set(callSid, sessionData);
     
-    // Initialize AI session
-    aiClient.initSession(callSid);
+    // Initialize AI session with caller phone number
+    aiClient.initSession(callSid, { callerPhone: sessionData.from });
     
     console.log(`📞 Call started: ${callSid} from ${sessionData.from}`);
     
