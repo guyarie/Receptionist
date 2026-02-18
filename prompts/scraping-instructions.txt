@@ -24,9 +24,17 @@ Guidelines:
   - "## Hours" - Office hours or note about scheduling
   - "## Parking" - Parking information and directions
   - "## Services" - List of services offered
-  - "## Insurance" - Insurance information if available
 - IMPORTANT: Extract the complete physical address, phone number, office hours, and parking details if present on the website
-- For each provider: Create a markdown document with sections like "# Provider Name, Credentials", "## About", "## Specialties", "## Approach", "## Contact"
+- For each provider: Create a markdown document with sections like:
+ - Provider Name
+ - Credentials
+ - Insurance they accept
+ - Approach
+ - Contact
+ - Fees
+ -  About
+ -  Specialties
+
 - Use the provider's full name with credentials for the heading (e.g., "# Miri Arie, LMFT")
 - Generate a kebab-case slug from the provider name (e.g., "miri-arie")
 - Extract all relevant information including specialties, therapeutic approaches, contact details
