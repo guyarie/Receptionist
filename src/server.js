@@ -123,6 +123,72 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// ============================================================================
+// Public Web Chat Endpoint (stateless — no server-side session storage)
+// ============================================================================
+
+// POST /api/webchat
+// Accepts the full conversation history from the client on every request.
+// Returns the assistant's reply without storing any state server-side.
+//
+// Request body:
+//   {
+//     "sessionId": "client-generated-uuid",
+//     "messages": [
+//       { "role": "user", "content": "Hello" },
+//       { "role": "assistant", "content": "Hi! How can I help?" },
+//       { "role": "user", "content": "What are your hours?" }
+//     ]
+//   }
+//
+// Response:
+//   { "reply": "We are open Monday–Friday...", "sessionId": "client-generated-uuid" }
+app.post('/api/webchat', async (req, res) => {
+  try {
+    const { sessionId, messages } = req.body;
+
+    // --- Input validation ---
+    if (!sessionId || typeof sessionId !== 'string' || sessionId.trim() === '') {
+      return res.status(400).json({ error: 'Missing or invalid sessionId' });
+    }
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'messages must be a non-empty array' });
+    }
+
+    // Validate each message has the expected shape
+    for (const msg of messages) {
+      if (
+        typeof msg !== 'object' ||
+        msg === null ||
+        typeof msg.role !== 'string' ||
+        typeof msg.content !== 'string'
+      ) {
+        return res.status(400).json({
+          error: 'Each message must be an object with string "role" and "content" fields'
+        });
+      }
+
+      const allowedRoles = ['user', 'assistant'];
+      if (!allowedRoles.includes(msg.role)) {
+        return res.status(400).json({
+          error: `Invalid message role "${msg.role}". Allowed roles: ${allowedRoles.join(', ')}`
+        });
+      }
+    }
+
+    // --- Call stateless AI method ---
+    const reply = await aiClient.sendMessageWithHistory(messages);
+
+    res.json({ reply, sessionId: sessionId.trim() });
+
+  } catch (error) {
+    console.error('❌ Webchat API error:', error);
+    errorBuffer.add(error, 'webchat-api');
+    res.status(500).json({ error: 'Failed to process message', details: error.message });
+  }
+});
+
 // Get greeting endpoint (for chat interface)
 app.get('/api/greeting', (req, res) => {
   res.json({ greeting: prompts.greeting });

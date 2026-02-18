@@ -35,16 +35,15 @@ class AIClient {
     this.availabilityContext = context;
     console.log('📅 Availability context loaded into AI client');
   }
-  
+
   /**
-   * Initialize a new conversation session
-   * @param {string} sessionId - Session identifier
-   * @param {Object} metadata - Optional metadata (e.g., caller phone number)
+   * Build the system prompt string (shared between session-based and stateless flows)
+   * @param {Object} metadata - Optional metadata (e.g., callerPhone)
+   * @returns {string}
    */
-  initSession(sessionId, metadata = {}) {
-    // Build system prompt with website context
+  buildSystemContent(metadata = {}) {
     let systemContent = prompts.systemPrompt;
-    
+
     // Add caller information if available
     if (metadata.callerPhone) {
       systemContent += '\n\n' + '='.repeat(50);
@@ -53,14 +52,14 @@ class AIClient {
       systemContent += `\n\nThe caller's phone number is: ${metadata.callerPhone}`;
       systemContent += '\nIf the caller asks for their callback number or the number they\'re calling from, you can provide this information.';
     }
-    
+
     if (this.websiteContext) {
       systemContent += '\n\n' + '='.repeat(50);
       systemContent += '\nPRACTICE INFORMATION (use this to answer questions):\n';
       systemContent += '='.repeat(50);
       systemContent += '\n\n' + this.websiteContext;
     }
-    
+
     // Add availability context after website context
     if (this.availabilityContext) {
       systemContent += '\n\n' + '='.repeat(50);
@@ -68,16 +67,24 @@ class AIClient {
       systemContent += '='.repeat(50);
       systemContent += '\n\n' + this.availabilityContext;
     } else {
-      // No availability data - instruct AI accordingly
       systemContent += '\n\n' + '='.repeat(50);
       systemContent += '\nSCHEDULING INFORMATION:\n';
       systemContent += '='.repeat(50);
       systemContent += '\n\nSpecific scheduling information is not currently available. If callers ask about availability or scheduling, politely let them know they should call back or leave a message for the office to return their call with current availability.';
     }
-    
+
+    return systemContent;
+  }
+  
+  /**
+   * Initialize a new conversation session
+   * @param {string} sessionId - Session identifier
+   * @param {Object} metadata - Optional metadata (e.g., caller phone number)
+   */
+  initSession(sessionId, metadata = {}) {
     const systemPrompt = {
       role: 'system',
-      content: systemContent
+      content: this.buildSystemContent(metadata)
     };
     
     this.conversationHistory.set(sessionId, [systemPrompt]);
@@ -85,7 +92,7 @@ class AIClient {
   }
   
   /**
-   * Send a message and get AI response
+   * Send a message and get AI response (session-based, used for voice/internal flows)
    */
   async sendMessage(sessionId, userMessage) {
     if (!this.conversationHistory.has(sessionId)) {
@@ -131,6 +138,47 @@ class AIClient {
       console.error('❌ OpenRouter API error:', error.message);
       throw error;
     }
+  }
+
+  /**
+   * Stateless chat: accepts a full conversation history from the client,
+   * prepends the system prompt, and returns only the assistant reply string.
+   * No server-side session state is stored.
+   *
+   * @param {Array<{role: string, content: string}>} clientMessages - Full prior conversation
+   * @returns {Promise<string>} - The assistant's reply text
+   */
+  async sendMessageWithHistory(clientMessages) {
+    // Validate that clientMessages is a non-empty array
+    if (!Array.isArray(clientMessages) || clientMessages.length === 0) {
+      throw new Error('clientMessages must be a non-empty array');
+    }
+
+    // Build system prompt and prepend it to the client-supplied history
+    const systemPrompt = {
+      role: 'system',
+      content: this.buildSystemContent()
+    };
+
+    const messages = [systemPrompt, ...clientMessages];
+
+    console.log(`💬 [webchat] Sending ${clientMessages.length} message(s) to AI`);
+
+    const response = await this.client.chat.completions.create({
+      model: this.model,
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 300 // Slightly more generous for web chat vs. phone
+    });
+
+    if (response.model) {
+      console.log(`🔍 [webchat] Actual model used: ${response.model}`);
+    }
+
+    const assistantMessage = response.choices[0].message.content;
+    console.log(`🤖 [webchat] AI: ${assistantMessage}`);
+
+    return assistantMessage;
   }
   
   /**

@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "fast-check": "^4.5.3",
+    "supertest": "^7.2.2",
     "vitest": "^4.0.18"
   }
 }
