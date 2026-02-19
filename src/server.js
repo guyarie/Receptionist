@@ -2,6 +2,7 @@
 // This is the minimal demo version to prove the pipeline works
 
 const express = require('express');
+const cors = require('cors');
 const WebSocket = require('ws');
 const http = require('http');
 const https = require('https');
@@ -55,6 +56,43 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// ============================================================================
+// CORS Configuration for Web Chat Widget
+// ============================================================================
+// Restricts cross-origin requests to the configured domain only.
+// In local development (no ALLOWED_ORIGIN set), falls back to localhost origins.
+// Wildcard CORS is intentionally avoided in production.
+
+const allowedOrigin = process.env.ALLOWED_ORIGIN;
+
+const webchatCorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. server-to-server, curl)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // In production: only allow the explicitly configured origin
+    if (allowedOrigin) {
+      if (origin === allowedOrigin) {
+        return callback(null, true);
+      }
+      console.warn(`🚫 CORS blocked request from origin: ${origin}`);
+      return callback(new Error(`CORS policy: origin ${origin} is not allowed`));
+    }
+
+    // In local development (no ALLOWED_ORIGIN set): allow localhost on any port
+    if (/^https?:\/\/localhost(:\d+)?$/.test(origin) || /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+
+    console.warn(`🚫 CORS blocked request from origin: ${origin}`);
+    return callback(new Error(`CORS policy: origin ${origin} is not allowed`));
+  },
+  methods: ['POST'],
+  allowedHeaders: ['Content-Type']
+};
+
 // IP whitelist middleware for admin routes
 app.use('/admin', (req, res, next) => {
   const allowedIps = config.server.adminAllowedIps;
@@ -82,14 +120,6 @@ app.use('/admin', (req, res, next) => {
 
 // Serve admin static files
 app.use('/admin', express.static('public/admin'));
-
-// CORS middleware for widget (allows embedding on external websites)
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // In production, replace * with your website domain
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Methods', 'GET, POST');
-  next();
-});
 
 // Health check endpoint
 app.get('/', (req, res) => {
@@ -146,7 +176,9 @@ app.post('/api/chat', async (req, res) => {
 // POST /api/webchat - Stateless chat endpoint for website widget
 // Accepts conversation history and returns AI response without server-side storage
 // Security: Validates input types, enforces limits, blocks role injection
-app.post('/api/webchat', async (req, res) => {
+// CORS: Restricted to ALLOWED_ORIGIN (or localhost in development)
+app.options('/api/webchat', cors(webchatCorsOptions)); // Handle preflight OPTIONS requests
+app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
   try {
     // Validate request body exists and is an object (not null, string, or array)
     if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
@@ -850,6 +882,11 @@ const PORT = config.server.port;
       console.log(`   - Twilio Account: ${config.twilio.accountSid.substring(0, 10)}...`);
       console.log(`   - OpenRouter Model: ${config.openRouter.model}`);
       console.log(`   - Provider Profiles: ${Object.keys(providerLoader.getAll()).length} loaded`);
+      if (allowedOrigin) {
+        console.log(`   - Web Chat CORS Origin: ${allowedOrigin}`);
+      } else {
+        console.log(`   - Web Chat CORS Origin: localhost only (set ALLOWED_ORIGIN for production)`);
+      }
       if (!useSSL) {
         console.log(`\n⚠️  Running without SSL — Twilio Media Streams requires HTTPS/WSS`);
         console.log(`   Set SSL_CERT_PATH and SSL_KEY_PATH in .env for production`);
