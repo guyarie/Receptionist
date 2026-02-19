@@ -77,8 +77,9 @@ const webchatCorsOptions = {
       if (origin === allowedOrigin) {
         return callback(null, true);
       }
+      // Log the blocked origin server-side, but don't leak it to client
       console.warn(`🚫 CORS blocked request from origin: ${origin}`);
-      return callback(new Error(`CORS policy: origin ${origin} is not allowed`));
+      return callback(new Error('CORS policy: origin not allowed'));
     }
 
     // In local development (no ALLOWED_ORIGIN set): allow localhost on any port
@@ -86,8 +87,9 @@ const webchatCorsOptions = {
       return callback(null, true);
     }
 
+    // Log the blocked origin server-side, but don't leak it to client
     console.warn(`🚫 CORS blocked request from origin: ${origin}`);
-    return callback(new Error(`CORS policy: origin ${origin} is not allowed`));
+    return callback(new Error('CORS policy: origin not allowed'));
   },
   methods: ['POST'],
   allowedHeaders: ['Content-Type']
