@@ -143,35 +143,42 @@ app.post('/api/chat', async (req, res) => {
 //
 // Response:
 //   { "reply": "We are open Monday–Friday...", "sessionId": "client-generated-uuid" }
+// POST /api/webchat - Stateless chat endpoint for website widget
+// Accepts conversation history and returns AI response without server-side storage
+// Security: Validates input types, enforces limits, blocks role injection
 app.post('/api/webchat', async (req, res) => {
   try {
-    // Validate request body exists and is an object
+    // Validate request body exists and is an object (not null, string, or array)
     if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
       return res.status(400).json({ error: 'Request body must be a JSON object' });
     }
 
     const { sessionId, messages } = req.body;
 
-    // --- Input validation ---
+    // --- SessionId validation ---
+    // Must be non-empty string for client-side session tracking
     if (!sessionId || typeof sessionId !== 'string' || sessionId.trim() === '') {
       return res.status(400).json({ error: 'Missing or invalid sessionId' });
     }
 
-    // Limit sessionId length to prevent DoS
+    // DoS protection: Limit sessionId length (1000 chars = ~150 UUIDs)
     if (sessionId.length > 1000) {
       return res.status(400).json({ error: 'sessionId too long (max 1000 characters)' });
     }
 
+    // --- Messages array validation ---
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'messages must be a non-empty array' });
     }
 
-    // Limit messages array length to prevent DoS
+    // DoS protection: Limit conversation history length
+    // 1000 messages = ~500 turns, sufficient for long conversations
     if (messages.length > 1000) {
       return res.status(400).json({ error: 'Too many messages (max 1000)' });
     }
 
-    // Validate each message has the expected shape
+    // --- Individual message validation ---
+    // Each message must have string 'role' and 'content' fields
     for (const msg of messages) {
       if (
         typeof msg !== 'object' ||
@@ -184,11 +191,14 @@ app.post('/api/webchat', async (req, res) => {
         });
       }
 
-      // Limit content length to prevent DoS
+      // DoS protection: Limit individual message size
+      // 50000 chars = ~10000 words, sufficient for detailed responses
       if (msg.content.length > 50000) {
         return res.status(400).json({ error: 'Message content too long (max 50000 characters)' });
       }
 
+      // Security: Only allow 'user' and 'assistant' roles
+      // Blocks 'system' (prompt injection), 'function', 'tool' (privilege escalation)
       const allowedRoles = ['user', 'assistant'];
       if (!allowedRoles.includes(msg.role)) {
         return res.status(400).json({
