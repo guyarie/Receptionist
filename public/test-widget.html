@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Widget – Manual Test Page</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px 32px;
+    }
+
+    header h1 { font-size: 24px; margin-bottom: 6px; }
+    header p  { font-size: 14px; opacity: 0.85; }
+
+    main {
+      max-width: 860px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .card h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: #444;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 10px;
+    }
+
+    .checklist { list-style: none; }
+    .checklist li {
+      padding: 8px 0;
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist .icon { font-size: 18px; flex-shrink: 0; }
+
+    .config-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .config-table th,
+    .config-table td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .config-table th { background: #f8f8f8; font-weight: 600; color: #555; }
+    .config-table code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #f8f8f8;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #ccc;
+      flex-shrink: 0;
+    }
+    .status-dot.green  { background: #4caf50; }
+    .status-dot.red    { background: #f44336; }
+    .status-dot.yellow { background: #ff9800; }
+
+    button.test-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    button.test-btn:hover { background: #5a6fd6; }
+
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      overflow-x: auto;
+      margin-top: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🧪 Chat Widget – Manual Test Page</h1>
+  <p>Use this page to visually verify the embeddable chat widget before deployment.</p>
+</header>
+
+<main>
+
+  <!-- Widget Config -->
+  <div class="card">
+    <h2>⚙️ Widget Configuration</h2>
+    <table class="config-table">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody id="config-table-body">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- API Health -->
+  <div class="card">
+    <h2>🌐 API Health Check</h2>
+    <p style="font-size:14px;color:#666;">Checks that the backend is reachable and the <code>/api/greeting</code> endpoint responds.</p>
+    <button class="test-btn" id="btn-health">Run Health Check</button>
+    <div class="status-bar" id="health-status">
+      <div class="status-dot" id="health-dot"></div>
+      <span id="health-msg">Click "Run Health Check" to test.</span>
+    </div>
+    <pre id="health-output" style="display:none;"></pre>
+  </div>
+
+  <!-- localStorage -->
+  <div class="card">
+    <h2>💾 localStorage Inspector</h2>
+    <p style="font-size:14px;color:#666;">Inspect and clear the values stored by the widget.</p>
+    <button class="test-btn" id="btn-inspect">Inspect Storage</button>
+    <button class="test-btn" id="btn-clear" style="background:#e53935;margin-left:8px;">Clear Storage</button>
+    <pre id="storage-output" style="display:none;"></pre>
+  </div>
+
+  <!-- Manual Checklist -->
+  <div class="card">
+    <h2>✅ Manual Test Checklist</h2>
+    <ul class="checklist">
+      <li><span class="icon">💬</span> Floating chat bubble appears in the bottom-right corner of this page.</li>
+      <li><span class="icon">🖱️</span> Clicking the bubble opens the chat panel; clicking again (or ×) closes it.</li>
+      <li><span class="icon">👋</span> A greeting message appears automatically when the panel first opens.</li>
+      <li><span class="icon">✉️</span> Typing a message and pressing Send displays the user bubble and then an AI reply.</li>
+      <li><span class="icon">⏳</span> A typing indicator (three animated dots) appears while waiting for the AI reply.</li>
+      <li><span class="icon">🔄</span> Refreshing the page and reopening the widget shows the previous conversation.</li>
+      <li><span class="icon">🆔</span> The same session ID is reused after a page refresh (check localStorage inspector above).</li>
+      <li><span class="icon">📵</span> Disabling the network and sending a message shows a graceful error message.</li>
+      <li><span class="icon">📱</span> The widget is usable on a narrow viewport (mobile simulation in DevTools).</li>
+      <li><span class="icon">⌨️</span> Pressing Escape while the panel is open closes it.</li>
+    </ul>
+  </div>
+
+  <!-- Embed Snippet -->
+  <div class="card">
+    <h2>📋 Embed Snippet</h2>
+    <p style="font-size:14px;color:#666;margin-bottom:12px;">Copy this snippet to embed the widget on any page:</p>
+    <pre id="embed-snippet"></pre>
+  </div>
+
+</main>
+
+<!-- Widget configuration override for this test page -->
+<script>
+  window.RTCChatConfig = {
+    apiUrl: window.location.origin,
+    title: 'Test Chat',
+    subtitle: 'Widget Test Page',
+    primaryColor: '#667eea',
+    position: 'bottom-right'
+  };
+</script>
+
+<!-- Load the widget -->
+<script src="/chat-widget.js"></script>
+
+<!-- Test page logic -->
+<script>
+  // ── Config table ──────────────────────────────────────────────────────────
+  (function renderConfigTable() {
+    const cfg = window.RTCChatConfig || {};
+    const tbody = document.getElementById('config-table-body');
+    const descriptions = {
+      apiUrl: 'Backend base URL',
+      title: 'Chat panel header title',
+      subtitle: 'Chat panel header subtitle',
+      primaryColor: 'Accent / brand colour',
+      position: 'Widget position on screen'
+    };
+    Object.entries(cfg).forEach(function([k, v]) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><code>${k}</code></td><td><code>${v}</code></td><td>${descriptions[k] || ''}</td>`;
+      tbody.appendChild(tr);
+    });
+  })();
+
+  // ── Embed snippet ─────────────────────────────────────────────────────────
+  (function renderEmbedSnippet() {
+    const snippet = [
+      '<script>',
+      '  window.RTCChatConfig = {',
+      '    apiUrl: \'https://yourdomain.com\',',
+      '    title: \'Chat with us\',',
+      '    primaryColor: \'#667eea\'',
+      '  };',
+      '<\/script>',
+      '<script src="https://yourdomain.com/chat-widget.js"><\/script>'
+    ].join('\n');
+    document.getElementById('embed-snippet').textContent = snippet;
+  })();
+
+  // ── Health check ──────────────────────────────────────────────────────────
+  document.getElementById('btn-health').addEventListener('click', async function() {
+    const dot = document.getElementById('health-dot');
+    const msg = document.getElementById('health-msg');
+    const out = document.getElementById('health-output');
+
+    dot.className = 'status-dot yellow';
+    msg.textContent = 'Checking…';
+    out.style.display = 'none';
+
+    try {
+      const apiUrl = (window.RTCChatConfig && window.RTCChatConfig.apiUrl) || window.location.origin;
+      const res = await fetch(apiUrl + '/api/greeting');
+      const data = await res.json();
+
+      dot.className = 'status-dot green';
+      msg.textContent = 'API reachable – HTTP ' + res.status;
+      out.textContent = JSON.stringify(data, null, 2);
+      out.style.display = 'block';
+    } catch (e) {
+      dot.className = 'status-dot red';
+      msg.textContent = 'API unreachable: ' + e.message;
+      out.textContent = e.stack || e.message;
+      out.style.display = 'block';
+    }
+  });
+
+  // ── localStorage inspector ────────────────────────────────────────────────
+  document.getElementById('btn-inspect').addEventListener('click', function() {
+    const out = document.getElementById('storage-output');
+    const keys = ['receptionist_session_id', 'receptionist_chat_history'];
+    const result = {};
+    keys.forEach(function(k) {
+      const raw = localStorage.getItem(k);
+      try { result[k] = raw ? JSON.parse(raw) : null; }
+      catch(e) { result[k] = raw; }
+    });
+    out.textContent = JSON.stringify(result, null, 2);
+    out.style.display = 'block';
+  });
+
+  document.getElementById('btn-clear').addEventListener('click', function() {
+    localStorage.removeItem('receptionist_session_id');
+    localStorage.removeItem('receptionist_chat_history');
+    const out = document.getElementById('storage-output');
+    out.textContent = 'Storage cleared. Reload the page to start a fresh session.';
+    out.style.display = 'block';
+  });
+</script>
+
+</body>
+</html>
