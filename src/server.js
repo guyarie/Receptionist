@@ -145,6 +145,11 @@ app.post('/api/chat', async (req, res) => {
 //   { "reply": "We are open Monday–Friday...", "sessionId": "client-generated-uuid" }
 app.post('/api/webchat', async (req, res) => {
   try {
+    // Validate request body exists and is an object
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+      return res.status(400).json({ error: 'Request body must be a JSON object' });
+    }
+
     const { sessionId, messages } = req.body;
 
     // --- Input validation ---
@@ -152,8 +157,18 @@ app.post('/api/webchat', async (req, res) => {
       return res.status(400).json({ error: 'Missing or invalid sessionId' });
     }
 
+    // Limit sessionId length to prevent DoS
+    if (sessionId.length > 1000) {
+      return res.status(400).json({ error: 'sessionId too long (max 1000 characters)' });
+    }
+
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'messages must be a non-empty array' });
+    }
+
+    // Limit messages array length to prevent DoS
+    if (messages.length > 1000) {
+      return res.status(400).json({ error: 'Too many messages (max 1000)' });
     }
 
     // Validate each message has the expected shape
@@ -167,6 +182,11 @@ app.post('/api/webchat', async (req, res) => {
         return res.status(400).json({
           error: 'Each message must be an object with string "role" and "content" fields'
         });
+      }
+
+      // Limit content length to prevent DoS
+      if (msg.content.length > 50000) {
+        return res.status(400).json({ error: 'Message content too long (max 50000 characters)' });
       }
 
       const allowedRoles = ['user', 'assistant'];
