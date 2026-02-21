@@ -17,6 +17,19 @@ function validateConfig() {
   }
 }
 
+/**
+ * Parse an integer environment variable, returning a default if absent or invalid.
+ * @param {string} key - Environment variable name
+ * @param {number} defaultValue - Fallback value
+ * @returns {number}
+ */
+function parseIntEnv(key, defaultValue) {
+  const raw = process.env[key];
+  if (raw === undefined || raw === null || raw.trim() === '') return defaultValue;
+  const parsed = parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : defaultValue;
+}
+
 const config = {
   twilio: {
     accountSid: process.env.TWILIO_ACCOUNT_SID,
@@ -32,7 +45,17 @@ const config = {
     realtimeVoice: process.env.OPENAI_REALTIME_VOICE || 'alloy'
   },
   realtime: {
-    provider: process.env.REALTIME_AI_PROVIDER || 'openai'
+    provider: process.env.REALTIME_AI_PROVIDER || 'openai',
+    vad: {
+      // Milliseconds of silence before the turn is considered complete.
+      // Lower values make the assistant respond faster but may cut off slow speakers.
+      silenceDurationMs: parseIntEnv('OPENAI_VAD_SILENCE_DURATION_MS', 600),
+      // Minimum speech duration (ms) required before VAD triggers a turn.
+      // Raising this reduces false positives from short background noises.
+      minSpeechDurationMs: parseIntEnv('OPENAI_VAD_MIN_SPEECH_DURATION_MS', 300),
+      // Audio padding (ms) prepended to detected speech to avoid clipping the start.
+      prefixPaddingMs: parseIntEnv('OPENAI_VAD_PREFIX_PADDING_MS', 300)
+    }
   },
   server: {
     port: parseInt(process.env.PORT || '3000', 10),
