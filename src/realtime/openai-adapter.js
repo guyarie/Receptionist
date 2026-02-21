@@ -60,7 +60,7 @@ class OpenAIAdapter extends ProviderAdapter {
         const instructions = instructionParts.filter(Boolean).join('\n\n');
 
         // Read VAD parameters from centralized config — no inline literals
-        const { silenceDurationMs, minSpeechDurationMs, prefixPaddingMs } = config.realtime.vad;
+        const { silenceDurationMs, prefixPaddingMs } = config.realtime.vad;
 
         // Send session.update with voice, audio format, VAD, transcription, and instructions
         const sessionUpdate = {
@@ -72,7 +72,6 @@ class OpenAIAdapter extends ProviderAdapter {
             turn_detection: {
               type: 'server_vad',
               silence_duration_ms: silenceDurationMs,
-              min_speech_duration_ms: minSpeechDurationMs,
               prefix_padding_ms: prefixPaddingMs
             },
             input_audio_transcription: {
