@@ -2,6 +2,7 @@
 
 const WebSocket = require('ws');
 const ProviderAdapter = require('./provider-adapter');
+const config = require('../config');
 
 const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17';
 
@@ -58,6 +59,9 @@ class OpenAIAdapter extends ProviderAdapter {
         
         const instructions = instructionParts.filter(Boolean).join('\n\n');
 
+        // Read VAD parameters from centralized config — no inline literals
+        const { silenceDurationMs, minSpeechDurationMs, prefixPaddingMs } = config.realtime.vad;
+
         // Send session.update with voice, audio format, VAD, transcription, and instructions
         const sessionUpdate = {
           type: 'session.update',
@@ -66,7 +70,10 @@ class OpenAIAdapter extends ProviderAdapter {
             input_audio_format: 'g711_ulaw',
             output_audio_format: 'g711_ulaw',
             turn_detection: {
-              type: 'server_vad'
+              type: 'server_vad',
+              silence_duration_ms: silenceDurationMs,
+              min_speech_duration_ms: minSpeechDurationMs,
+              prefix_padding_ms: prefixPaddingMs
             },
             input_audio_transcription: {
               model: 'whisper-1'
@@ -77,10 +84,8 @@ class OpenAIAdapter extends ProviderAdapter {
 
         this.ws.send(JSON.stringify(sessionUpdate));
 
-        // Trigger an immediate greeting by sending a conversation item with the greeting text
+        // Trigger an immediate greeting by injecting a user turn
         // This makes the AI speak immediately when the call connects
-        const greetingMessage = options.greeting || 'Hello! How can I help you today?';
-        
         this.ws.send(JSON.stringify({
           type: 'conversation.item.create',
           item: {
@@ -150,9 +155,22 @@ class OpenAIAdapter extends ProviderAdapter {
         break;
 
       case 'input_audio_buffer.speech_started':
+        console.log('🎤 Speech started — VAD detected caller audio');
         if (this.onSpeechStarted) {
           this.onSpeechStarted();
         }
+        break;
+
+      case 'input_audio_buffer.speech_stopped':
+        console.log('🔇 Speech stopped — VAD detected end of caller turn');
+        break;
+
+      case 'response.done':
+        console.log('✅ Response turn complete');
+        break;
+
+      case 'response.cancelled':
+        console.log('⚡ Response interrupted — cancelled by new speech input');
         break;
 
       case 'error':
@@ -181,6 +199,7 @@ class OpenAIAdapter extends ProviderAdapter {
   cancelResponse() {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
 
+    console.log('⚡ Cancelling in-progress response due to interruption');
     this.ws.send(JSON.stringify({
       type: 'response.cancel'
     }));
