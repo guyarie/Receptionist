@@ -4,8 +4,12 @@ This guide walks you through deploying the AI Phone Receptionist to your Digital
 
 ## Server Information
 - IP Address: `138.68.51.142`
+- Domain: `phone.rtcbellevue.com` (DNS configured in Squarespace)
 - OS: Ubuntu (recommended)
 - SSH Access: Configured with your SSH key
+- Project Location: `/home/guyarie/receptionist_prod/Receptionist`
+- Service User: `receptionist`
+- Port: 443 (HTTPS direct binding)
 
 ## Step 1: Install Node.js on Server
 
@@ -128,9 +132,14 @@ exit
 3. Click on your phone number
 4. Under "Voice & Fax", set:
    - **A CALL COMES IN**: Webhook
-   - **URL**: `http://138.68.51.142:3000/incoming-call`
+   - **URL**: `https://phone.rtcbellevue.com/incoming-call` (or your domain)
    - **HTTP**: POST
 5. Save changes
+
+**Important:** If using a custom domain with SSL, ensure:
+- Your `.env` has `PORT=443` (for direct HTTPS binding)
+- SSL certificates are configured: `SSL_CERT_PATH` and `SSL_KEY_PATH`
+- The systemd service has `AmbientCapabilities=CAP_NET_BIND_SERVICE` to bind to port 443
 
 ## Step 9: Test the Deployment
 

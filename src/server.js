@@ -877,9 +877,14 @@ const PORT = config.server.port;
     server.listen(PORT, () => {
       const scheme = useSSL ? 'https' : 'http';
       const wsScheme = useSSL ? 'wss' : 'ws';
+      
+      // Use PUBLIC_URL from env if set, otherwise show localhost
+      const publicUrl = process.env.PUBLIC_URL || `${scheme}://localhost:${PORT}`;
+      const baseUrl = publicUrl.replace(/\/$/, ''); // Remove trailing slash if present
+      
       console.log(`🚀 Server running on port ${PORT} (${useSSL ? 'HTTPS' : 'HTTP'})`);
-      console.log(`📞 Webhook URL: ${scheme}://localhost:${PORT}/incoming-call`);
-      console.log(`🔌 WebSocket URL: ${wsScheme}://localhost:${PORT}/media-stream`);
+      console.log(`📞 Webhook URL: ${baseUrl}/incoming-call`);
+      console.log(`🔌 WebSocket URL: ${baseUrl.replace(/^http/, 'ws')}/media-stream`);
       console.log(`\n✅ Configuration loaded:`);
       console.log(`   - Twilio Account: ${config.twilio.accountSid.substring(0, 10)}...`);
       console.log(`   - OpenRouter Model: ${config.openRouter.model}`);
@@ -892,6 +897,9 @@ const PORT = config.server.port;
       if (!useSSL) {
         console.log(`\n⚠️  Running without SSL — Twilio Media Streams requires HTTPS/WSS`);
         console.log(`   Set SSL_CERT_PATH and SSL_KEY_PATH in .env for production`);
+      }
+      if (!process.env.PUBLIC_URL) {
+        console.log(`\n💡 Tip: Set PUBLIC_URL in .env to show your actual webhook URL`);
       }
     });
   } catch (error) {
