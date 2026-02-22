@@ -372,17 +372,24 @@ function extractProviderLinks(html) {
           return;
         }
 
-        // Both should start with capital letter (typical for names)
-        const looksLikeName = /^[A-Z]/.test(firstWord) && /^[A-Z]/.test(secondWord);
+        // First word should start with capital letter (typical for names)
+        // Second word can be lowercase for particles like "de", "van", "von", "del", "la"
+        // Strip leading punctuation from second word (e.g., "(Michelle)" -> "Michelle")
+        const firstWordCapitalized = /^[A-Z]/.test(firstWord);
+        const secondWordClean = secondWord.replace(/^[^\w]+/, ''); // Remove leading non-word chars
+        const secondWordLower = secondWordClean.toLowerCase();
+        const isNameParticle = ['de', 'van', 'von', 'del', 'la', 'le', 'di', 'da'].includes(secondWordLower);
+        const secondWordCapitalized = /^[A-Z]/.test(secondWordClean);
+        
+        const looksLikeName = firstWordCapitalized && (secondWordCapitalized || isNameParticle);
 
         if (!looksLikeName) {
           // Doesn't look like a person's name - skip
           return;
         }
         
-        // Additional check: second word should not be a common service word
-        const secondWordLower = secondWord.toLowerCase();
-        if (serviceKeywords.includes(secondWordLower)) {
+        // Additional check: second word should not be a common service word (unless it's a name particle)
+        if (!isNameParticle && serviceKeywords.includes(secondWordLower)) {
           // e.g., "Medication Management", "Selective Mutism"
           return;
         }
@@ -444,7 +451,17 @@ function extractProviderLinks(html) {
         if (words.length >= 2) {
           const firstWord = words[0];
           const secondWord = words[1].replace(/,.*$/, '');
-          const looksLikeName = /^[A-Z]/.test(firstWord) && /^[A-Z]/.test(secondWord);
+          
+          // First word should start with capital letter (typical for names)
+          // Second word can be lowercase for particles like "de", "van", "von", "del", "la"
+          // Strip leading punctuation from second word (e.g., "(Michelle)" -> "Michelle")
+          const firstWordCapitalized = /^[A-Z]/.test(firstWord);
+          const secondWordClean = secondWord.replace(/^[^\w]+/, ''); // Remove leading non-word chars
+          const secondWordLower = secondWordClean.toLowerCase();
+          const isNameParticle = ['de', 'van', 'von', 'del', 'la', 'le', 'di', 'da'].includes(secondWordLower);
+          const secondWordCapitalized = /^[A-Z]/.test(secondWordClean);
+          
+          const looksLikeName = firstWordCapitalized && (secondWordCapitalized || isNameParticle);
           if (!looksLikeName) return;
         } else {
           return; // Single word - skip
@@ -508,6 +525,7 @@ Focus on:
 Return a JSON object with this structure:
 {
   "name": "Full Name with Credentials",
+  "fileName": "FirstName LastName",
   "content": "Complete markdown content for provider file",
   "email": "email@example.com or null",
   "phone": "phone number or null",
@@ -515,6 +533,7 @@ Return a JSON object with this structure:
 }
 
 IMPORTANT:
+- The "fileName" field should contain only first and last name without credentials (e.g., "Miri Arie" not "Miri Arie, PhD, CGP")
 - The "insurance" field should be an array of insurance provider names
 - If no insurance information is found, return an empty array []
 - Do not use placeholder text like "Not provided" or "Not available"
@@ -716,6 +735,12 @@ async function callLLMForProvider(providerName, text) {
     else if (!Array.isArray(providerData.insurance)) {
       console.warn(`⚠️ Provider "${providerData.name}" has invalid insurance type, setting to empty array`);
       providerData.insurance = [];
+    }
+
+    // Extract fileName field (optional, for accurate filename generation)
+    // If missing or invalid, it will be set to null and fallback logic will be used
+    if (!providerData.fileName || typeof providerData.fileName !== 'string' || providerData.fileName.trim() === '') {
+      providerData.fileName = null;
     }
 
     console.log(`✅ Successfully extracted data for ${providerName}`);
@@ -1168,6 +1193,51 @@ function normalizeProviderName(fullName) {
   return nameToSlug(truncatedName);
 }
 /**
+ * Validate a fileName field from LLM response
+ * Checks that the fileName contains only the provider's first and last name
+ * without credentials or invalid characters. Used to determine if the fileName
+ * field can be used directly for slug generation or if fallback is needed.
+ *
+ * Validation rules:
+ * 1. Must be a non-empty string
+ * 2. Must contain at least one alphabetic character
+ * 3. Should only contain letters, spaces, and hyphens
+ * 4. Should not exceed 100 characters
+ *
+ * @param {string} fileName - The fileName field from LLM response
+ * @returns {boolean} True if valid, false otherwise
+ * @example
+ * validateFileName("Miri Arie") // returns true
+ * validateFileName("Miri Arie, PhD") // returns false (contains comma)
+ * validateFileName("") // returns false (empty)
+ * validateFileName(null) // returns false (not a string)
+ */
+function validateFileName(fileName) {
+  if (!fileName || typeof fileName !== 'string') {
+    return false;
+  }
+
+  const trimmed = fileName.trim();
+
+  // Must contain at least one letter
+  if (!/[a-zA-Z]/.test(trimmed)) {
+    return false;
+  }
+
+  // Should only contain letters, spaces, and hyphens
+  if (!/^[a-zA-Z\s-]+$/.test(trimmed)) {
+    return false;
+  }
+
+  // Should not be too long
+  if (trimmed.length > 100) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Process a single provider page
  * Fetches provider page, extracts text, saves cache, and returns result object.
  * This function is designed to be resilient - it catches all errors and returns
@@ -1298,8 +1368,21 @@ async function processSingleProvider(providerLink, browser, index, total) {
       return result;
     }
 
-    // Normalize provider name to slug
-    const slug = normalizeProviderName(providerData.name);
+    // Generate slug from fileName if available, otherwise fall back to normalizeProviderName
+    let slug;
+    if (providerData.fileName && validateFileName(providerData.fileName)) {
+      // Use fileName field for accurate slug generation
+      slug = nameToSlug(providerData.fileName);
+      console.log(`✅ Using fileName field for slug generation: "${providerData.fileName}" → "${slug}"`);
+    } else {
+      // Fall back to normalizeProviderName for backward compatibility
+      slug = normalizeProviderName(providerData.name);
+      if (providerData.fileName) {
+        console.warn(`⚠️ Invalid fileName for provider: ${providerData.name} (fileName: "${providerData.fileName}"), using normalizeProviderName fallback`);
+      } else {
+        console.log(`ℹ️  fileName field missing for provider: ${providerData.name}, using normalizeProviderName fallback`);
+      }
+    }
     result.slug = slug;
 
     // Skip if normalization failed

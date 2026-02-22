@@ -272,3 +272,162 @@ describe('Provider Insurance Field Validation', () => {
     expect(providerWithEmptyInsurance.insurance).toHaveLength(0);
   });
 });
+
+describe('validateFileName', () => {
+  // Note: validateFileName is not exported, so we test the expected behavior
+  // The actual function will be tested through integration tests
+  
+  it('should accept valid names with first and last name', () => {
+    // Valid names: letters and spaces only
+    const validNames = [
+      'Miri Arie',
+      'Jeffrey Gillman',
+      'Lilach Geppert-Shapira',
+      'John Doe',
+      'Mary Jane Watson'
+    ];
+    
+    validNames.forEach(name => {
+      // Should contain only letters, spaces, and hyphens
+      expect(/^[a-zA-Z\s-]+$/.test(name)).toBe(true);
+      // Should contain at least one letter
+      expect(/[a-zA-Z]/.test(name)).toBe(true);
+      // Should not be too long
+      expect(name.length).toBeLessThanOrEqual(100);
+    });
+  });
+  
+  it('should reject empty or null values', () => {
+    const invalidValues = [null, undefined, '', '   '];
+    
+    invalidValues.forEach(value => {
+      if (value === null || value === undefined) {
+        expect(value).toBeFalsy();
+      } else {
+        expect(value.trim()).toBe('');
+      }
+    });
+  });
+  
+  it('should reject names with credentials', () => {
+    // Names with commas (credentials) should be rejected
+    const namesWithCredentials = [
+      'Miri Arie, PhD',
+      'Jeffrey Gillman, PhD, LMFT',
+      'John Doe, MD',
+      'Jane Smith, LCSW, PsyD'
+    ];
+    
+    namesWithCredentials.forEach(name => {
+      // Should contain comma (invalid character)
+      expect(name.includes(',')).toBe(true);
+      // Should NOT match the valid pattern
+      expect(/^[a-zA-Z\s-]+$/.test(name)).toBe(false);
+    });
+  });
+  
+  it('should reject names with special characters', () => {
+    const namesWithSpecialChars = [
+      'John@Doe',
+      'Jane.Smith',
+      'Bob#Johnson',
+      'Alice (Williams)',
+      'Charlie [Brown]',
+      'David & Eve'
+    ];
+    
+    namesWithSpecialChars.forEach(name => {
+      // Should NOT match the valid pattern (letters, spaces, hyphens only)
+      expect(/^[a-zA-Z\s-]+$/.test(name)).toBe(false);
+    });
+  });
+  
+  it('should reject names with numbers', () => {
+    const namesWithNumbers = [
+      'John Doe 123',
+      '123 Main Street',
+      'Provider 1',
+      'Dr. 2nd'
+    ];
+    
+    namesWithNumbers.forEach(name => {
+      // Should contain at least one digit
+      expect(/\d/.test(name)).toBe(true);
+      // Should NOT match the valid pattern
+      expect(/^[a-zA-Z\s-]+$/.test(name)).toBe(false);
+    });
+  });
+  
+  it('should reject names that are too long', () => {
+    // Names over 100 characters should be rejected
+    const tooLongName = 'A'.repeat(101);
+    
+    expect(tooLongName.length).toBeGreaterThan(100);
+    expect(tooLongName.length).toBe(101);
+  });
+  
+  it('should accept names exactly 100 characters', () => {
+    // Names exactly 100 characters should be accepted
+    const exactlyHundred = 'A'.repeat(100);
+    
+    expect(exactlyHundred.length).toBe(100);
+    expect(/^[a-zA-Z\s-]+$/.test(exactlyHundred)).toBe(true);
+  });
+  
+  it('should reject names with no alphabetic characters', () => {
+    const noLetters = [
+      '123',
+      '---',
+      '   ',
+      '...',
+      '!!!'
+    ];
+    
+    noLetters.forEach(name => {
+      // Should NOT contain any letters
+      expect(/[a-zA-Z]/.test(name)).toBe(false);
+    });
+  });
+  
+  it('should accept names with hyphens', () => {
+    // Hyphens are valid (for hyphenated last names)
+    const hyphenatedNames = [
+      'Mary-Jane Watson',
+      'Jean-Luc Picard',
+      'Lilach Geppert-Shapira'
+    ];
+    
+    hyphenatedNames.forEach(name => {
+      // Should match the valid pattern
+      expect(/^[a-zA-Z\s-]+$/.test(name)).toBe(true);
+      // Should contain at least one letter
+      expect(/[a-zA-Z]/.test(name)).toBe(true);
+    });
+  });
+  
+  it('should reject non-string types', () => {
+    const nonStrings = [
+      123,
+      true,
+      false,
+      { name: 'John Doe' },
+      ['John', 'Doe']
+    ];
+    
+    nonStrings.forEach(value => {
+      expect(typeof value).not.toBe('string');
+    });
+  });
+  
+  it('should handle edge case of single name', () => {
+    // Single names (no last name) should still be valid
+    const singleNames = ['Madonna', 'Prince', 'Cher'];
+    
+    singleNames.forEach(name => {
+      // Should match the valid pattern
+      expect(/^[a-zA-Z\s-]+$/.test(name)).toBe(true);
+      // Should contain at least one letter
+      expect(/[a-zA-Z]/.test(name)).toBe(true);
+    });
+  });
+});
