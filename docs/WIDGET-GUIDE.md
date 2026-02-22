@@ -54,16 +54,25 @@ When deploying to production, you'll need to:
 2. Update the `apiUrl` in the widget configuration
 3. Host the `chat-widget.js` file on your server
 
-### Step 2: Enable CORS
-If your website is on a different domain than your server, you'll need to enable CORS. Add this to `src/server.js`:
+### Step 2: Configure CORS for Web Chat
+The server uses secure CORS configuration to control which websites can use the chat widget.
 
-```javascript
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://www.rtcbellevue.com');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
+**Set the `ALLOWED_ORIGIN` environment variable in your `.env` file:**
+
+```bash
+# Single website
+ALLOWED_ORIGIN=https://www.yourpractice.com
+
+# Multiple websites (comma-separated)
+ALLOWED_ORIGIN=https://www.yourpractice.com,https://staging.yourpractice.com,https://yourpractice.squarespace.com
 ```
+
+**Important notes:**
+- Include the full origin (protocol + domain + port if non-standard)
+- No trailing slashes
+- Separate multiple origins with commas
+- In local development, localhost is automatically allowed (no configuration needed)
+- The server will log configured origins on startup
 
 ### Step 3: Add to Website
 Add the widget code to your website's template or footer so it appears on all pages.

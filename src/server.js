@@ -59,11 +59,17 @@ app.use(express.static('public'));
 // ============================================================================
 // CORS Configuration for Web Chat Widget
 // ============================================================================
-// Restricts cross-origin requests to the configured domain only.
+// Restricts cross-origin requests to the configured domain(s) only.
 // In local development (no ALLOWED_ORIGIN set), falls back to localhost origins.
 // Wildcard CORS is intentionally avoided in production.
+//
+// ALLOWED_ORIGIN can be:
+// - Single origin: ALLOWED_ORIGIN=https://example.com
+// - Multiple origins (comma-separated): ALLOWED_ORIGIN=https://example.com,https://www.example.com,https://staging.example.com
 
-const allowedOrigin = process.env.ALLOWED_ORIGIN;
+const allowedOrigins = process.env.ALLOWED_ORIGIN 
+  ? process.env.ALLOWED_ORIGIN.split(',').map(origin => origin.trim()).filter(origin => origin)
+  : [];
 
 const webchatCorsOptions = {
   origin: (origin, callback) => {
@@ -72,9 +78,9 @@ const webchatCorsOptions = {
       return callback(null, true);
     }
 
-    // In production: only allow the explicitly configured origin
-    if (allowedOrigin) {
-      if (origin === allowedOrigin) {
+    // In production: only allow the explicitly configured origins
+    if (allowedOrigins.length > 0) {
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       // Log the blocked origin server-side, but don't leak it to client
@@ -889,10 +895,10 @@ const PORT = config.server.port;
       console.log(`   - Twilio Account: ${config.twilio.accountSid.substring(0, 10)}...`);
       console.log(`   - OpenRouter Model: ${config.openRouter.model}`);
       console.log(`   - Provider Profiles: ${Object.keys(providerLoader.getAll()).length} loaded`);
-      if (allowedOrigin) {
-        console.log(`   - Web Chat CORS Origin: ${allowedOrigin}`);
+      if (allowedOrigins.length > 0) {
+        console.log(`   - Web Chat CORS Origins: ${allowedOrigins.join(', ')}`);
       } else {
-        console.log(`   - Web Chat CORS Origin: localhost only (set ALLOWED_ORIGIN for production)`);
+        console.log(`   - Web Chat CORS Origins: localhost only (set ALLOWED_ORIGIN for production)`);
       }
       if (!useSSL) {
         console.log(`\n⚠️  Running without SSL — Twilio Media Streams requires HTTPS/WSS`);
