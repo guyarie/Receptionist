@@ -1,74 +1,46 @@
 #!/bin/bash
 # Deployment script for DigitalOcean droplet
+# Updates the production deployment via git pull
 
 set -e  # Exit on error
 
 SERVER_IP="138.68.51.142"
-APP_DIR="/opt/ai-phone-receptionist"
-REPO_URL="https://github.com/yourusername/ai-phone-receptionist.git"  # Update this!
+SERVER_USER="guyarie"
+APP_DIR="/home/guyarie/receptionist_prod/Receptionist"
+SERVICE_NAME="ai-phone-receptionist"
 
 echo "🚀 Deploying AI Phone Receptionist to DigitalOcean..."
+echo ""
 
-# Install Node.js and dependencies on server
-echo "📦 Installing Node.js and system dependencies..."
-ssh root@$SERVER_IP << 'ENDSSH'
-# Update system
-apt-get update
-apt-get upgrade -y
-
-# Install Node.js 20.x
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-apt-get install -y nodejs git
-
-# Verify installation
-node --version
-npm --version
-
-echo "✅ Node.js installed successfully"
-ENDSSH
-
-# Create app directory and copy files
-echo "📁 Setting up application directory..."
-ssh root@$SERVER_IP "mkdir -p $APP_DIR"
-
-# Copy application files (excluding node_modules, .git, etc.)
-echo "📤 Uploading application files..."
-rsync -avz --exclude 'node_modules' \
-           --exclude '.git' \
-           --exclude 'call-summaries' \
-           --exclude 'data' \
-           --exclude '.env' \
-           ./ root@$SERVER_IP:$APP_DIR/
-
-# Install dependencies and set up service
-echo "📦 Installing npm dependencies..."
-ssh root@$SERVER_IP << ENDSSH
+# Pull latest changes from git
+echo "📥 Pulling latest changes from git..."
+ssh $SERVER_USER@$SERVER_IP << ENDSSH
 cd $APP_DIR
 
-# Install dependencies
+# Pull latest code
+git pull
+
+# Install/update dependencies
+echo "📦 Installing dependencies..."
 npm install --production
 
-# Create necessary directories
-mkdir -p call-summaries
-mkdir -p data/providers
-mkdir -p data/practice
-mkdir -p data/availability
-
-echo "✅ Dependencies installed"
+echo "✅ Code updated successfully"
 ENDSSH
+
+# Restart the service
+echo ""
+echo "🔄 Restarting service..."
+ssh $SERVER_USER@$SERVER_IP "sudo systemctl restart $SERVICE_NAME"
+
+# Check service status
+echo ""
+echo "📊 Checking service status..."
+ssh $SERVER_USER@$SERVER_IP "sudo systemctl status $SERVICE_NAME --no-pager"
 
 echo ""
 echo "✅ Deployment complete!"
 echo ""
-echo "Next steps:"
-echo "1. Copy your .env file to the server:"
-echo "   scp .env root@$SERVER_IP:$APP_DIR/.env"
-echo ""
-echo "2. Copy your data files:"
-echo "   scp -r data/* root@$SERVER_IP:$APP_DIR/data/"
-echo ""
-echo "3. Install and start the systemd service:"
-echo "   ssh root@$SERVER_IP 'cd $APP_DIR && bash deployment/install-service.sh'"
-echo ""
-echo "4. Check service status:"
-echo "   ssh root@$SERVER_IP 'systemctl status ai-phone-receptionist'"
+echo "Useful commands:"
+echo "  View logs: ssh $SERVER_USER@$SERVER_IP 'sudo journalctl -u $SERVICE_NAME -f'"
+echo "  Check status: ssh $SERVER_USER@$SERVER_IP 'sudo systemctl status $SERVICE_NAME'"
+echo "  Test endpoint: curl https://phone.rtcbellevue.com/"

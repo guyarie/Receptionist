@@ -3,11 +3,14 @@
 # AI Phone Receptionist Startup Script
 # This script starts the AI phone receptionist server
 
-# Get the directory where this script is located
+# Get the directory where this script is located (deployment folder)
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Get the project root directory (parent of deployment folder)
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
 # Change to the project directory
-cd "$SCRIPT_DIR"
+cd "$PROJECT_DIR"
 
 # Check if .env file exists
 if [ ! -f .env ]; then

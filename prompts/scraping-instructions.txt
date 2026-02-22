@@ -28,7 +28,7 @@ Guidelines:
 - For each provider: Create a markdown document with sections like:
  - Provider Name
  - Credentials
- - Insurance they accept
+ - Insurance they accept. THIS IS VERY IMPORTANT. **Please double check if you don't find insurance information for a provider. Maybe you missed it. It's very important to have it in the profile. 
  - Approach
  - Contact
  - Fees
@@ -37,7 +37,6 @@ Guidelines:
 
 - Use the provider's full name with credentials for the heading (e.g., "# Miri Arie, LMFT")
 - Generate a kebab-case slug from the provider name (e.g., "miri-arie")
-- Extract all relevant information including specialties, therapeutic approaches, contact details
+- Extract all relevant information including specialties, therapeutic approaches, contact details, credentials, insurance, contact, fees. 
 - Format contact info as bullet points
-- Keep the tone professional and warm
-- If information is unclear or missing, omit that section rather than guessing
+- If information is unclear or missing, store that in a "questions.md" file under the 'practice' folder

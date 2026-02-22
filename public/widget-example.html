@@ -38,8 +38,13 @@
   
   <!-- STEP 1: Configure the widget (optional) -->
   <script>
+    // Automatically use the same host and port as the current page
+    const currentPort = window.location.port || '80';
+    const currentHost = window.location.hostname;
+    const currentProtocol = window.location.protocol;
+    
     window.RTCChatConfig = {
-      apiUrl: 'http://localhost:3000',  // Your server URL
+      apiUrl: `${currentProtocol}//${currentHost}:${currentPort}`,  // Auto-detect from current page
       position: 'bottom-right',          // or 'bottom-left'
       primaryColor: '#667eea',           // Your brand color
       title: 'Chat with us'              // Widget title

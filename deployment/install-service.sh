@@ -29,7 +29,7 @@ CURRENT_USER=$(whoami)
 NODE_PATH=$(which node)
 if [ -z "$NODE_PATH" ]; then
     echo "❌ Error: Node.js not found in PATH"
-    echo "   Please install Node.js first (see docs/systemd-setup.md)"
+    echo "   Please install Node.js first"
     exit 1
 fi
 
@@ -52,6 +52,15 @@ if [ ! -d "$PROJECT_DIR/node_modules" ]; then
     echo ""
 fi
 
+# Check if receptionist user exists
+if ! id "receptionist" &>/dev/null; then
+    echo "⚠️  Warning: 'receptionist' user does not exist!"
+    echo "   Creating receptionist user..."
+    sudo useradd -r -s /bin/false receptionist
+    echo "✅ Created receptionist user"
+    echo ""
+fi
+
 # Create service file from template
 SERVICE_FILE="/tmp/ai-phone-receptionist.service"
 echo "📝 Creating systemd service file..."
@@ -63,7 +72,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=$CURRENT_USER
+User=receptionist
+Group=receptionist
 WorkingDirectory=$PROJECT_DIR
 ExecStart=$NODE_PATH $PROJECT_DIR/src/server.js
 Restart=on-failure
@@ -71,6 +81,16 @@ RestartSec=10
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=ai-phone-receptionist
+
+# Allow binding to port 443 without root
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=$PROJECT_DIR/call-summaries $PROJECT_DIR/data
 
 [Install]
 WantedBy=multi-user.target
@@ -95,6 +115,11 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
+# Set proper permissions for receptionist user
+echo "🔐 Setting file permissions..."
+sudo chown -R receptionist:receptionist "$PROJECT_DIR"
+sudo chmod -R 755 "$PROJECT_DIR"
+
 # Copy service file to systemd directory
 echo "📋 Installing service file..."
 sudo cp "$SERVICE_FILE" /etc/systemd/system/ai-phone-receptionist.service
@@ -112,8 +137,8 @@ echo ""
 echo "✅ Installation complete!"
 echo ""
 echo "Next steps:"
-echo "  1. Ensure .env file is configured: nano .env"
-echo "  2. Install dependencies if needed: npm install"
+echo "  1. Ensure .env file is configured with PORT=443"
+echo "  2. Ensure SSL certificates are configured (SSL_CERT_PATH, SSL_KEY_PATH)"
 echo "  3. Start the service: sudo systemctl start ai-phone-receptionist"
 echo "  4. Check status: sudo systemctl status ai-phone-receptionist"
 echo "  5. View logs: sudo journalctl -u ai-phone-receptionist -f"

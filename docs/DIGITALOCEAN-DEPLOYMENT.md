@@ -3,239 +3,426 @@
 This guide walks you through deploying the AI Phone Receptionist to your DigitalOcean droplet.
 
 ## Server Information
-- IP Address: `138.68.51.142`
-- Domain: `phone.rtcbellevue.com` (DNS configured in Squarespace)
-- OS: Ubuntu (recommended)
-- SSH Access: Configured with your SSH key
-- Project Location: `/home/guyarie/receptionist_prod/Receptionist`
-- Service User: `receptionist`
-- Port: 443 (HTTPS direct binding)
+- **IP Address**: `138.68.51.142`
+- **Domain**: `phone.rtcbellevue.com` (DNS configured in Squarespace)
+- **OS**: Ubuntu 22.04
+- **SSH User**: `guyarie`
+- **Service User**: `receptionist` (runs the Node.js process)
+- **Project Location**: `/home/guyarie/receptionist_prod/Receptionist`
+- **Port**: 443 (HTTPS with SSL certificates)
+- **Node.js Version**: v20.20.0
 
-## Step 1: Install Node.js on Server
+## Prerequisites
 
-SSH into your server and install Node.js:
+Before deploying, ensure you have:
+- SSH access to the droplet (`ssh guyarie@138.68.51.142`)
+- Your code pushed to a git repository
+- SSL certificates configured on the server
+- `.env` file with `PORT=443`, `SSL_CERT_PATH`, and `SSL_KEY_PATH` configured
+
+## Initial Server Setup (One-Time)
+
+If this is your first deployment, follow these steps:
+
+### 1. Install Node.js
 
 ```bash
-ssh root@138.68.51.142
+ssh guyarie@138.68.51.142
 
 # Update system
-apt-get update && apt-get upgrade -y
+sudo apt-get update && sudo apt-get upgrade -y
 
 # Install Node.js 20.x
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-apt-get install -y nodejs git
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+sudo apt-get install -y nodejs git
 
 # Verify installation
-node --version
+node --version  # Should show v20.20.0 or similar
 npm --version
 
-# Exit SSH session
 exit
 ```
 
-## Step 2: Clone Repository from GitHub
-
-First, make sure your code is pushed to GitHub. Then on the server:
+### 2. Clone Repository
 
 ```bash
-ssh root@138.68.51.142
+ssh guyarie@138.68.51.142
+
+# Create project directory
+mkdir -p ~/receptionist_prod
+cd ~/receptionist_prod
 
 # Clone your repository
-cd /opt
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git ai-phone-receptionist
+git clone <YOUR_REPO_URL> Receptionist
 
-# Or if you haven't pushed to GitHub yet, we'll use scp for now
-# (see Alternative Method below)
+# Or if already cloned, just pull latest
+cd Receptionist
+git pull
 
 exit
 ```
 
-**Alternative Method (if not using GitHub yet):**
+### 3. Upload Environment Variables
 
 ```bash
-# Create app directory on server
-ssh root@138.68.51.142 "mkdir -p /opt/ai-phone-receptionist"
-
-# Upload application files (this will take a minute)
-scp -r src prompts public deployment package.json package-lock.json vitest.config.js root@138.68.51.142:/opt/ai-phone-receptionist/
+# Copy your .env file from local machine
+scp .env guyarie@138.68.51.142:~/receptionist_prod/Receptionist/.env
 ```
 
-## Step 3: Upload Environment Variables
-
-```bash
-# Copy your .env file
-scp .env root@138.68.51.142:/opt/ai-phone-receptionist/.env
+Make sure your `.env` includes:
+```
+PORT=443
+SSL_CERT_PATH=/path/to/your/cert.pem
+SSL_KEY_PATH=/path/to/your/key.pem
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_PHONE_NUMBER=your_phone_number
+OPENROUTER_API_KEY=your_openrouter_key
+OPENAI_API_KEY=your_openai_key
 ```
 
-## Step 4: Upload Data Files
+### 4. Upload Data Files (If Not in Git)
 
 ```bash
 # Copy provider profiles and practice data
-scp -r data root@138.68.51.142:/opt/ai-phone-receptionist/
+scp -r data/* guyarie@138.68.51.142:~/receptionist_prod/Receptionist/data/
 ```
 
-## Step 5: Install Dependencies on Server
+### 5. Install Dependencies
 
 ```bash
-ssh root@138.68.51.142
+ssh guyarie@138.68.51.142
 
-cd /opt/ai-phone-receptionist
+cd ~/receptionist_prod/Receptionist
 
 # Install npm dependencies
 npm install --production
 
 # Create necessary directories
 mkdir -p call-summaries
-mkdir -p examples/availability
-mkdir -p examples/data
+mkdir -p data/providers
+mkdir -p data/practice
+mkdir -p data/availability
 
 exit
 ```
 
-## Step 6: Install and Start Service
+### 6. Install Systemd Service
 
 ```bash
-ssh root@138.68.51.142
+ssh guyarie@138.68.51.142
 
-cd /opt/ai-phone-receptionist
+cd ~/receptionist_prod/Receptionist
 
 # Run the installation script
 bash deployment/install-service.sh
 
-# Check service status
-systemctl status ai-phone-receptionist
-
-# View logs
-journalctl -u ai-phone-receptionist -f
-```
-
-## Step 7: Configure Firewall
-
-```bash
-ssh root@138.68.51.142
-
-# Allow HTTP and HTTPS
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw allow 3000/tcp
-
-# Enable firewall (if not already enabled)
-ufw --force enable
+# The script will:
+# - Create the 'receptionist' user if it doesn't exist
+# - Set proper file permissions
+# - Install the systemd service
+# - Enable auto-start on boot
 
 exit
 ```
 
-## Step 8: Update Twilio Webhook URL
+### 7. Start the Service
 
-1. Go to your Twilio Console
-2. Navigate to Phone Numbers → Active Numbers
+```bash
+ssh guyarie@138.68.51.142
+
+# Start the service
+sudo systemctl start ai-phone-receptionist
+
+# Check status
+sudo systemctl status ai-phone-receptionist
+
+# View logs
+sudo journalctl -u ai-phone-receptionist -f
+
+exit
+```
+
+### 8. Configure Firewall
+
+```bash
+ssh guyarie@138.68.51.142
+
+# Allow HTTPS
+sudo ufw allow 443/tcp
+
+# Enable firewall (if not already enabled)
+sudo ufw --force enable
+
+# Check firewall status
+sudo ufw status
+
+exit
+```
+
+### 9. Update Twilio Webhook URL
+
+1. Go to your [Twilio Console](https://console.twilio.com/)
+2. Navigate to **Phone Numbers** → **Active Numbers**
 3. Click on your phone number
-4. Under "Voice & Fax", set:
+4. Under **Voice & Fax**, set:
    - **A CALL COMES IN**: Webhook
-   - **URL**: `https://phone.rtcbellevue.com/incoming-call` (or your domain)
+   - **URL**: `https://phone.rtcbellevue.com/incoming-call`
    - **HTTP**: POST
 5. Save changes
 
-**Important:** If using a custom domain with SSL, ensure:
-- Your `.env` has `PORT=443` (for direct HTTPS binding)
-- SSL certificates are configured: `SSL_CERT_PATH` and `SSL_KEY_PATH`
-- The systemd service has `AmbientCapabilities=CAP_NET_BIND_SERVICE` to bind to port 443
-
-## Step 9: Test the Deployment
+### 10. Test the Deployment
 
 ```bash
 # Test the health endpoint
-curl http://138.68.51.142:3000/
+curl https://phone.rtcbellevue.com/
 
 # Should return: "AI Phone Receptionist is running!"
 ```
 
-Call your Twilio number to test!
+Call your Twilio number to test the voice interaction!
+
+## Deploying Updates
+
+Once the initial setup is complete, deploying updates is simple:
+
+### Option 1: Use the Deployment Script (Recommended)
+
+From your local machine:
+
+```bash
+# Make sure your changes are committed and pushed to git
+git push
+
+# Run the deployment script
+bash deployment/deploy-to-digitalocean.sh
+```
+
+The script will:
+1. SSH into the server
+2. Pull latest changes from git
+3. Install/update dependencies
+4. Restart the service
+5. Show service status
+
+### Option 2: Manual Deployment
+
+```bash
+ssh guyarie@138.68.51.142
+
+cd ~/receptionist_prod/Receptionist
+
+# Pull latest changes
+git pull
+
+# Install/update dependencies
+npm install --production
+
+# Restart service
+sudo systemctl restart ai-phone-receptionist
+
+# Check status
+sudo systemctl status ai-phone-receptionist
+
+exit
+```
 
 ## Useful Commands
 
-### View Logs
+### View Real-Time Logs
 ```bash
-ssh root@138.68.51.142 "journalctl -u ai-phone-receptionist -f"
+ssh guyarie@138.68.51.142 "sudo journalctl -u ai-phone-receptionist -f"
+```
+
+### View Recent Logs (Last 50 Lines)
+```bash
+ssh guyarie@138.68.51.142 "sudo journalctl -u ai-phone-receptionist -n 50"
+```
+
+### Check Service Status
+```bash
+ssh guyarie@138.68.51.142 "sudo systemctl status ai-phone-receptionist"
 ```
 
 ### Restart Service
 ```bash
-ssh root@138.68.51.142 "systemctl restart ai-phone-receptionist"
+ssh guyarie@138.68.51.142 "sudo systemctl restart ai-phone-receptionist"
 ```
 
 ### Stop Service
 ```bash
-ssh root@138.68.51.142 "systemctl stop ai-phone-receptionist"
+ssh guyarie@138.68.51.142 "sudo systemctl stop ai-phone-receptionist"
 ```
 
-### Update Application
-
-**If using git:**
+### Start Service
 ```bash
-ssh root@138.68.51.142 "cd /opt/ai-phone-receptionist && git pull && npm install --production && systemctl restart ai-phone-receptionist"
+ssh guyarie@138.68.51.142 "sudo systemctl start ai-phone-receptionist"
 ```
 
-**If using scp:**
+### Reload Prompts Without Restart
 ```bash
-# Upload new files
-scp -r src root@138.68.51.142:/opt/ai-phone-receptionist/
-
-# Restart service
-ssh root@138.68.51.142 "systemctl restart ai-phone-receptionist"
+curl https://phone.rtcbellevue.com/reload-prompts
 ```
 
-## Setting Up HTTPS (Optional but Recommended)
-
-For production, you should use HTTPS. Install Caddy (easiest) or nginx:
-
-### Using Caddy (Recommended)
-
+### View Call Summaries
 ```bash
-ssh root@138.68.51.142
+# In browser
+https://phone.rtcbellevue.com/call-summaries
 
-# Install Caddy
-apt install -y debian-keyring debian-archive-keyring apt-transport-https
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-apt update
-apt install caddy
-
-# Create Caddyfile
-cat > /etc/caddy/Caddyfile << 'EOF'
-receptionist.yourdomain.com {
-    reverse_proxy localhost:3000
-}
-EOF
-
-# Restart Caddy
-systemctl restart caddy
+# Or via SSH
+ssh guyarie@138.68.51.142 "ls -lh ~/receptionist_prod/Receptionist/call-summaries/"
 ```
-
-Then update your Twilio webhook to use `https://receptionist.yourdomain.com/incoming-call`
 
 ## Troubleshooting
 
-### Service won't start
-```bash
-# Check logs for errors
-ssh root@138.68.51.142 "journalctl -u ai-phone-receptionist -n 50"
+### Service Won't Start
 
-# Check if port 3000 is in use
-ssh root@138.68.51.142 "lsof -i :3000"
+Check the logs for errors:
+```bash
+ssh guyarie@138.68.51.142 "sudo journalctl -u ai-phone-receptionist -n 100"
 ```
 
-### Can't connect to server
-```bash
-# Test SSH connection
-ssh root@138.68.51.142 "echo 'Connected'"
+Common issues:
+- Missing `.env` file
+- Invalid SSL certificate paths
+- Port 443 already in use
+- Missing environment variables
 
-# Check firewall
-ssh root@138.68.51.142 "ufw status"
+### Port 443 Already in Use
+
+Check what's using port 443:
+```bash
+ssh guyarie@138.68.51.142 "sudo lsof -i :443"
 ```
 
-### Environment variables not loaded
+### Permission Errors
+
+Ensure the `receptionist` user has proper permissions:
 ```bash
-# Verify .env file exists
-ssh root@138.68.51.142 "cat /opt/ai-phone-receptionist/.env"
+ssh guyarie@138.68.51.142
+
+cd ~/receptionist_prod/Receptionist
+sudo chown -R receptionist:receptionist .
+sudo chmod -R 755 .
+
+exit
 ```
+
+### SSL Certificate Issues
+
+Verify your SSL certificate paths in `.env`:
+```bash
+ssh guyarie@138.68.51.142 "cat ~/receptionist_prod/Receptionist/.env | grep SSL"
+```
+
+Make sure the files exist and are readable:
+```bash
+ssh guyarie@138.68.51.142 "ls -l /path/to/your/cert.pem /path/to/your/key.pem"
+```
+
+### Can't Connect to Server
+
+Test SSH connection:
+```bash
+ssh guyarie@138.68.51.142 "echo 'Connected'"
+```
+
+Check firewall:
+```bash
+ssh guyarie@138.68.51.142 "sudo ufw status"
+```
+
+### Environment Variables Not Loaded
+
+Verify `.env` file exists and has correct values:
+```bash
+ssh guyarie@138.68.51.142 "cat ~/receptionist_prod/Receptionist/.env"
+```
+
+### Git Pull Fails
+
+If you have local changes on the server:
+```bash
+ssh guyarie@138.68.51.142
+
+cd ~/receptionist_prod/Receptionist
+
+# Stash local changes
+git stash
+
+# Pull latest
+git pull
+
+# Reapply local changes if needed
+git stash pop
+
+exit
+```
+
+## Monitoring
+
+### Check Service Health
+```bash
+# Health check endpoint
+curl https://phone.rtcbellevue.com/
+
+# Model info
+curl https://phone.rtcbellevue.com/api/model-info
+```
+
+### Monitor System Resources
+```bash
+ssh guyarie@138.68.51.142
+
+# Check CPU and memory usage
+top
+
+# Check disk space
+df -h
+
+# Check service memory usage
+sudo systemctl status ai-phone-receptionist
+
+exit
+```
+
+### View Active Connections
+```bash
+ssh guyarie@138.68.51.142 "sudo netstat -tulpn | grep :443"
+```
+
+## Security Notes
+
+- The service runs as the `receptionist` user (not root) for security
+- `AmbientCapabilities=CAP_NET_BIND_SERVICE` allows binding to port 443 without root
+- Security hardening enabled: `NoNewPrivileges`, `PrivateTmp`, `ProtectSystem`, `ProtectHome`
+- Only `call-summaries` and `data` directories are writable by the service
+- SSL/TLS encryption for all HTTPS traffic
+- Firewall configured to only allow necessary ports
+
+## Backup Recommendations
+
+### Backup Call Summaries
+```bash
+# Download call summaries to local machine
+scp -r guyarie@138.68.51.142:~/receptionist_prod/Receptionist/call-summaries ./backup/
+```
+
+### Backup Data Files
+```bash
+# Download data files to local machine
+scp -r guyarie@138.68.51.142:~/receptionist_prod/Receptionist/data ./backup/
+```
+
+### Backup Environment Variables
+```bash
+# Download .env file to local machine
+scp guyarie@138.68.51.142:~/receptionist_prod/Receptionist/.env ./backup/.env.production
+```
+
+## Additional Resources
+
+- [Twilio Console](https://console.twilio.com/)
+- [OpenRouter Dashboard](https://openrouter.ai/)
+- [Systemd Service Documentation](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
+- Project Documentation: `docs/` directory

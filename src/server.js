@@ -244,7 +244,7 @@ app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
     // --- Call stateless AI method ---
     const reply = await aiClient.sendMessageWithHistory(messages);
 
-    res.json({ reply, sessionId: sessionId.trim() });
+    res.json({ response: reply, sessionId: sessionId.trim() });
 
   } catch (error) {
     console.error('❌ Webchat API error:', error);

@@ -13,10 +13,8 @@
   };
 
   // ─── Storage Keys ─────────────────────────────────────────────────────────
-  const STORAGE_KEYS = {
-    history: 'receptionist_chat_history',
-    sessionId: 'receptionist_session_id'
-  };
+  // PRIVACY NOTE: For healthcare/therapy settings, we do NOT persist chat history
+  // to localStorage. Each session is ephemeral and cleared when the widget closes.
 
   // ─── Session ID ───────────────────────────────────────────────────────────
   /**
@@ -32,61 +30,16 @@
   }
 
   /**
-   * Retrieve an existing sessionId from localStorage or create and persist a new one.
+   * Generate a new session ID for each widget instance.
+   * PRIVACY: Does NOT persist to localStorage - generates fresh ID each time.
    * @returns {string}
    */
   function getOrCreateSessionId() {
-    try {
-      var existing = localStorage.getItem(STORAGE_KEYS.sessionId);
-      if (existing) return existing;
-      var newId = generateUUID();
-      localStorage.setItem(STORAGE_KEYS.sessionId, newId);
-      return newId;
-    } catch (e) {
-      // localStorage unavailable (e.g. private browsing restrictions)
-      return generateUUID();
-    }
+    return generateUUID();
   }
 
   // ─── Conversation History ─────────────────────────────────────────────────
-  /**
-   * Load conversation history from localStorage.
-   * Returns an array of {role, content} objects.
-   * @returns {Array<{role: string, content: string}>}
-   */
-  function loadHistory() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEYS.history);
-      if (!raw) return [];
-      var parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  /**
-   * Persist conversation history to localStorage.
-   * @param {Array<{role: string, content: string}>} history
-   */
-  function saveHistory(history) {
-    try {
-      localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(history));
-    } catch (e) {
-      // Silently fail if storage is full or unavailable
-    }
-  }
-
-  /**
-   * Append a single message to the persisted history.
-   * @param {Array<{role: string, content: string}>} history
-   * @param {string} role  - 'user' | 'assistant'
-   * @param {string} content
-   */
-  function appendToHistory(history, role, content) {
-    history.push({ role: role, content: content });
-    saveHistory(history);
-  }
+  // PRIVACY: No localStorage persistence - history only exists in memory during session
 
   // ─── API ──────────────────────────────────────────────────────────────────
   /**
@@ -228,16 +181,12 @@
 
     // State
     const sessionId = getOrCreateSessionId();
-    let conversationHistory = loadHistory();
+    let conversationHistory = []; // PRIVACY: In-memory only, not persisted
     let isOpen = false;
     let isBusy = false;
 
     // ── Render persisted history on first open ──────────────────────────────
-    function renderHistory() {
-      conversationHistory.forEach(function (msg) {
-        renderMessage(msg.role === 'user' ? 'user' : 'ai', msg.content);
-      });
-    }
+    // PRIVACY: No history to render - each session starts fresh
 
     // ── Toggle panel ────────────────────────────────────────────────────────
     function openChat() {
@@ -245,6 +194,7 @@
       chatWindow.style.display = 'flex';
       chatButton.setAttribute('aria-expanded', 'true');
 
+      // Always fetch greeting on first open since we don't persist history
       if (conversationHistory.length === 0) {
         fetchGreeting();
       }
@@ -280,11 +230,11 @@
         if (!response.ok) throw new Error('Greeting fetch failed');
         const data = await response.json();
         const greetingText = data.greeting || 'Hello! How can I help you today?';
-        appendToHistory(conversationHistory, 'assistant', greetingText);
+        conversationHistory.push({ role: 'assistant', content: greetingText }); // In-memory only
         renderMessage('ai', greetingText);
       } catch (e) {
         const fallback = 'Hello! How can I help you today?';
-        appendToHistory(conversationHistory, 'assistant', fallback);
+        conversationHistory.push({ role: 'assistant', content: fallback }); // In-memory only
         renderMessage('ai', fallback);
       }
     }
@@ -297,8 +247,8 @@
       const text = chatInput.value.trim();
       if (!text) return;
 
-      // Optimistically render user message
-      appendToHistory(conversationHistory, 'user', text);
+      // Add to in-memory history and render
+      conversationHistory.push({ role: 'user', content: text });
       renderMessage('user', text);
       chatInput.value = '';
 
@@ -310,7 +260,7 @@
       try {
         const reply = await sendToAPI(sessionId, conversationHistory);
         typingEl.remove();
-        appendToHistory(conversationHistory, 'assistant', reply);
+        conversationHistory.push({ role: 'assistant', content: reply }); // In-memory only
         renderMessage('ai', reply);
       } catch (err) {
         typingEl.remove();
@@ -398,10 +348,7 @@
       return wrapper;
     }
 
-    // Render any previously stored history immediately
-    if (conversationHistory.length > 0) {
-      renderHistory();
-    }
+    // PRIVACY: No history rendering - each session starts fresh
   }
 
   // Run after DOM is ready
@@ -412,14 +359,11 @@
   }
 
   // ─── Public API (for testing) ─────────────────────────────────────────────
+  // PRIVACY: Removed localStorage functions - no persistent storage
   window._RTCChatWidget = {
     generateUUID: generateUUID,
     getOrCreateSessionId: getOrCreateSessionId,
-    loadHistory: loadHistory,
-    saveHistory: saveHistory,
-    appendToHistory: appendToHistory,
-    sendToAPI: sendToAPI,
-    STORAGE_KEYS: STORAGE_KEYS
+    sendToAPI: sendToAPI
   };
 
 })();
