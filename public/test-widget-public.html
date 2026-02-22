@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RTC Chat Widget - Public Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      border-left: 4px solid #2196f3;
+    }
+    .warning {
+      background: #fff3cd;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      border-left: 4px solid #ffc107;
+    }
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 RTC Chat Widget - Public Test Page</h1>
+    
+    <div class="info">
+      <strong>ℹ️ Test Page</strong><br>
+      This page tests the chat widget from a public URL. The widget should appear in the bottom-right corner.
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ CORS Notice</strong><br>
+      If the widget doesn't work, you may need to configure <code>ALLOWED_ORIGIN</code> in your server's <code>.env</code> file to allow this domain.
+    </div>
+
+    <h2>Instructions:</h2>
+    <ol>
+      <li>Look for the chat button in the bottom-right corner</li>
+      <li>Click it to open the chat window</li>
+      <li>Try sending a message to test the AI receptionist</li>
+      <li>Check browser console (F12) for any errors</li>
+    </ol>
+
+    <h2>What to Test:</h2>
+    <ul>
+      <li>Widget appears and is clickable</li>
+      <li>Chat window opens/closes properly</li>
+      <li>Messages send and receive responses</li>
+      <li>Conversation history is maintained</li>
+      <li>Widget is mobile-responsive</li>
+    </ul>
+
+    <p style="margin-top: 40px; color: #666; font-size: 14px;">
+      <strong>Server URL:</strong> <span id="server-url"></span><br>
+      <strong>Page URL:</strong> <span id="page-url"></span>
+    </p>
+  </div>
+
+  <!-- Configure the widget to use current server -->
+  <script>
+    // Automatically detect server URL
+    const serverUrl = window.location.origin;
+    document.getElementById('server-url').textContent = serverUrl;
+    document.getElementById('page-url').textContent = window.location.href;
+
+    window.RTCChatConfig = {
+      apiUrl: serverUrl,
+      position: 'bottom-right',
+      primaryColor: '#667eea',
+      title: 'Chat with RTC'
+    };
+  </script>
+
+  <!-- Include the widget script from same server -->
+  <script src="/chat-widget.js"></script>
+</body>
+</html>

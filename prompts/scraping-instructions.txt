@@ -1,3 +1,30 @@
+===================================================================
+USAGE NOTES FOR DEVELOPERS
+===================================================================
+
+This prompt file contains enhanced insurance extraction guidance that is critical for the AI phone receptionist system.
+
+WHY INSURANCE EXTRACTION IS CRITICAL:
+- Insurance acceptance is one of the most common questions callers ask
+- Without accurate insurance data, the AI receptionist cannot help callers determine if they can use their insurance
+- Missing insurance information forces callers to wait for callbacks or visit the website manually
+- Complete insurance data enables immediate, accurate responses that improve caller experience
+
+WHAT THIS PROMPT DOES:
+- Provides explicit, emphatic instructions to the AI about insurance importance
+- Lists common insurance provider names to search for
+- Specifies exact JSON structure (array of strings, never placeholder text)
+- Includes a verification checklist to ensure thorough extraction
+- Guides the AI to search multiple sections of provider profiles
+
+MAINTENANCE NOTES:
+- If insurance extraction quality degrades, review the "CRITICAL" section below
+- Add new insurance provider names to the list as they become relevant
+- Keep the verification checklist comprehensive but not overwhelming
+- The emphatic language ("CRITICAL", "ABSOLUTELY ESSENTIAL") is intentional and necessary
+
+===================================================================
+
 You are analyzing the website content for Relational Therapy Collective (RTC), a therapy practice.
 
 Your task is to extract and structure information about the practice and its providers into clean markdown summaries.
@@ -28,15 +55,80 @@ Guidelines:
 - For each provider: Create a markdown document with sections like:
  - Provider Name
  - Credentials
- - Insurance they accept. THIS IS VERY IMPORTANT. **Please double check if you don't find insurance information for a provider. Maybe you missed it. It's very important to have it in the profile. 
+ - Insurance (CRITICAL - see detailed instructions below)
  - Approach
  - Contact
  - Fees
- -  About
- -  Specialties
+ - About
+ - Specialties
 
 - Use the provider's full name with credentials for the heading (e.g., "# Miri Arie, LMFT")
 - Generate a kebab-case slug from the provider name (e.g., "miri-arie")
-- Extract all relevant information including specialties, therapeutic approaches, contact details, credentials, insurance, contact, fees. 
+- Extract all relevant information including specialties, therapeutic approaches, contact details, credentials, insurance, contact, fees
 - Format contact info as bullet points
 - If information is unclear or missing, store that in a "questions.md" file under the 'practice' folder
+
+=== CRITICAL: INSURANCE INFORMATION EXTRACTION ===
+
+INSURANCE INFORMATION IS ABSOLUTELY ESSENTIAL FOR EVERY PROVIDER.
+
+This is the MOST IMPORTANT piece of information to extract. The AI phone receptionist CANNOT answer caller questions about insurance without this data.
+
+WHERE TO LOOK FOR INSURANCE INFORMATION:
+- Provider bio sections (often near the end)
+- Sections labeled "Insurance", "Accepted Insurance", "Insurance Accepted", "Insurance Plans"
+- Sections labeled "Fees", "Payment", "Billing"
+- Paragraphs mentioning insurance companies by name
+- Bullet lists of insurance providers
+- Anywhere in the provider's profile content
+
+COMMON INSURANCE PROVIDER NAMES TO SEARCH FOR:
+- Aetna
+- Blue Cross Blue Shield (BCBS)
+- Cigna
+- UnitedHealthcare (UHC)
+- Anthem
+- Humana
+- Kaiser Permanente
+- Medicare
+- Medicaid
+- TriCare
+- Optum
+- Oscar Health
+- Premera
+- Regence
+
+EXACT JSON STRUCTURE REQUIRED:
+The "insurance" field in each provider object MUST be an array of strings:
+
+CORRECT:
+"insurance": ["Aetna", "Blue Cross Blue Shield", "Cigna"]
+
+CORRECT (if no insurance found):
+"insurance": []
+
+INCORRECT (never use placeholder text):
+"insurance": "Insurance information not provided"
+
+INCORRECT (never use a string):
+"insurance": "Aetna, Blue Cross"
+
+EXTRACTION INSTRUCTIONS:
+1. Search the ENTIRE provider section for insurance mentions
+2. Look for insurance company names in paragraphs, lists, and headings
+3. Extract each insurance provider name as a separate array element
+4. If multiple insurance providers are mentioned, include ALL of them
+5. If insurance information is in a sentence like "I accept Aetna and Blue Cross", extract both
+6. If you see "most major insurance plans", try to find specific names mentioned elsewhere
+7. Return an empty array [] ONLY if you have thoroughly searched and found NO insurance information
+
+VERIFICATION CHECKLIST (complete before returning JSON):
+[ ] Did I search for sections labeled "Insurance", "Fees", "Payment", or "Billing"?
+[ ] Did I search the provider's bio/about section for insurance mentions?
+[ ] Did I search for common insurance company names (Aetna, Blue Cross, Cigna, etc.)?
+[ ] Did I check if insurance is mentioned in paragraphs or bullet lists?
+[ ] Is my "insurance" field an array of strings (not a string or placeholder)?
+[ ] If I found insurance information, did I include ALL providers mentioned?
+[ ] If I didn't find insurance, did I thoroughly search the entire provider section?
+
+REMEMBER: Insurance information is CRITICAL. Take extra time to search thoroughly. The AI receptionist depends on this data to help callers.
