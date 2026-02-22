@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarah Chen, PhD - Relational Therapy Collective</title>
+    <style>
+        .loading { display: block; }
+        .loaded { display: none; }
+        .dynamic-content { display: none; }
+        .dynamic-content.visible { display: block; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Relational Therapy Collective</h1>
+    </header>
+
+    <main class="provider-profile">
+        <div class="provider-header">
+            <h2>Sarah Chen, PhD</h2>
+            <p class="provider-title">Clinical Psychologist</p>
+        </div>
+
+        <section class="provider-contact">
+            <h3>Contact Information</h3>
+            <p class="email">Email: sarah.chen@rtcollective.com</p>
+            <p class="phone">Phone: (206) 555-0456</p>
+        </section>
+
+        <!-- This content is initially hidden and loaded via JavaScript -->
+        <div class="loading-indicator loading">
+            <p>Loading insurance information...</p>
+        </div>
+
+        <section class="provider-insurance dynamic-content" id="insurance-section">
+            <h3>Insurance Accepted</h3>
+            <ul id="insurance-list">
+                <!-- Populated by JavaScript -->
+            </ul>
+        </section>
+
+        <section class="provider-specialties dynamic-content" id="specialties-section">
+            <h3>Specialties</h3>
+            <ul id="specialties-list">
+                <!-- Populated by JavaScript -->
+            </ul>
+        </section>
+
+        <section class="provider-bio">
+            <h3>About Sarah</h3>
+            <p>Dr. Sarah Chen is a licensed clinical psychologist specializing in evidence-based treatments for anxiety disorders, OCD, and trauma-related conditions.</p>
+        </section>
+    </main>
+
+    <script>
+        // Simulate dynamic content loading (as would happen with real API calls)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate network delay
+            setTimeout(function() {
+                // Hide loading indicator
+                const loadingIndicator = document.querySelector('.loading-indicator');
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+
+                // Load insurance information
+                const insuranceList = document.getElementById('insurance-list');
+                const insuranceData = ['Aetna', 'Cigna', 'United Healthcare', 'Kaiser Permanente'];
+                insuranceData.forEach(function(insurance) {
+                    const li = document.createElement('li');
+                    li.textContent = insurance;
+                    insuranceList.appendChild(li);
+                });
+                document.getElementById('insurance-section').classList.add('visible');
+
+                // Load specialties
+                const specialtiesList = document.getElementById('specialties-list');
+                const specialtiesData = [
+                    'Anxiety Disorders',
+                    'Obsessive-Compulsive Disorder (OCD)',
+                    'Post-Traumatic Stress Disorder',
+                    'Cognitive Behavioral Therapy (CBT)',
+                    'Exposure and Response Prevention (ERP)'
+                ];
+                specialtiesData.forEach(function(specialty) {
+                    const li = document.createElement('li');
+                    li.textContent = specialty;
+                    specialtiesList.appendChild(li);
+                });
+                document.getElementById('specialties-section').classList.add('visible');
+
+                // Mark page as fully loaded
+                document.body.setAttribute('data-content-loaded', 'true');
+            }, 500); // 500ms delay to simulate network request
+        });
+    </script>
+
+    <footer>
+        <p>&copy; 2024 Relational Therapy Collective. All rights reserved.</p>
+    </footer>
+</body>
+</html>

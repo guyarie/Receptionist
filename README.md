@@ -79,6 +79,98 @@ This will create markdown files in `data/providers/` with AI-generated summaries
 
 See `examples/data/README.md` for more details on the data folder structure.
 
+#### Puppeteer Setup for Website Scraping
+
+The scraper uses **Puppeteer** (headless Chrome) by default to capture JavaScript-rendered content like insurance information. This requires Chrome/Chromium to be installed on your system.
+
+**System Dependencies:**
+
+- **Windows**: Chrome is usually already installed. If not, [download Chrome](https://www.google.com/chrome/)
+- **Linux (Ubuntu/Debian)**:
+  ```bash
+  sudo apt-get update
+  sudo apt-get install -y chromium-browser
+  ```
+- **Linux (CentOS/RHEL)**:
+  ```bash
+  sudo yum install -y chromium
+  ```
+- **macOS**: Chrome is usually already installed. If not, [download Chrome](https://www.google.com/chrome/)
+
+**Configuration Options:**
+
+The scraper behavior can be customized via environment variables in your `.env` file:
+
+```env
+# Scraping mode: 'puppeteer' (default) or 'axios' (fallback)
+SCRAPING_MODE=puppeteer
+
+# Multi-page scraping: visit individual provider pages for complete data
+MULTI_PAGE_SCRAPING=true         # Enable multi-page scraping (recommended)
+
+# Puppeteer settings
+PAGE_LOAD_TIMEOUT=10000          # Page load timeout in milliseconds
+BROWSER_HEADLESS=true            # Run browser in headless mode
+BROWSER_DISABLE_IMAGES=true      # Disable images for faster scraping
+BROWSER_DISABLE_CSS=false        # Disable CSS (not recommended)
+
+# Retry settings
+MAX_RETRIES=3                    # Retry attempts for failed pages
+RETRY_DELAY=1000                 # Initial retry delay in milliseconds
+```
+
+**Multi-Page Scraping:**
+
+By default, the scraper visits each provider's individual page to extract complete information. This provides:
+
+- **Complete insurance details**: Individual provider pages often list accepted insurance plans that aren't on the homepage
+- **Detailed specialties**: More comprehensive information about therapeutic approaches and areas of expertise
+- **Better accuracy**: AI processes each provider separately with full context from their dedicated page
+- **Resilient processing**: If one provider page fails, others continue processing successfully
+- **Per-provider caching**: Each provider's content is cached separately for easier debugging
+
+**Performance expectations:**
+- Single-page mode: ~30-60 seconds for 10 providers (homepage only)
+- Multi-page mode: ~40-90 seconds for 10 providers (visits each provider page)
+
+The additional time is worthwhile for significantly better data quality, especially for insurance information. To use the faster single-page mode (not recommended), set `MULTI_PAGE_SCRAPING=false` in your `.env` file.
+
+**Troubleshooting:**
+
+- **"Failed to launch browser" error**:
+  - Ensure Chrome/Chromium is installed (see system dependencies above)
+  - On Linux servers, you may need additional dependencies:
+    ```bash
+    sudo apt-get install -y ca-certificates fonts-liberation libappindicator3-1 \
+      libasound2 libatk-bridge2.0-0 libatk1.0-0 libc6 libcairo2 libcups2 \
+      libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 \
+      libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 \
+      libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 \
+      libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 \
+      libxss1 libxtst6 lsb-release wget xdg-utils
+    ```
+  - Fallback: Set `SCRAPING_MODE=axios` in `.env` to use simple HTTP client (may miss dynamic content)
+
+- **"Page load timeout" errors**:
+  - Increase `PAGE_LOAD_TIMEOUT` in `.env` (e.g., `PAGE_LOAD_TIMEOUT=30000` for 30 seconds)
+  - Check your internet connection
+  - Verify the website URL is correct
+
+- **Missing insurance or dynamic content**:
+  - Ensure `SCRAPING_MODE=puppeteer` (not axios)
+  - Increase `PAGE_LOAD_TIMEOUT` to allow more time for JavaScript to execute
+  - Check that the website actually contains the expected content
+
+- **Scraping is slow**:
+  - Ensure `BROWSER_DISABLE_IMAGES=true` to skip image downloads
+  - Reduce `PAGE_LOAD_TIMEOUT` if pages load quickly
+  - The scraper reuses a single browser instance for all pages, which helps performance
+
+- **Docker/Container environments**:
+  - Add `--no-sandbox` flag by setting environment variable (handled automatically in production mode)
+  - Ensure sufficient memory allocation (at least 512MB recommended)
+  - Install Chrome/Chromium in your Dockerfile
+
 ### Step 3: Test AI Integration (Optional)
 
 Before setting up the phone system, test that your OpenRouter API key works:

@@ -75,7 +75,7 @@ describe('generateScrapingReport - Integration', () => {
     expect(report).toContain('New files created:** 2');
     expect(report).toContain('Existing files updated:** 1');
     expect(report).toContain('Validation warnings:** 1');
-    expect(report).toContain('Providers without insurance:** 1');
+    expect(report).toContain('Providers missing insurance:** 1');
   });
 
   it('should demonstrate report usage in scraper workflow', () => {
@@ -159,7 +159,7 @@ describe('generateScrapingReport - Integration', () => {
 
     // Verify all issues are reported
     expect(report).toContain('Validation warnings:** 2');
-    expect(report).toContain('Providers without insurance:** 2');
+    expect(report).toContain('Providers missing insurance:** 2');
     expect(report).toContain('### Missing Insurance Information');
     expect(report).toContain('### Email Format Issues');
     expect(report).toContain('### Phone Format Issues');

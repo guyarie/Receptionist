@@ -68,12 +68,9 @@ describe('writeReport', () => {
   });
 
   it('should handle write errors gracefully and return null', () => {
-    // Create a mock scenario where writing fails
-    // We'll try to write to an invalid path by mocking the directory creation
-    const originalMkdirSync = fs.mkdirSync;
-    
-    // Mock mkdirSync to throw an error
-    fs.mkdirSync = () => {
+    // Mock fs.writeFileSync to throw an error
+    const originalWriteFileSync = fs.writeFileSync;
+    fs.writeFileSync = () => {
       throw new Error('Permission denied');
     };
 
@@ -84,7 +81,7 @@ describe('writeReport', () => {
     expect(filepath).toBeNull();
 
     // Restore original function
-    fs.mkdirSync = originalMkdirSync;
+    fs.writeFileSync = originalWriteFileSync;
   });
 
   it('should write multiple reports with different timestamps', () => {

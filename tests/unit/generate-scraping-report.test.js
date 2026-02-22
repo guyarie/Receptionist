@@ -50,7 +50,7 @@ describe('generateScrapingReport', () => {
     expect(report).toContain('New files created:** 1');
     expect(report).toContain('Existing files updated:** 1');
     expect(report).toContain('Validation warnings:** 1');
-    expect(report).toContain('Providers without insurance:** 1');
+    expect(report).toContain('Providers missing insurance:** 1');
 
     // Verify provider details
     expect(report).toContain('### John Doe, PhD');
@@ -251,3 +251,197 @@ describe('generateScrapingReport', () => {
     expect(report).toContain('Phone validation:');
   });
 });
+
+  it('should include timing information when available', () => {
+    const results = {
+      summaries: {
+        practiceOverview: 'Practice overview',
+        providers: [
+          {
+            name: 'John Doe',
+            content: 'Content',
+            insurance: ['Aetna'],
+            email: 'john@example.com',
+            phone: '555-1234'
+          }
+        ]
+      },
+      operations: {
+        created: ['john-doe'],
+        updated: [],
+        validationWarnings: [],
+        timing: {
+          total: 5432,
+          fetch: 2100,
+          extract: 150,
+          aiProcessing: 2800,
+          fileWriting: 382
+        }
+      }
+    };
+
+    const report = generateScrapingReport(results);
+
+    expect(report).toContain('### Performance Metrics');
+    expect(report).toContain('Total duration:** 5432ms (5.43s)');
+    expect(report).toContain('Website fetch:** 2100ms');
+    expect(report).toContain('Content extraction:** 150ms');
+    expect(report).toContain('AI processing:** 2800ms');
+    expect(report).toContain('File writing:** 382ms');
+  });
+
+  it('should handle missing timing information gracefully', () => {
+    const results = {
+      summaries: {
+        practiceOverview: 'Practice overview',
+        providers: []
+      },
+      operations: {
+        created: [],
+        updated: [],
+        validationWarnings: []
+      }
+    };
+
+    const report = generateScrapingReport(results);
+
+    expect(report).not.toContain('### Performance Metrics');
+    expect(report).toContain('# Provider Scraping Report');
+  });
+
+  it('should include detailed error information with scraping mode', () => {
+    const results = {
+      summaries: {
+        practiceOverview: '',
+        providers: []
+      },
+      operations: {
+        created: [],
+        updated: [],
+        validationWarnings: [],
+        errors: [
+          {
+            provider: 'Main Website',
+            type: 'timeout',
+            message: 'Navigation timeout of 10000 ms exceeded',
+            url: 'https://example.com',
+            attempts: 3,
+            duration: 30500
+          },
+          {
+            provider: 'Provider Page',
+            type: 'navigation',
+            message: 'net::ERR_NAME_NOT_RESOLVED',
+            url: 'https://invalid.example.com',
+            attempts: 3,
+            duration: 5200
+          }
+        ]
+      }
+    };
+
+    const report = generateScrapingReport(results);
+
+    expect(report).toContain('## Scraping Errors');
+    expect(report).toContain('### Timeout Errors');
+    expect(report).toContain('### Navigation Errors');
+    
+    // Check timeout error details
+    expect(report).toContain('**Provider:** Main Website');
+    expect(report).toContain('**Error:** Navigation timeout of 10000 ms exceeded');
+    expect(report).toContain('**URL:** https://example.com');
+    expect(report).toContain('**Scraping mode:** puppeteer');
+    expect(report).toContain('**Retry attempts:** 3');
+    expect(report).toContain('**Duration:** 30500ms');
+    
+    // Check navigation error details
+    expect(report).toContain('**Provider:** Provider Page');
+    expect(report).toContain('**Error:** net::ERR_NAME_NOT_RESOLVED');
+    expect(report).toContain('**URL:** https://invalid.example.com');
+    expect(report).toContain('**Duration:** 5200ms');
+  });
+
+  it('should categorize errors by type', () => {
+    const results = {
+      summaries: {
+        practiceOverview: '',
+        providers: []
+      },
+      operations: {
+        created: [],
+        updated: [],
+        validationWarnings: [],
+        errors: [
+          {
+            provider: 'Provider 1',
+            type: 'timeout',
+            message: 'Timeout error',
+            url: 'https://example.com/1',
+            attempts: 3
+          },
+          {
+            provider: 'Provider 2',
+            type: 'navigation',
+            message: 'Navigation error',
+            url: 'https://example.com/2',
+            attempts: 3
+          },
+          {
+            provider: 'Provider 3',
+            type: 'parsing',
+            message: 'Parsing error',
+            url: 'https://example.com/3',
+            attempts: 1
+          },
+          {
+            provider: 'Provider 4',
+            type: 'unknown',
+            message: 'Unknown error',
+            url: 'https://example.com/4',
+            attempts: 1
+          }
+        ]
+      }
+    };
+
+    const report = generateScrapingReport(results);
+
+    expect(report).toContain('### Timeout Errors');
+    expect(report).toContain('### Navigation Errors');
+    expect(report).toContain('### Parsing Errors');
+    expect(report).toContain('### Other Errors');
+    expect(report).toContain('Provider 1');
+    expect(report).toContain('Provider 2');
+    expect(report).toContain('Provider 3');
+    expect(report).toContain('Provider 4');
+  });
+
+  it('should include error recommendations in report', () => {
+    const results = {
+      summaries: {
+        practiceOverview: '',
+        providers: []
+      },
+      operations: {
+        created: [],
+        updated: [],
+        validationWarnings: [],
+        errors: [
+          {
+            provider: 'Main Website',
+            type: 'timeout',
+            message: 'Timeout error',
+            url: 'https://example.com',
+            attempts: 3
+          }
+        ]
+      }
+    };
+
+    const report = generateScrapingReport(results);
+
+    expect(report).toContain('**Scraping errors:** 1 error(s) occurred during scraping');
+    expect(report).toContain('Increasing PAGE_LOAD_TIMEOUT if timeout errors are frequent');
+    expect(report).toContain('Trying axios mode as fallback (set SCRAPING_MODE=axios)');
+    expect(report).toContain('Reviewing error details above and retrying failed providers');
+  });

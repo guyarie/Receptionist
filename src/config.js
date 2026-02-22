@@ -50,6 +50,8 @@ const config = {
       // Milliseconds of silence before the turn is considered complete.
       // Lower values make the assistant respond faster but may cut off slow speakers.
       silenceDurationMs: parseIntEnv('OPENAI_VAD_SILENCE_DURATION_MS', 600),
+      // Minimum duration of speech (ms) required to be considered valid speech.
+      minSpeechDurationMs: parseIntEnv('OPENAI_VAD_MIN_SPEECH_DURATION_MS', 300),
       // Audio padding (ms) prepended to detected speech to avoid clipping the start.
       prefixPaddingMs: parseIntEnv('OPENAI_VAD_PREFIX_PADDING_MS', 300)
     }

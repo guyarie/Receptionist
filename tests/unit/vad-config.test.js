@@ -46,9 +46,7 @@ async function loadConfig(overrides = {}) {
   
   // Stub override environment variables
   for (const [key, value] of Object.entries(overrides)) {
-    if (value === undefined) {
-      vi.unstubEnv(key);
-    } else {
+    if (value !== undefined) {
       vi.stubEnv(key, value);
     }
   }
