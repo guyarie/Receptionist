@@ -13,7 +13,7 @@ AI-powered phone receptionist for Relational Therapy Collective (RTC).
 
 ### Step 1: Install Dependencies
 ```bash
-npm install
+npm install 
 ```
 
 ### Step 2: Configure Environment Variables
