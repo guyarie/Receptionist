@@ -134,8 +134,8 @@
                 ${call.fullTranscript && call.fullTranscript.length > 0 
                   ? call.fullTranscript.map(msg => `
                       <p style="margin-bottom: 0.5rem;">
-                        <strong>${UI.escapeHtml(msg.role === 'user' ? 'Caller' : 'AI')}:</strong> 
-                        ${UI.escapeHtml(msg.content)}
+                        <strong>${UI.escapeHtml(msg.speaker)}:</strong> 
+                        ${UI.escapeHtml(msg.message)}
                       </p>
                     `).join('')
                   : '<p class="text-muted">No transcript available</p>'
