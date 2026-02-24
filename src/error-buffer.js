@@ -5,6 +5,8 @@
  * When the buffer is full, the oldest error is dropped to make room for new ones.
  */
 
+const { getPacificTimeISO } = require('./time-utils');
+
 class ErrorBuffer {
   constructor(maxSize = 50) {
     this.maxSize = maxSize;
@@ -23,14 +25,14 @@ class ErrorBuffer {
       // Simple string message
       errorEntry = {
         message: error,
-        timestamp: new Date().toISOString(),
+        timestamp: getPacificTimeISO(),
         context: context
       };
     } else if (error instanceof Error) {
       // Error instance
       errorEntry = {
         message: error.message,
-        timestamp: new Date().toISOString(),
+        timestamp: getPacificTimeISO(),
         context: context || error.name,
         stack: error.stack
       };
@@ -38,7 +40,7 @@ class ErrorBuffer {
       // Already formatted error object
       errorEntry = {
         message: error.message || 'Unknown error',
-        timestamp: error.timestamp || new Date().toISOString(),
+        timestamp: error.timestamp || getPacificTimeISO(),
         context: error.context || context,
         stack: error.stack
       };
@@ -46,7 +48,7 @@ class ErrorBuffer {
       // Fallback for unexpected types
       errorEntry = {
         message: String(error),
-        timestamp: new Date().toISOString(),
+        timestamp: getPacificTimeISO(),
         context: context
       };
     }

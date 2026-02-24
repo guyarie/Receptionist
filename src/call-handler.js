@@ -1,6 +1,7 @@
 // Call Handler - Manages individual call sessions
 const aiClient = require('./ai-client');
 const callSummary = require('./call-summary');
+const { getPacificTimeISO } = require('./time-utils');
 
 class CallHandler {
   constructor() {
@@ -15,7 +16,7 @@ class CallHandler {
       callSid,
       from: callerInfo.from || 'Unknown',
       to: callerInfo.to || 'Unknown',
-      startTime: new Date().toISOString(),
+      startTime: getPacificTimeISO(),
       audioBuffer: []
     };
     
@@ -80,7 +81,7 @@ class CallHandler {
           from: session.from,
           to: session.to,
           startTime: session.startTime,
-          endTime: new Date().toISOString(),
+          endTime: getPacificTimeISO(),
           conversationHistory: conversationHistory
         });
         

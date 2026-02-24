@@ -3,6 +3,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const WebSocket = require('ws');
 const http = require('http');
 const https = require('https');
@@ -18,6 +19,10 @@ const { createProviderAdapter } = require('./realtime/provider-factory');
 const SessionManager = require('./realtime/session-manager');
 const RelayService = require('./realtime/relay-service');
 const { createAuthMiddleware, createLoginRouter } = require('./admin-auth');
+const { setupConsoleTimestamps } = require('./time-utils');
+
+// Setup console logging with Pacific time timestamps
+setupConsoleTimestamps();
 
 const app = express();
 app.set('trust proxy', true); // Trust X-Forwarded-* headers from reverse proxies/tunnels
@@ -55,6 +60,7 @@ if (realtimeAvailable) {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // Required for CSRF token validation
 app.use(express.static('public'));
 
 // ============================================================================
@@ -713,7 +719,7 @@ app.get('/call-summaries', (req, res) => {
         </div>
         <div class="info-item">
           <div class="info-label">Start Time</div>
-          <div>${new Date(call.startTime).toLocaleString()}</div>
+          <div>${new Date(call.startTime).toLocaleString('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}</div>
         </div>
         <div class="info-item">
           <div class="info-label">Duration</div>

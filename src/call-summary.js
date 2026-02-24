@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const aiClient = require('./ai-client');
+const { getPacificTimeISO, getFilenameSafeTimestamp } = require('./time-utils');
 
 class CallSummaryManager {
   constructor() {
@@ -97,8 +98,8 @@ ${messages.map(m => `${m.role === 'user' ? 'Caller' : 'Receptionist'}: ${m.conte
           }))
       };
       
-      // Create filename with timestamp
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      // Create filename with timestamp (Pacific time)
+      const timestamp = getFilenameSafeTimestamp();
       const filename = `call-${timestamp}-${callSid.substring(0, 8)}.json`;
       const filepath = path.join(this.summariesDir, filename);
       

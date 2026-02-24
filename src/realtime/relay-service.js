@@ -2,6 +2,7 @@
 
 const callSummary = require('../call-summary');
 const errorBuffer = require('../error-buffer');
+const { getPacificTimeISO } = require('../time-utils');
 
 /**
  * Relay Service - Bridges a Twilio Media Stream WebSocket and a Provider Adapter
@@ -26,7 +27,7 @@ class RelayService {
     this.callerInfo = callerInfo || {};
     this.conversationHistory = [];
     this.closed = false;
-    this.startTime = new Date().toISOString();
+    this.startTime = getPacificTimeISO();
     this.sessionManager = null;
     this.errors = [];
   }
@@ -138,7 +139,7 @@ class RelayService {
         from: this.callerInfo.from,
         to: this.callerInfo.to,
         startTime: this.startTime,
-        endTime: new Date().toISOString(),
+        endTime: getPacificTimeISO(),
         conversationHistory: formattedHistory
       });
     } catch (err) {

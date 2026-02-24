@@ -41,6 +41,7 @@ const fs = require('fs');
 const path = require('path');
 const OpenAI = require('openai');
 const prompts = require('./prompts');
+const { getPacificTimeISO, getFilenameSafeTimestamp } = require('./time-utils');
 require('dotenv').config();
 
 // Configuration
@@ -1508,9 +1509,9 @@ function saveScrapeCache(html, text, url, providerName = null) {
       fs.mkdirSync(cacheDir, { recursive: true });
     }
 
-    const timestamp = new Date().toISOString().replace(/:/g, '-');
+    const timestamp = getFilenameSafeTimestamp();
     const cacheData = {
-      timestamp: new Date().toISOString(),
+      timestamp: getPacificTimeISO(),
       url: url,
       scrapingMode: SCRAPING_MODE,
       htmlLength: html.length,
@@ -1854,7 +1855,7 @@ async function writeProviderFiles(summaries) {
  */
 function generateScrapingReport(results) {
   const { summaries, operations } = results;
-  const timestamp = new Date().toISOString();
+  const timestamp = getPacificTimeISO();
 
   // Calculate summary statistics
   const totalProviders = summaries.providers.length;
@@ -2234,8 +2235,8 @@ function writeReport(reportContent) {
       console.log(`📁 Created reports directory: ${reportsDir}`);
     }
 
-    // Generate timestamped filename
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    // Generate timestamped filename (Pacific time)
+    const timestamp = getFilenameSafeTimestamp();
     const filename = `scraping-report-${timestamp}.md`;
     const filepath = path.join(reportsDir, filename);
 
