@@ -919,6 +919,18 @@ const PORT = config.server.port;
       } else {
         console.log(`   - Web Chat CORS Origins: localhost only (set ALLOWED_ORIGIN for production)`);
       }
+      console.log(`\n🔐 Admin Panel Security:`);
+      if (config.admin.password) {
+        console.log(`   - Authentication: ENABLED (password set, ${config.admin.password.length} chars)`);
+        console.log(`   - Session Secret: ${config.admin.sessionSecret ? 'Set' : 'Using password as secret'}`);
+      } else {
+        console.log(`   - Authentication: DISABLED (no password set - admin panel is unprotected!)`);
+      }
+      if (config.server.adminAllowedIps.length > 0) {
+        console.log(`   - IP Whitelist: ${config.server.adminAllowedIps.join(', ')}`);
+      } else {
+        console.log(`   - IP Whitelist: None (all IPs allowed)`);
+      }
       if (!useSSL) {
         console.log(`\n⚠️  Running without SSL — Twilio Media Streams requires HTTPS/WSS`);
         console.log(`   Set SSL_CERT_PATH and SSL_KEY_PATH in .env for production`);
