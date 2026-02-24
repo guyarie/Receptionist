@@ -41,6 +41,11 @@ npm install
    
    # Server Configuration
    PORT=3000
+   
+   # Admin Panel Security
+   ADMIN_ALLOWED_IPS=                    # Comma-separated IPs (leave empty to allow all)
+   ADMIN_PASSWORD=your-secure-password   # Required for production
+   SESSION_SECRET=your-random-secret     # Optional (uses ADMIN_PASSWORD if not set)
    ```
 
 **Where to find these:**
@@ -260,6 +265,17 @@ The AI will respond naturally to your questions!
 - Verify the webhook URL in Twilio matches your tunnel URL
 - Check the server logs for errors
 
+### "Can't access admin panel"
+- If you see a login page, enter the password from your `ADMIN_PASSWORD` environment variable
+- If you forgot the password, update it in `.env` and restart the server
+- Check that cookies are enabled in your browser
+- Clear browser cookies and try again if you're having session issues
+
+### "Admin login shows 'Too many attempts'"
+- Wait 15 minutes for the rate limit to reset
+- Check that you're using the correct password from `.env`
+- Restart the server to clear the rate limiter (development only)
+
 ### "AI doesn't respond"
 - Check server logs for errors
 - Verify OpenRouter API key is valid
@@ -271,6 +287,7 @@ The AI will respond naturally to your questions!
 ├── src/
 │   ├── server.js              # Main Express server with Twilio webhooks
 │   ├── config.js              # Configuration loader
+│   ├── admin-auth.js          # Admin authentication (login, sessions, CSRF)
 │   ├── ai-client.js           # OpenRouter AI integration
 │   ├── call-handler.js        # Call session management (Gather mode)
 │   ├── call-summary.js        # Call summary generation
@@ -283,6 +300,15 @@ The AI will respond naturally to your questions!
 │   └── test-ai.js             # AI testing script
 ├── prompts/                   # Editable AI prompts
 ├── public/                    # Web chat interface and admin UI
+│   └── admin/                 # Admin dashboard (password-protected)
+│       ├── login.html         # Login page
+│       ├── index.html         # Dashboard home
+│       ├── calls.html         # Call logs
+│       ├── prompts.html       # Prompt editor
+│       ├── availability.html  # Availability editor
+│       ├── providers.html     # Provider profiles
+│       ├── admin.js           # Admin UI JavaScript
+│       └── admin.css          # Admin UI styles
 ├── .env                       # Environment variables (not in git)
 ├── .env.example               # Example environment variables
 ├── package.json               # Node.js dependencies
@@ -315,20 +341,69 @@ The AI will respond naturally to your questions!
 8. **Loop continues** until caller hangs up
 9. **Call summary generated** when call ends
 
+## Admin Panel Security
+
+The admin dashboard at `/admin` is protected by password authentication. This prevents unauthorized access to sensitive information like call logs, prompts, and provider data.
+
+### Setting Up Admin Authentication
+
+1. **Set admin password** in your `.env` file:
+   ```env
+   ADMIN_PASSWORD=your-secure-password-here
+   ```
+
+2. **Optional: Set a separate session secret** for additional security:
+   ```env
+   SESSION_SECRET=your-random-secret-key-here
+   ```
+   If not set, `ADMIN_PASSWORD` will be used as the session secret.
+
+3. **Restart the server** to apply changes:
+   ```bash
+   npm start
+   ```
+
+4. **Access the admin panel** at `http://localhost:3000/admin`
+   - You'll be redirected to the login page
+   - Enter your admin password
+   - You'll stay logged in for 24 hours
+
+### Security Features
+
+- **Password Protection**: All admin routes require authentication
+- **Session Cookies**: Stateless HMAC-signed tokens (no server-side storage)
+- **CSRF Protection**: Double-submit token pattern prevents cross-site attacks
+- **Rate Limiting**: 5 failed login attempts per IP within 15 minutes
+- **Constant-Time Comparison**: Prevents timing attacks on password verification
+- **IP Whitelisting**: Optional additional layer (set `ADMIN_ALLOWED_IPS` in `.env`)
+
+### Development Mode
+
+During development, you can leave `ADMIN_PASSWORD` unset to disable authentication:
+- The server will log a warning: `⚠️ ADMIN_PASSWORD not set or empty — admin panel is unprotected`
+- Admin panel will be accessible without login
+- **Never deploy to production without setting ADMIN_PASSWORD**
+
+### Logout
+
+Click the "Logout" button in the admin navigation (top right) to end your session.
+
 ## Features
 
 - **Dual Voice Modes**: Real-time streaming (low latency) or turn-by-turn (fallback)
 - **Natural Conversations**: Context-aware responses with interruption support (streaming mode)
 - **Web Chat Interface**: Browser-based chat for testing and customer support
-- **Admin Dashboard**: View call logs, edit prompts, manage availability
+- **Secure Admin Dashboard**: Password-protected panel to view call logs, edit prompts, manage availability
 - **Call Summaries**: AI-generated summaries of all conversations
 - **Website Integration**: Automatically scrapes practice information
 - **Customizable Prompts**: Edit AI personality and responses without code changes
 - **Graceful Fallback**: Works without OpenAI API key using Gather-based speech
+- **Production-Ready Security**: CSRF protection, rate limiting, session management
 
 ## Next Steps
 
 Now that you have a working system, you can:
+- [ ] **Set a strong admin password** for production deployment
 - [ ] Test both voice modes (with and without OPENAI_API_KEY)
 - [ ] Customize prompts in the `prompts/` directory
 - [ ] Access the admin dashboard at `http://localhost:3000/admin`

@@ -17,6 +17,7 @@ const errorBuffer = require('./error-buffer');
 const { createProviderAdapter } = require('./realtime/provider-factory');
 const SessionManager = require('./realtime/session-manager');
 const RelayService = require('./realtime/relay-service');
+const { createAuthMiddleware, createLoginRouter } = require('./admin-auth');
 
 const app = express();
 app.set('trust proxy', true); // Trust X-Forwarded-* headers from reverse proxies/tunnels
@@ -125,6 +126,18 @@ app.use('/admin', (req, res, next) => {
   console.warn(`🚫 Admin access denied from IP: ${clientIp}`);
   res.status(403).send('Access denied');
 });
+
+// Auth middleware for admin routes (after IP whitelist)
+app.use('/admin', createAuthMiddleware(config.admin.password, {
+  sessionSecret: config.admin.sessionSecret,
+  cookieName: 'admin_session',
+}));
+
+// Login router for admin authentication
+app.use(createLoginRouter(config.admin.password, {
+  sessionSecret: config.admin.sessionSecret,
+  cookieName: 'admin_session',
+}));
 
 // Serve admin static files
 app.use('/admin', express.static('public/admin'));

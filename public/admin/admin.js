@@ -12,6 +12,12 @@ async function apiFetch(url, options = {}) {
     });
 
     if (!response.ok) {
+      // Handle 401 Unauthorized by redirecting to login
+      if (response.status === 401) {
+        window.location.href = '/admin/login';
+        return;
+      }
+
       const error = await response.json().catch(() => ({ error: 'Request failed' }));
       throw new Error(error.error || `HTTP ${response.status}`);
     }
@@ -66,7 +72,27 @@ function renderNav(activePage) {
   nav.innerHTML = pages.map(page => {
     const isActive = activePage === page.path ? 'active' : '';
     return `<li><a href="${page.path}" class="${isActive}">${page.name}</a></li>`;
-  }).join('');
+  }).join('') + `
+    <li style="margin-left: auto;">
+      <a href="#" id="logout-btn" style="color: #dc3545;">Logout</a>
+    </li>
+  `;
+
+  // Attach logout handler
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await fetch('/admin/logout', { method: 'POST' });
+        window.location.href = '/admin/login';
+      } catch (error) {
+        console.error('Logout error:', error);
+        // Redirect to login anyway
+        window.location.href = '/admin/login';
+      }
+    });
+  }
 }
 
 // Format timestamp

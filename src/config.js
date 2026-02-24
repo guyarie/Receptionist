@@ -63,6 +63,10 @@ const config = {
     adminAllowedIps: process.env.ADMIN_ALLOWED_IPS 
       ? process.env.ADMIN_ALLOWED_IPS.split(',').map(ip => ip.trim()).filter(ip => ip)
       : []
+  },
+  admin: {
+    password: process.env.ADMIN_PASSWORD || null,
+    sessionSecret: process.env.SESSION_SECRET || process.env.ADMIN_PASSWORD || null
   }
 };
 
@@ -72,6 +76,11 @@ validateConfig();
 // Warn if OpenAI API key is not set (realtime voice streaming will be unavailable)
 if (!config.openai.apiKey) {
   console.warn('⚠️ OPENAI_API_KEY not set — real-time voice streaming unavailable, using Gather fallback');
+}
+
+// Warn if admin password is not set (admin panel will be unprotected)
+if (!config.admin.password || config.admin.password.trim() === '') {
+  console.warn('⚠️ ADMIN_PASSWORD not set or empty — admin panel is unprotected and accessible without authentication');
 }
 
 module.exports = config;
