@@ -122,14 +122,18 @@ ${messages.map(m => `${m.role === 'user' ? 'Caller' : 'Receptionist'}: ${m.conte
   getAllSummaries() {
     try {
       const files = fs.readdirSync(this.summariesDir)
-        .filter(file => file.endsWith('.json'))
-        .sort()
-        .reverse(); // Most recent first
+        .filter(file => file.endsWith('.json'));
       
+      // Load all summaries and sort by actual startTime (most recent first)
       return files.map(file => {
         const filepath = path.join(this.summariesDir, file);
         const content = fs.readFileSync(filepath, 'utf-8');
         return JSON.parse(content);
+      }).sort((a, b) => {
+        // Sort by startTime descending (most recent first)
+        const timeA = new Date(a.startTime).getTime();
+        const timeB = new Date(b.startTime).getTime();
+        return timeB - timeA;
       });
       
     } catch (error) {
@@ -147,29 +151,32 @@ ${messages.map(m => `${m.role === 'user' ? 'Caller' : 'Receptionist'}: ${m.conte
   getSummariesPaginated(page = 1, limit = 20) {
     try {
       const files = fs.readdirSync(this.summariesDir)
-        .filter(file => file.endsWith('.json'))
-        .sort()
-        .reverse(); // Most recent first
+        .filter(file => file.endsWith('.json'));
       
-      const total = files.length;
+      // Load all summaries and sort by actual startTime (most recent first)
+      const summaries = files.map(file => {
+        const filepath = path.join(this.summariesDir, file);
+        const content = fs.readFileSync(filepath, 'utf-8');
+        const summary = JSON.parse(content);
+        return {
+          id: file.replace('.json', ''),
+          filename: file,
+          ...summary
+        };
+      }).sort((a, b) => {
+        // Sort by startTime descending (most recent first)
+        const timeA = new Date(a.startTime).getTime();
+        const timeB = new Date(b.startTime).getTime();
+        return timeB - timeA;
+      });
+      
+      const total = summaries.length;
       const totalPages = Math.ceil(total / limit);
       const validPage = Math.max(1, Math.min(page, totalPages || 1));
       
       const startIndex = (validPage - 1) * limit;
       const endIndex = startIndex + limit;
-      const pageFiles = files.slice(startIndex, endIndex);
-      
-      const calls = pageFiles.map(file => {
-        const filepath = path.join(this.summariesDir, file);
-        const content = fs.readFileSync(filepath, 'utf-8');
-        const summary = JSON.parse(content);
-        
-        // Return summary with id (filename without extension)
-        return {
-          id: file.replace('.json', ''),
-          ...summary
-        };
-      });
+      const calls = summaries.slice(startIndex, endIndex);
       
       return {
         calls,

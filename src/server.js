@@ -280,7 +280,7 @@ app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
 
 // Get greeting endpoint (for chat interface)
 app.get('/api/greeting', (req, res) => {
-  res.json({ greeting: prompts.greeting });
+  res.json({ greeting: prompts.webchatGreeting });
 });
 
 // Get current model info endpoint

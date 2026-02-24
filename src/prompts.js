@@ -16,6 +16,7 @@ class PromptLoader {
     const files = {
       systemPrompt: 'system-prompt.txt',
       greeting: 'greeting.txt',
+      webchatGreeting: 'webchat-greeting.txt',
       followUp: 'follow-up.txt',
       closing: 'closing.txt',
       noSpeechDetected: 'no-speech-detected.txt',
@@ -43,6 +44,7 @@ class PromptLoader {
     const defaults = {
       systemPrompt: 'You are a helpful receptionist.',
       greeting: 'Hello! How can I help you?',
+      webchatGreeting: 'Hello! Welcome to our practice. How can I help you today?',
       followUp: 'Is there anything else?',
       closing: 'Thank you for calling!',
       noSpeechDetected: 'I didn\'t catch that. Could you repeat?',
@@ -68,6 +70,7 @@ class PromptLoader {
     const promptMap = {
       systemPrompt: { name: 'System Prompt', filename: 'system-prompt.txt' },
       greeting: { name: 'Greeting', filename: 'greeting.txt' },
+      webchatGreeting: { name: 'Webchat Greeting', filename: 'webchat-greeting.txt' },
       followUp: { name: 'Follow-up', filename: 'follow-up.txt' },
       closing: { name: 'Closing', filename: 'closing.txt' },
       noSpeechDetected: { name: 'No Speech Detected', filename: 'no-speech-detected.txt' },
@@ -111,6 +114,7 @@ class PromptLoader {
   // Getters for each prompt
   get systemPrompt() { return this.cache.systemPrompt; }
   get greeting() { return this.cache.greeting; }
+  get webchatGreeting() { return this.cache.webchatGreeting; }
   get followUp() { return this.cache.followUp; }
   get closing() { return this.cache.closing; }
   get noSpeechDetected() { return this.cache.noSpeechDetected; }

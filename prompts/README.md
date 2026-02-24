@@ -20,7 +20,7 @@ This directory contains editable text files that control what your AI receptioni
 ---
 
 ### `greeting.txt`
-**What it does:** The first thing callers hear when they call.
+**What it does:** The first thing callers hear when they call on the phone.
 
 **When to edit:**
 - Change the practice name
@@ -31,6 +31,21 @@ This directory contains editable text files that control what your AI receptioni
 - Keep it under 20 seconds when spoken
 - Include who you are and how you can help
 - Make it warm and welcoming
+
+---
+
+### `webchat-greeting.txt`
+**What it does:** The first message visitors see when they open the chat widget on your website.
+
+**When to edit:**
+- Adjust the tone for text-based chat (more casual than phone)
+- Remove phone-specific language
+- Make it more concise for web visitors
+
+**Tips:**
+- Keep it brief - web visitors scan quickly
+- Skip phone-specific details like "thank you for calling"
+- Focus on how you can help them right now
 
 ---
 
