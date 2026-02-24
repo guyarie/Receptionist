@@ -289,7 +289,8 @@ function createAuthMiddleware(adminPassword, options = {}) {
 
   return (req, res, next) => {
     // Skip authentication for login routes
-    if (req.path === '/admin/login' || req.path === '/login') {
+    // Note: req.path is relative to the mount point (/admin)
+    if (req.path === '/login') {
       return next();
     }
 
@@ -328,7 +329,8 @@ function createAuthMiddleware(adminPassword, options = {}) {
    */
   function handleUnauthenticated(req, res) {
     // Check if this is an API request
-    if (req.path.startsWith('/admin/api/') || req.path.startsWith('/api/')) {
+    // Note: req.path is relative to the mount point (/admin)
+    if (req.path.startsWith('/api/')) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
