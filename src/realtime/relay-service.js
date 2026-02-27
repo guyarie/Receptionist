@@ -30,6 +30,7 @@ class RelayService {
     this.startTime = getPacificTimeISO();
     this.sessionManager = null;
     this.errors = [];
+    this.keepaliveInterval = null;
   }
 
   /**
@@ -47,6 +48,44 @@ class RelayService {
     this.provider.onClose = () => this.handleProviderClose();
 
     await this.provider.connect(options);
+
+    // Start keepalive mechanism after initialization completes
+    this._startKeepalive();
+  }
+
+  /**
+   * Start sending periodic keepalive messages to prevent WebSocket timeout.
+   * Sends a Twilio mark event every 30 seconds.
+   * @private
+   */
+  _startKeepalive() {
+    this.keepaliveInterval = setInterval(() => {
+      try {
+        // Check WebSocket readyState before sending
+        if (this.twilioWs.readyState === 1) {
+          this.twilioWs.send(JSON.stringify({
+            event: 'mark',
+            streamSid: this.streamSid,
+            mark: { name: 'keepalive' }
+          }));
+          console.log(`🔄 [${this.callSid}] Keepalive ping sent`);
+        }
+      } catch (err) {
+        // Don't propagate keepalive errors to main error handler
+        console.log(`⚠️ [${this.callSid}] Keepalive ping failed:`, err.message);
+      }
+    }, 30000); // 30 seconds
+  }
+
+  /**
+   * Stop the keepalive timer.
+   * @private
+   */
+  _stopKeepalive() {
+    if (this.keepaliveInterval) {
+      clearInterval(this.keepaliveInterval);
+      this.keepaliveInterval = null;
+    }
   }
 
   /**
@@ -119,6 +158,9 @@ class RelayService {
   async cleanup() {
     if (this.closed) return;
     this.closed = true;
+
+    // Stop keepalive timer
+    this._stopKeepalive();
 
     // Close the provider connection
     try {

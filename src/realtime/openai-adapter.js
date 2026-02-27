@@ -13,11 +13,13 @@ const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realt
  */
 class OpenAIAdapter extends ProviderAdapter {
   constructor(apiKey, voice) {
-    super();
-    this.apiKey = apiKey;
-    this.voice = voice || 'alloy';
-    this.ws = null;
-  }
+      super();
+      this.apiKey = apiKey;
+      this.voice = voice || 'alloy';
+      this.ws = null;
+      this.keepaliveInterval = null;
+    }
+
 
   /**
    * Open WebSocket to OpenAI Realtime API.
@@ -103,6 +105,9 @@ class OpenAIAdapter extends ProviderAdapter {
         this.ws.send(JSON.stringify({
           type: 'response.create'
         }));
+
+        // Start keepalive mechanism to prevent WebSocket timeout during silence
+        this._startKeepalive();
 
         resolve();
       });
@@ -208,9 +213,51 @@ class OpenAIAdapter extends ProviderAdapter {
    * Close the WebSocket connection.
    */
   close() {
+    // Stop keepalive mechanism
+    this._stopKeepalive();
+    
     if (this.ws) {
       this.ws.close();
       this.ws = null;
+    }
+  }
+  /**
+   * Start sending periodic keepalive pings to prevent WebSocket timeout.
+   * Sends a session.update with empty update every 30 seconds.
+   */
+  _startKeepalive() {
+    // Clear any existing interval
+    this._stopKeepalive();
+
+    console.log('🔄 Starting OpenAI WebSocket keepalive (30s interval)');
+
+    this.keepaliveInterval = setInterval(() => {
+      try {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          // Send session.update with empty update as keepalive ping
+          // This is safe and idempotent - doesn't affect conversation state
+          this.ws.send(JSON.stringify({
+            type: 'session.update',
+            session: {}
+          }));
+          console.log('💓 OpenAI keepalive ping sent');
+        }
+      } catch (err) {
+        // Don't propagate keepalive errors to main error handler
+        // Just log at debug level to avoid noise
+        console.log('⚠️ OpenAI keepalive ping failed:', err.message);
+      }
+    }, 30000); // 30 seconds
+  }
+
+  /**
+   * Stop sending keepalive pings.
+   */
+  _stopKeepalive() {
+    if (this.keepaliveInterval) {
+      clearInterval(this.keepaliveInterval);
+      this.keepaliveInterval = null;
+      console.log('🛑 OpenAI WebSocket keepalive stopped');
     }
   }
 }
