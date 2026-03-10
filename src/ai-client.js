@@ -1,10 +1,20 @@
-// OpenRouter AI Client
+// AI Client — supports OpenAI direct (cheaper) and OpenRouter (fallback)
 const OpenAI = require('openai');
 const config = require('./config');
 const prompts = require('./prompts');
 
 class AIClient {
   constructor() {
+    // Primary: OpenAI direct (if key available) — GPT-4o Mini for webchat
+    if (config.openai.apiKey) {
+      this.openaiClient = new OpenAI({
+        apiKey: config.openai.apiKey,
+      });
+      this.webchatModel = 'gpt-4o-mini';
+      console.log('✅ OpenAI direct client initialized (webchat: gpt-4o-mini)');
+    }
+
+    // Fallback: OpenRouter
     this.client = new OpenAI({
       baseURL: 'https://openrouter.ai/api/v1',
       apiKey: config.openRouter.apiKey,
@@ -162,17 +172,22 @@ class AIClient {
 
     const messages = [systemPrompt, ...clientMessages];
 
-    console.log(`💬 [webchat] Sending ${clientMessages.length} message(s) to AI`);
+    // Use OpenAI direct if available (25x cheaper), fallback to OpenRouter
+    const useOpenAI = !!this.openaiClient;
+    const client = useOpenAI ? this.openaiClient : this.client;
+    const model = useOpenAI ? this.webchatModel : this.model;
 
-    const response = await this.client.chat.completions.create({
-      model: this.model,
+    console.log(`💬 [webchat] Sending ${clientMessages.length} message(s) to ${model} via ${useOpenAI ? 'OpenAI' : 'OpenRouter'}`);
+
+    const response = await client.chat.completions.create({
+      model: model,
       messages: messages,
       temperature: 0.7,
-      max_tokens: 500 // Web chat can be more detailed than phone
+      max_tokens: 500
     });
 
     if (response.model) {
-      console.log(`🔍 [webchat] Actual model used: ${response.model}`);
+      console.log(`🔍 [webchat] Model: ${response.model}`);
     }
 
     const assistantMessage = response.choices[0].message.content;

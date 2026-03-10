@@ -1,0 +1,2219 @@
+{
+  "summary": {
+    "totalConversations": 24,
+    "totalAPICalls": 164,
+    "avgQualification": 90,
+    "elapsed": "6.7"
+  },
+  "fieldStats": {
+    "name": {
+      "desc": "Customer name",
+      "collected": 23,
+      "total": 24,
+      "pct": 96
+    },
+    "phone": {
+      "desc": "Phone number",
+      "collected": 24,
+      "total": 24,
+      "pct": 100
+    },
+    "email": {
+      "desc": "Email address",
+      "collected": 18,
+      "total": 24,
+      "pct": 75
+    },
+    "city": {
+      "desc": "City/Address",
+      "collected": 23,
+      "total": 24,
+      "pct": 96
+    },
+    "housing_type": {
+      "desc": "House or Condo",
+      "collected": 17,
+      "total": 24,
+      "pct": 71
+    },
+    "ev_type": {
+      "desc": "EV type",
+      "collected": 16,
+      "total": 24,
+      "pct": 67
+    },
+    "has_charger": {
+      "desc": "Has charger already?",
+      "collected": 22,
+      "total": 24,
+      "pct": 92
+    },
+    "prewired": {
+      "desc": "Pre-wired status",
+      "collected": 23,
+      "total": 24,
+      "pct": 96
+    },
+    "service_size": {
+      "desc": "Service size (amps)",
+      "collected": 24,
+      "total": 24,
+      "pct": 100
+    },
+    "location_distance": {
+      "desc": "Install location + distance",
+      "collected": 24,
+      "total": 24,
+      "pct": 100
+    },
+    "photos": {
+      "desc": "Panel photos requested",
+      "collected": 24,
+      "total": 24,
+      "pct": 100
+    }
+  },
+  "categoryStats": {
+    "alice-type": {
+      "scores": [
+        100,
+        100,
+        91,
+        100,
+        91
+      ],
+      "issues": 0,
+      "avg": 96
+    },
+    "owen-type": {
+      "scores": [
+        73,
+        82,
+        82
+      ],
+      "issues": 0,
+      "avg": 79
+    },
+    "condo": {
+      "scores": [
+        91,
+        82
+      ],
+      "issues": 0,
+      "avg": 87
+    },
+    "price-focused": {
+      "scores": [
+        100,
+        91,
+        91
+      ],
+      "issues": 0,
+      "avg": 94
+    },
+    "difficult": {
+      "scores": [
+        91,
+        82,
+        82
+      ],
+      "issues": 0,
+      "avg": 85
+    },
+    "repair": {
+      "scores": [
+        73
+      ],
+      "issues": 0,
+      "avg": 73
+    },
+    "renter": {
+      "scores": [
+        91,
+        100
+      ],
+      "issues": 0,
+      "avg": 96
+    },
+    "south-bay": {
+      "scores": [
+        100,
+        91
+      ],
+      "issues": 0,
+      "avg": 96
+    },
+    "edge": {
+      "scores": [
+        100,
+        82,
+        100
+      ],
+      "issues": 0,
+      "avg": 94
+    }
+  },
+  "issues": {},
+  "details": [
+    {
+      "scenario": "alice-condo-minimal",
+      "category": "alice-type",
+      "desc": "Condo customer gives almost nothing upfront",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 11,
+      "total": 11,
+      "pct": 100,
+      "issues": [],
+      "davidResponses": [
+        "Is this for a house or condo? And what area are you located in?",
+        "Thanks! And what city are you located in? That'll help me confirm we service your area.",
+        "Perfect, we definitely serve San Francisco. Have you already purchased a Tesla charger, or would you need us to supply one?",
+        "Thanks for letting me know it's a condo - that's helpful. For condo installations, you might qualify for CleanPowerSF rebates up to $5,000. \n\nIs your parking spot already pre-wired for EV charging, or would this need new wiring from the electrical panel?",
+        "Got it - we can definitely help with charger selection. For your condo's electrical setup, could you take a few photos of:\n1. The electrical meter\n2. Main breaker panel\n3. Sub-panel with the door open\n\nYou can share them right here in the chat. This helps us prepare an accurate quote and identify the best installation approach for your garage.\n\nHow far is your parking spot from the electrical panel?",
+        "No problem at all! Since it's a condo, we'll need to work with your HOA and check the electrical setup. Could you tell me roughly where your parking spot is located in the garage? And what's your name so PJ can prepare some options for you?",
+        "Thanks for that info - that's helpful to know. Since it's a longer run in a condo setting, PJ will want to review the setup and discuss options with you. Could I get your name and best contact number? He can help explain the process, including HOA coordination and available rebates.",
+        "Thanks for those photos! I'll make sure PJ gets them. Could I get your name and best contact number so he can reach out with a detailed quote? Also, what's the best email to send the quote to?",
+        "Thanks Alice! I've got all your information about the Tesla Model Y, condo installation in San Francisco, and the parking location about 50-60 feet from the electrical room. I'll make sure PJ gets your photos and contact details. He'll reach out to discuss options, potential rebates, and HOA coordination. \n\nIs there anything else you'd like to know while we have you?"
+      ]
+    },
+    {
+      "scenario": "vague-customer-1",
+      "category": "alice-type",
+      "desc": "Customer says almost nothing, needs constant prompting",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 11,
+      "total": 11,
+      "pct": 100,
+      "issues": [],
+      "davidResponses": [
+        "I'd be happy to help! Could you let me know which city you're located in so I can confirm we service your area?",
+        "Thanks for letting me know about your Tesla! First, I just need to confirm which city you're in to make sure you're within our service area. Then I can help you with the perfect charging setup.",
+        "Perfect, Daly City is definitely in our service area! Are you looking to install this at a house or a condo/apartment?",
+        "Great! Have you already purchased a Tesla charger, or would you like us to supply one for the installation?",
+        "I'll make sure we include a Tesla charger in your quote. To help determine pricing, is your home already pre-wired for an EV charger, or does it have a dedicated circuit for one?",
+        "Would you be able to take a few photos of your electrical panel? I'll need pictures of:\n1. Your electrical meter (outside)\n2. Main breaker panel\n3. Panel with the door open showing the circuit breakers\n\nYou can share them right here in the chat, and PJ can check if you're pre-wired. While you're getting those, where would you like the charger installed - garage, outside wall, or somewhere else?",
+        "Thanks! Since it's in the garage near your panel, that should help keep costs down. Could you snap those electrical panel photos when you have a chance? This helps us prepare an accurate quote. \n\nIn the meantime, could I get your name and best contact number so PJ can reach out with detailed pricing?",
+        "Thanks for those photos! I'll make sure PJ gets them. Could I get your name and best phone number to reach you? Also, what's a good email address to send the quote to?",
+        "Thanks Mike! I've got all your info - Tesla charger needed, garage installation, and your photos. PJ will review everything and reach out to you very soon with a detailed quote. He'll call you at 6-5-0, 5-5-5, 1-2-3-4. Is there anything else you need to know in the meantime?"
+      ]
+    },
+    {
+      "scenario": "vague-customer-2",
+      "category": "alice-type",
+      "desc": "Customer gives one-word answers",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 10,
+      "total": 11,
+      "pct": 91,
+      "issues": [],
+      "davidResponses": [
+        "I'd be happy to help! Could you let me know which city you're located in so I can confirm we service your area? Also, is this for a house or condo?",
+        "Thanks! I see you have a Rivian. To help prepare an accurate quote, could you let me know:\n\n1. Which city are you located in? (Just want to confirm we service your area)\n2. Is this for a house or condo/apartment?",
+        "Perfect - Foster City is definitely in our service area. Is this for a house or condo/apartment? Also, have you already purchased a charger, or would you like us to supply one?",
+        "Great! For your Rivian at your house, have you already purchased a charger, or do you need one? Also, is your home already pre-wired for an EV charger (meaning there's a dedicated outlet or breaker in place)?",
+        "I can help with charger options. To prepare an accurate quote, could you snap a few quick photos of your electrical setup? We'll need:\n1. Your electrical meter\n2. Main breaker\n3. Breaker panel with the door open\n\nYou can share them right here in the chat. Also, where would you like the charger installed (garage, outside wall, etc.)?",
+        "No problem! Where are you thinking of installing the charger (garage, outside wall, etc.)? And roughly how far would that be from your electrical panel? Even a rough estimate helps us prepare a quote.",
+        "Thanks! Since it's about a 20-foot run to your garage wall, we're looking at a range of $2,500 to over $5,000 depending on your electrical setup. To give you an exact quote, could you share your:\n\n1. Name\n2. Phone number\n3. Email address\n\nPJ will reach out ASAP with a detailed quote and can discuss charger options for your Rivian.",
+        "Thanks for those photos! I'll make sure PJ gets them. To get your quote prepared, could you share your contact details?\n\n1. Your name\n2. Best phone number to reach you\n3. Email address for the quote\n\nOnce I have those, PJ can review your setup and reach out with an exact quote and charger recommendations for your Rivian.",
+        "Thanks Sarah! I've got all your information and photos for your Rivian charger installation in Foster City. PJ will review everything and reach out to you soon with a detailed quote and charger recommendations.\n\nJust to confirm, I have:\n- Phone: 650-111-2222\n- Email: sarah.j@gmail.com\n- Location: Garage wall, ~20 feet from panel\n\nPJ will be in touch very soon. He'll help you choose the best charger setup for your Rivian and go over all the details!"
+      ]
+    },
+    {
+      "scenario": "confused-elderly",
+      "category": "alice-type",
+      "desc": "Older customer, not tech savvy",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 11,
+      "total": 11,
+      "pct": 100,
+      "issues": [],
+      "davidResponses": [
+        "That's wonderful! I'd be happy to help you get set up with a home charger. Could you let me know what city you're located in so I can confirm we service your area?\n\nAlso, what type of electric car did your son get you? That will help us recommend the right charging setup.",
+        "The Chevy Bolt is a great car! Let me help get you set up. Could you confirm what city you're in? \n\nAlso, are you in a house or an apartment/condo? This helps us understand what type of installation you'll need.",
+        "Perfect - San Mateo is right in our service area! And you're in a house or condo/apartment?\n\nAlso, have you already purchased a charger, or would you like us to help recommend and supply one? We can do either.",
+        "Great! For your Bolt, we can get you set up with a perfect charging solution. To help prepare an accurate quote, could you tell me if your home is already pre-wired for an EV charger? This would mean having a dedicated 240V outlet or breaker already installed.",
+        "Thanks for letting me know. Would you be able to snap a few photos of your electrical setup? Specifically, we'd need:\n1. Your electrical meter\n2. Main breaker\n3. Breaker panel with the door open\n\nYou can share them right here in the chat. This helps us prepare an accurate quote and determine if any upgrades might be needed.\n\nAlso, where would you like the charger installed - garage, outside wall, or somewhere else?",
+        "That's completely fine! Don't worry about the technical details - that's what we're here for. Could you tell me where you'd like the charger installed (like in your garage or on an outside wall)? \n\nAnd those photos would really help us understand your setup. If you're not comfortable opening the electrical panel, even just a photo of your electrical meter would be helpful. It's usually the grey box outside your house where the power comes in.",
+        "That's helpful information! A 10-foot run from your electrical panel to the garage is pretty standard. Since this will be a new installation (not pre-wired) with a short run, you're looking at roughly $1,600 to $2,500 for the installation, depending on your specific setup.\n\nTo move forward with getting you a precise quote, could I get:\n1. Your full name\n2. Best phone number to reach you\n3. Email address\n\nPJ will review everything and reach back out ASAP with an exact quote.",
+        "Absolutely! Your son can send the photos either:\n- Right through this chat\n- Text them to (650) 542-8877\n- Or email them to pj@chargewizards.com\n\nJust make sure he includes your name and address so we know they're your photos. \n\nIn the meantime, could I get your contact information so PJ can reach out to discuss your installation?",
+        "Thanks Dorothy! I've got all your information:\n- House in San Mateo\n- Chevy Bolt\n- Garage installation, about 10 feet from panel\n- Phone: 650-333-4444\n- Email: dorothy@aol.com\n\nOnce your son sends those electrical panel photos, PJ will prepare a detailed quote for you. He'll reach out soon to discuss everything and answer any questions you have about getting your Bolt charging setup installed.\n\nIs there anything else you'd like to know in the meantime?"
+      ]
+    },
+    {
+      "scenario": "just-browsing",
+      "category": "alice-type",
+      "desc": "Not committed, just exploring options",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 10,
+      "total": 11,
+      "pct": 91,
+      "issues": [],
+      "davidResponses": [
+        "That's great! I'd be happy to help you understand the charger installation process. Are you looking at any particular EV model? And would this be for a house or condo in the Bay Area?",
+        "Perfect! Tesla chargers are our specialty. To help you get an accurate quote, could you let me know if this would be for a house or condo, and which city you're located in?",
+        "Great - Burlingame is right in our service area. Is this for a house or a condo/apartment? This helps us understand what type of installation we're looking at.",
+        "Thanks! For planning purposes, would you happen to know if your garage already has a dedicated 240V outlet or any pre-wiring for an EV charger? And roughly how far is the garage from your home's electrical panel?",
+        "No problem! The electrical setup is still important to know even before you get the charger. Could you take a few quick photos of your electrical panel (with the door open) and electrical meter? This helps us determine if you have enough capacity and what kind of installation you might need. You can share the photos right here in the chat.",
+        "Thanks for letting me know about the 100A service. That's actually where our Dynamic Power Management (DPM) system can help - it can save you $3,000 to $8,000 by avoiding a panel upgrade while still letting you charge your Tesla safely. \n\nWould you be able to snap those photos of your electrical panel and meter? That would help us confirm the best solution for your setup.",
+        "That's helpful to know - a 40-foot run to a detached garage means this would likely be in the $2,500 to $5,000 range, depending on the route we need to take with the wiring. \n\nCould I get your name and the best phone number to reach you? PJ can review your setup and provide an exact quote, including options like Dynamic Power Management to work with your 100A service.",
+        "No problem at all! Given what you've shared - 100A service, 40-foot run to a detached garage, and no pre-wiring - you're looking at roughly $2,500 to $5,000 for a complete installation. That includes all permits, materials, and labor. \n\nWould you like me to explain how our Dynamic Power Management system could help manage your charging with the 100A service? Or do you have any other questions I can help with?",
+        "Thanks Tom! I'll have PJ review your setup - detached garage with a 40-foot run and 100A service. He'll reach out to discuss options, including how our Dynamic Power Management can work with your electrical service. \n\nIs there a particular time of day that works best for him to call you at 650-222-3333?"
+      ]
+    },
+    {
+      "scenario": "owen-prewired-techie",
+      "category": "owen-type",
+      "desc": "Tech-savvy customer with all info ready",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": false,
+          "provided": true,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 8,
+      "total": 11,
+      "pct": 73,
+      "issues": [],
+      "davidResponses": [
+        "Perfect - you're in our service area and having 200A service is great! Since you already have a 14-50 outlet, this should be pretty straightforward. \n\nWhere in the garage is the outlet located relative to where you want the Tesla charger installed?",
+        "Thanks Owen! Just to confirm - you want to convert the existing NEMA 14-50 outlet to a hardwired Tesla charger, right?\n\nCould you snap a few quick photos of your electrical panel (with the door open) and the existing outlet location? You can share them right here in the chat. This helps us prepare an accurate quote for the conversion.",
+        "Thanks for those photos! I'll make sure PJ gets them. \n\nJust one more thing to clarify - how far is the existing NEMA 14-50 outlet from where you'd like the Tesla charger mounted? Even a rough estimate helps.",
+        "I have all your info and photos, and I'll make sure PJ gets this right away. Since you already have the 14-50 outlet, this should be a fairly simple conversion. Converting an existing outlet is typically in the $800-$1,600 range, but PJ will give you an exact quote after reviewing the photos.\n\nPJ will call you at 925-237-0742 to discuss the details and schedule the installation. You should hear from him very soon!"
+      ]
+    },
+    {
+      "scenario": "informed-customer",
+      "category": "owen-type",
+      "desc": "Did research, knows what they want",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 9,
+      "total": 11,
+      "pct": 82,
+      "issues": [],
+      "davidResponses": [
+        "Perfect - Hillsborough is right in our service area. Since you haven't mentioned having a charger yet, would you like us to supply one, or do you already have one in mind?\n\nFor your setup with a 15-foot run from the panel, you're looking at around $2,500 to $3,500 depending on the installation details. Could you snap a few quick photos of your electrical meter, main breaker, and breaker panel with the door open? You can share them right here in the chat.",
+        "Yes, we can definitely supply and install the ChargePoint Home Flex - it's a great choice for the BMW iX. Before we go further, would you mind sharing those electrical panel photos? That'll help us confirm everything will work smoothly with your setup.",
+        "Thanks for those photos! I'll make sure PJ gets them. \n\nTo get you an accurate quote, could I get your name and the best phone number and email to reach you?",
+        "Thanks James! I've got all your details - BMW iX, ChargePoint Home Flex installation in Hillsborough, 200A service with a 15-foot run to the garage, and your photos and contact info.\n\nPJ will review everything and reach out to you very soon with a detailed quote. He can also discuss charger options and timeline for the installation. Is there anything else you'd like to know in the meantime?"
+      ]
+    },
+    {
+      "scenario": "second-charger",
+      "category": "owen-type",
+      "desc": "Already has one charger, adding second",
+      "fields": {
+        "name": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 9,
+      "total": 11,
+      "pct": 82,
+      "issues": [],
+      "davidResponses": [
+        "That's great! Since you already have one charger installed, adding a second one should be straightforward. Is your Rivian charger already purchased, or do you need us to supply one?",
+        "Perfect - we can definitely help with that. Since you're only 5 feet from the existing charger location, this should be a relatively simple installation. Could you snap a few quick photos of your electrical panel (with the door open) so we can see how the first Tesla charger was wired and what capacity we have for the Rivian charger? You can share them right here in the chat.",
+        "Thanks for those photos! I'll make sure PJ gets them. Since you mentioned a 200A panel and we can see how the first charger was done, this is looking straightforward. \n\nWhat's the best phone number and email to reach you for the quote?",
+        "Thanks Dave! Just to confirm: I have you at 650-444-5555 and dave.m@gmail.com in San Carlos, looking to add a Rivian charger about 5 feet from your existing Tesla charger. \n\nPJ will review your setup and reach out ASAP with a quote and recommendations for the best Rivian charger options. With your 200A panel and the short distance, this should be a clean installation."
+      ]
+    },
+    {
+      "scenario": "condo-hoa-complex",
+      "category": "condo",
+      "desc": "Condo owner navigating HOA approval",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": false,
+          "provided": true,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 10,
+      "total": 11,
+      "pct": 91,
+      "issues": [],
+      "davidResponses": [
+        "That's a great starting point! Condo installations are one of our specialties, and there might actually be some nice rebates available for SF condo installations. Let me ask a couple quick questions to help get you started.\n\nFirst, have you already gotten initial approval from your HOA to install a charger? And what kind of EV do you have (or plan to get)?",
+        "Great choice! And we work with lots of Ioniq 5 owners. Before we get into the HOA details, I should mention you might qualify for up to $5,000 in CleanPowerSF rebates since you're in a San Francisco condo.\n\nWhere would your parking spot be in relation to the building's electrical room? This helps us understand the installation path.",
+        "Thanks for that detail. For garage installations like this, we handle everything - including the electrical plans, load calculations, and permit documentation your HOA will need. \n\nWould you be looking to have us supply the charger, or did you already purchase one? Most universal chargers like ChargePoint or JuiceBox work great with the Ioniq 5.",
+        "Got it - we can definitely help recommend the right charger for your setup. Given the 80-foot run in a garage, I'd like to get a few photos to help PJ prepare an accurate quote and documentation for your HOA. Could you snap pictures of:\n1. The electrical room's main panel\n2. Your parking space\n3. The path between them\n\nYou can share them right here in the chat. Would you be able to do that?",
+        "That's totally normal for condo installations! PJ can coordinate directly with your building manager or maintenance staff to assess the electrical capacity. \n\nCould you share your name and contact info? PJ can reach out to discuss next steps, including how to approach your HOA and what documentation they typically require. He's helped many SF condo owners through this exact process.",
+        "Thanks for those photos! I'll make sure PJ gets them. For condo projects like yours, we'll need to do a detailed assessment of the building's electrical capacity and determine the best installation approach.\n\nCould I get your name and best contact number? PJ can review these photos and reach out to discuss the next steps with both you and your HOA.",
+        "Thanks Lisa! Just to confirm I have everything:\n- You have a Hyundai Ioniq 5\n- Condo in SF with underground parking, ~80 feet from electrical room\n- Need both charger and installation\n- Photos received of electrical room\n- Contact: Lisa Chen, 415-222-3333, lisa.chen@yahoo.com\n\nPJ will review your setup and reach out soon to discuss the installation plan, HOA documentation requirements, and those CleanPowerSF rebates that could help offset the costs. Is there anything else you'd like me to note for him?"
+      ]
+    },
+    {
+      "scenario": "condo-board-member",
+      "category": "condo",
+      "desc": "Board member exploring options for building",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 9,
+      "total": 11,
+      "pct": 82,
+      "issues": [],
+      "davidResponses": [
+        "This is exactly the type of project we specialize in! For multi-unit buildings like yours, there might be significant rebates available through CleanPowerSF - up to $5,000 per installation for qualifying projects.\n\nCould you tell me a bit more about your building's parking setup? Is it a shared garage or individual spots?\n\nRemember: I'm gathering info so PJ can prepare a comprehensive plan for your HOA.",
+        "Great! For a 10-charger project, we can design a scalable solution using Dynamic Power Management (DPM), which intelligently shares power between chargers and can save significantly on electrical infrastructure costs.\n\nHave any residents already purchased chargers, or would you need guidance on charger selection for the building?",
+        "Thanks for those details! Long runs like that are no problem - we handle complex garage installations regularly. With DPM, we can often avoid expensive electrical service upgrades even with multiple chargers.\n\nCould I get some photos of your building's main electrical room/panels? This helps us evaluate the power capacity and design the most cost-effective solution. You can share them right here in the chat.",
+        "Thanks for that info. For a multi-unit project like this, we'll want to thoroughly assess the building's electrical capacity. DPM can help maximize your existing infrastructure, but we'll need to verify everything.\n\nCould you share your name and best contact info? PJ has extensive experience with HOA projects and can walk you through the technical details, available rebates, and different installation approaches.",
+        "Absolutely! For large HOA projects like this, PJ does a comprehensive on-site assessment. Before scheduling that, could you share:\n\n1. Your name and best phone number to reach you\n2. The building's address in Daly City\n\nPJ can then prepare for the walkthrough and bring relevant materials about HOA solutions and available rebate programs.",
+        "Thanks Robert! I'll make sure PJ gets all this information about your 50-unit Daly City project, including:\n- Planning for 10 EV charging stations\n- Underground garage with ~100ft conduit runs\n- 100A per unit service\n- Need full building assessment\n\nPJ will reach out to you very soon to schedule the site assessment and discuss HOA-specific solutions, including the CleanPowerSF rebate opportunities. He'll also bring information about DPM options that could save your building significant costs.\n\nIs there anything else you'd like me to note for PJ before he calls you?"
+      ]
+    },
+    {
+      "scenario": "price-first-cooperative",
+      "category": "price-focused",
+      "desc": "Leads with price but cooperates with qualification",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 11,
+      "total": 11,
+      "pct": 100,
+      "issues": [],
+      "davidResponses": [
+        "It depends! Every setup is different. Let me ask a few quick questions so we can give you a real number instead of a guess.\n\nFirst, are you in a house or condo/apartment? And what city are you located in?",
+        "Thanks! And is your home already pre-wired for an EV charger, or does it have a dedicated breaker for one? \n\nAlso, do you already have a charger you'd like us to install, or do you need us to supply one?",
+        "Thanks! And about the electrical setup - is there already a 240V outlet or dedicated breaker for EV charging? This makes a big difference in the installation cost.\n\nAlso, where would you like the charger installed (garage, outside wall, etc.), and roughly how far is that from your electrical panel?",
+        "Thanks for clarifying. Where would you like the charger installed, and about how far is that location from your electrical panel? This will help me give you a more accurate price range.\n\nAlso, it would really help if you could snap a few photos of your electrical meter, main breaker, and breaker panel with the door open. You can share them right here in the chat.",
+        "Thanks for letting me know about your 100A service. For a new installation without existing wiring, you're looking at around $2,500 to over $5,000 depending on the exact setup. However, we offer Dynamic Power Management (DPM) which can save you $3,000-$8,000 by avoiding a panel upgrade.\n\nCould you tell me where you'd like the charger installed and roughly how far that is from your electrical panel? This will help PJ prepare a more accurate quote.",
+        "Got it - garage location about 25 feet from the panel. This helps give us a clear picture. \n\nTo get you an exact quote, could I get your name and best phone number? PJ will review everything and reach out to you with a detailed estimate right away. Also, those photos of your electrical panel would be really helpful if you can share them.",
+        "Thanks for those photos! I'll make sure PJ gets them.\n\nCould I get your name and best phone number to reach you? And what's the best email to send the quote to? PJ will review everything and get back to you with a detailed estimate ASAP.",
+        "Perfect, thank you Jennifer! I've got all your information:\n- Chevy Bolt\n- Redwood City house with 100A service\n- Garage installation, 25 feet from panel\n- Photos of your electrical setup\n- Phone: 650-999-1111\n- Email: jen.wu@gmail.com\n\nPJ will review your setup and reach out very soon with a detailed quote. He'll also discuss how our Dynamic Power Management system might help avoid any panel upgrade costs. Thanks for choosing ChargeWizards!"
+      ]
+    },
+    {
+      "scenario": "price-obsessed",
+      "category": "price-focused",
+      "desc": "Only cares about price, resistant to qualification",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 10,
+      "total": 11,
+      "pct": 91,
+      "issues": [],
+      "davidResponses": [
+        "It depends! Every setup is different. Let me ask a few quick questions so we can give you a real number instead of a guess. First, do you live in a house or condo/apartment?",
+        "Perfect, we definitely cover San Mateo. Do you already have a Tesla charger, or would you need us to supply one? Also, is your home already pre-wired for an EV charger, or does it have a dedicated breaker for one?",
+        "Since you're not pre-wired and it's a 15-foot run from your panel, you're looking at $2,500 to over $5,000 depending on the complexity. If you can snap a few photos of your electrical meter, main breaker, and breaker panel with the door open, PJ can give you an exact quote. You can share the photos right here in the chat.",
+        "Thanks for that info. Could I get your name and best phone number? PJ can review your setup (200A panel, 15-foot garage installation) and get back to you with an exact quote right away.",
+        "Thanks for that photo! I'll make sure PJ gets it. Could I get your name and best contact number so he can reach out with a detailed quote? Also, what's the best email to send the quote to?",
+        "Thanks Chris! I've got your info - 650-123-4567 and chris@email.com. PJ will review your setup (Tesla Model 3, 200A panel, 15-foot garage installation) and reach out ASAP with a detailed quote. He'll also recommend the best charger options for your situation. Is there anything else you'd like to know while you have me?"
+      ]
+    },
+    {
+      "scenario": "budget-conscious",
+      "category": "price-focused",
+      "desc": "Trying to find cheapest option",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 10,
+      "total": 11,
+      "pct": 91,
+      "issues": [],
+      "davidResponses": [
+        "The most cost-effective setup depends on your specific needs. Let me ask you a few quick questions so I can point you in the right direction. \n\nAre you in the San Francisco Bay Area? And do you already have an EV, or are you planning to get one?\n\nLet's figure out what makes the most sense for your situation.",
+        "Great, you're in our service area and the Leaf is a perfect candidate for home charging. Have you already purchased a charger, or would you like us to help with that too?",
+        "Since you mentioned older construction, it would be really helpful to know about your electrical setup. Is your home already pre-wired for an EV charger, or do you know what size electrical service you have (like 100A or 200A)?",
+        "That's not a problem - we work with lots of older homes. Could you snap a few photos of your electrical meter, main breaker, and breaker panel with the door open? This helps us figure out the most cost-effective solution. \n\nAlso, where would you like the charger installed, and roughly how far is that from your electrical panel?",
+        "With a 100A service from the 1970s, our Dynamic Power Management (DPM) system could be perfect for you - it can save $3,000 to $8,000 by avoiding a panel upgrade while still giving you fast, reliable charging. \n\nWhere in your home would you like to charge? (garage, carport, etc.)?",
+        "That's a great setup - short distance from the panel will help keep costs down. Since it's a basic run with no pre-wiring, you're looking at around $1,600-2,500 for a complete installation. \n\nWould you like PJ to put together an exact quote for you? I'll just need your name and best contact info to get that started.",
+        "Yes, we can install a NEMA 14-50 outlet (240V) which lets you use the portable charger that came with your Leaf. It's a simpler and often more affordable option than a permanent charger, while still giving you good charging speeds.\n\nWould you like to get a quote for that option? PJ can go over the pros and cons of both approaches.",
+        "Thanks Mary! I'll make sure PJ gets all your information about installing a charging solution for your Nissan Leaf in Pacifica. To recap: you have a 1970s home with 100A service, garage installation about 8 feet from the panel, and you're interested in both NEMA 14-50 outlet and charger options.\n\nPJ will reach out to you soon with recommendations and pricing. If you're able to send those electrical panel photos we discussed, that would be really helpful - you can share them right here in the chat, text them to (650) 542-8877, or email them to pj@chargewizards.com."
+      ]
+    },
+    {
+      "scenario": "impatient-exec",
+      "category": "difficult",
+      "desc": "Busy executive, wants it done fast",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 10,
+      "total": 11,
+      "pct": 91,
+      "issues": [],
+      "davidResponses": [
+        "Great! We install a lot of chargers in Menlo Park. Let me ask a couple quick questions to help get you an accurate quote.\n\nIs this for a house or condo/apartment?",
+        "Perfect - that's a good charger choice. Is your home already pre-wired for an EV charger, or does it have a dedicated circuit for one?\n\nAlso, could you snap a few photos of your electrical meter, main breaker, and breaker panel with the door open? You can share them right here in the chat.",
+        "Thanks for those details! Since you're looking at a short 10-foot run from the panel, and you've got a good 200-amp service, this should be pretty straightforward. \n\nWould you mind sharing those panel photos? They really help us prepare an accurate quote. Also, what's the best phone number and email for PJ to reach you?",
+        "I understand you're busy. For a non-prewired installation like yours with a short run, you're typically looking at $1,600-2,500. PJ can give you an exact number and timeline if you share your contact info - what's the best number to reach you?",
+        "Thanks Dan! I'll make sure PJ gets your info right away - Grizzl-E charger installation in Menlo Park, 200A panel, garage location about 10 feet from the panel. \n\nIf you get a chance to snap those panel photos later, you can text them to (650) 542-8877 - just include your name and address. PJ will reach out very soon with a quote and timeline."
+      ]
+    },
+    {
+      "scenario": "angry-previous-bad-experience",
+      "category": "difficult",
+      "desc": "Had bad experience with another installer",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 9,
+      "total": 11,
+      "pct": 82,
+      "issues": [],
+      "davidResponses": [
+        "I'm sorry to hear about your trouble. This is actually a common issue we can help with. Could you tell me which brand of charger you have installed, and how often the breaker is tripping?",
+        "Half Moon Bay is definitely in our service area. Could you take a few photos of your JuiceBox charger and your electrical panel (with the door open) so PJ can see what's going on? You can share them right here in the chat. \n\nAlso, where is the charger installed - garage or outside?",
+        "Thanks for that info. Since you mentioned 100A service, I should note that we offer Dynamic Power Management which can help prevent overloading and breaker trips - it could save you $3,000-8,000 vs a panel upgrade.\n\nCould you share those photos of your JuiceBox and electrical panel? That will help PJ diagnose what's causing the tripping issue.",
+        "That's good it's close to the panel. Let me get your contact info so PJ can review your setup and give you options to fix this. What's the best phone number and email to reach you?",
+        "Thanks for those photos! I'll make sure PJ gets them. Could I get your name, phone number, and email address? PJ will reach out ASAP with a solution to stop those breaker trips.",
+        "Perfect, thanks Karen. I've got your photos and contact info - PJ will review everything and call you at 6-5-0-8-8-8-1-2-3-4. He'll be able to recommend the best solution for your JuiceBox setup, whether that's rewiring, adding Dynamic Power Management, or other options to prevent those breaker trips.\n\nIs there anything else you need to know while we wait for PJ to reach out?"
+      ]
+    },
+    {
+      "scenario": "skeptical-about-bots",
+      "category": "difficult",
+      "desc": "Doesnt want to talk to AI",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 9,
+      "total": 11,
+      "pct": 82,
+      "issues": [],
+      "davidResponses": [
+        "I'm an AI assistant helping ChargeWizards with customer inquiries. I can gather all the information needed for your EV charger installation quote, and then PJ, our owner, will personally review your setup and get back to you. Would you like to learn more about our installation services?",
+        "Great, San Bruno is definitely in our service area! Is this for a house or condo/apartment? And have you already purchased a Tesla charger, or would you like us to supply one?",
+        "Thanks! And for your Tesla charger - would you like us to supply and install one, or do you already have one to install?\n\nSince you mentioned no existing wiring, it would help to see your electrical setup. Could you snap a few photos of your electrical meter, main breaker, and breaker panel with the door open? You can share them right here in the chat.",
+        "Thanks for those details! With a 100A service and a 30-foot run, we might want to look at Dynamic Power Management (DPM) - it could save you $3,000-8,000 by avoiding a panel upgrade. \n\nGiven the distance and setup, this would likely fall in the $2,500-5,000 range for installation. PJ can give you an exact quote after reviewing your setup.\n\nCould I get your name and best contact number so PJ can reach out with a detailed quote?",
+        "Of course! Let me check if PJ is available. Could I get your phone number so he can call you right back?",
+        "Thanks Steve! I'll make sure PJ gets your information right away. Since you have a 100A panel, he'll definitely want to discuss DPM options with you. He'll call you back at 650-222-9999 as soon as possible."
+      ]
+    },
+    {
+      "scenario": "charger-broken",
+      "category": "repair",
+      "desc": "Existing charger stopped working",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": false,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 8,
+      "total": 11,
+      "pct": 73,
+      "issues": [],
+      "davidResponses": [
+        "Sorry to hear about your charger issues. What model Tesla do you have? And is this a Tesla Wall Connector or a mobile charger you're using?\n\nI'd like to get some photos of your setup to help PJ diagnose the problem. Could you share pictures of:\n1. The charger showing the red light\n2. Your electrical panel with the door open\n\nResponse: Keep responses concise and natural (2-3 sentences max), be helpful, gather qualifying info naturally, one or two questions at a time.",
+        "Got it. Are there any error codes on the charger, or just the red light? And would you be able to snap those photos of the Wall Connector and electrical panel? They'll help PJ diagnose the issue quickly.",
+        "Thanks. Could you take a few photos of the Wall Connector and your electrical panel? You can share them right here in the chat. This will help PJ figure out what's going on before he reaches out.",
+        "Perfect, that's helpful info. Could I get your name and best phone number? And if you could share those photos of the Wall Connector and panel, PJ can often diagnose the issue before even coming out.",
+        "Thanks for those photos! I'll make sure PJ gets them. Could I get your name and best contact number so he can reach out with a diagnosis? Also, what's a good email address to send any follow-up information to?",
+        "Thanks Amy! I've got all your information and photos. PJ will review everything and call you back at 650-555-8888 as soon as possible to help resolve the issue with your Tesla charger. Is there anything else you need in the meantime?"
+      ]
+    },
+    {
+      "scenario": "renter-wants-charger",
+      "category": "renter",
+      "desc": "Renter wanting to install charger",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 10,
+      "total": 11,
+      "pct": 91,
+      "issues": [],
+      "davidResponses": [
+        "Yes, we can definitely help! Since you're renting, you'll just need your landlord's approval first. \n\nWhat kind of EV do you have or are planning to get? This helps us recommend the right charging setup.",
+        "Great choice! Have you already purchased a charger, or would you like us to recommend and supply one that's compatible with your Bolt EUV?\n\nAlso, do you know if your rental home is already pre-wired for EV charging (like a dedicated 240V outlet or breaker)?",
+        "Perfect that you have a garage - that's ideal for installation. Since you mentioned it's a rental house, would you be comfortable getting a few photos of your electrical panel? We'll need to see:\n1. The electrical meter\n2. Main breaker panel\n3. Sub-panel with the door open\n\nThis helps us prepare an accurate quote before discussing options with your landlord.",
+        "That's great that you have landlord approval! To help prepare an accurate quote, could you let me know approximately how far the garage is from your electrical panel? \n\nAlso, is this something you're looking to have done soon? We can often complete installations within a few weeks once we have permits approved.",
+        "Thanks for that info! Since the garage is close to the panel, that should help keep costs down. Would you be able to snap those photos of your electrical setup? That way PJ can check your service size and available capacity to give you an accurate quote.\n\nYou can share the photos right here in the chat, or if you prefer, text them to (650) 542-8877 (just include your name and address).",
+        "Thanks for sending that photo! I'll make sure PJ gets it. \n\nSince you haven't purchased a charger yet, would you like us to supply and install one? We can recommend options that work great with the Bolt EUV.\n\nTo help prepare your quote, could I get your name and best contact number?",
+        "Thanks Nina! Just to confirm: I have your info and that you're looking for a complete charger installation for your Bolt EUV in Belmont, with landlord approval. The garage is close to the panel, which is great.\n\nPJ will review your panel photo and reach out to you ASAP with a detailed quote. He can also recommend the best charger options for your setup.\n\nIs there anything else you'd like to know while you have me?"
+      ]
+    },
+    {
+      "scenario": "landlord-for-tenant",
+      "category": "renter",
+      "desc": "Landlord installing for rental property",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 11,
+      "total": 11,
+      "pct": 100,
+      "issues": [],
+      "davidResponses": [
+        "That's great! We help many property owners install EV chargers for their tenants. Is this for a single-family home or an apartment/condo building?\n\nI can help gather some initial details to get you a quote. It's a smart investment - EV charging can increase property value and tenant appeal.",
+        "I understand. We'll need a few key details to provide an accurate quote. Would you happen to know if the property has a garage or where they're hoping to have the charger installed?\n\n(I'll also need to find out what EV they have since different cars have different charging needs - we can check with your tenant on that.)",
+        "Thanks! That's helpful - 200A service gives us plenty of room to work with. \n\nCould you help me get a few photos of the electrical setup? We'll need pictures of: 1) the electrical meter, 2) main breaker, and 3) breaker panel with the door open. You can share them right here in the chat, or have your tenant send them.",
+        "Perfect - that's a straightforward setup with a short run. Since it's a 10-foot run from the panel to the garage, you're looking at around $1,600 to $2,500 for a complete installation, depending on the specific charger and setup needed.\n\nCould I get your name and contact info? PJ can prepare a detailed quote and discuss the best options for your rental property.",
+        "Thanks for letting me know. That's totally fine - most homes aren't pre-wired, and with just a 10-foot run to the garage, it's still a straightforward installation.\n\nWould you be providing the charger, or would you like us to supply one? We can do either option, and PJ can recommend the best charger type based on your tenant's vehicle.",
+        "Thanks for those photos! I'll make sure PJ gets them. \n\nTo help prepare your quote, could I get your name and the best phone number to reach you? Also, what's a good email address to send the quote to?\n\nOnce we have your contact info, PJ can review the photos and provide an accurate quote for the installation, including charger recommendations based on your tenant's vehicle.",
+        "Thanks Bill! Just to confirm - I have:\n- Bill Chen\n- 650-444-3333\n- bill.chen@landlord.com\n- Property in Millbrae\n- Single family house, garage installation\n- 200A service, ~10 foot run from panel\n- Photos received of panel and garage\n\nPJ will review everything and reach out to you very soon with a detailed quote. He can also discuss charger options and answer any landlord-specific questions you might have.\n\nWould you like me to note down your tenant's contact information as well?"
+      ]
+    },
+    {
+      "scenario": "sunnyvale-customer",
+      "category": "south-bay",
+      "desc": "Sunnyvale customer in expanded area",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 11,
+      "total": 11,
+      "pct": 100,
+      "issues": [],
+      "davidResponses": [
+        "Yes, we service Sunnyvale! Are you looking to install this at a house or condo/apartment?",
+        "Thanks! And is this for a house or condo installation? This helps me understand what kind of setup we might be looking at.",
+        "Perfect, thanks! Have you already purchased a charger, or would you like us to provide one? Also, could you snap a few photos of your electrical panel (with the door open) and meter? Those really help us prepare an accurate quote.",
+        "Great! And is your home already pre-wired for an EV charger, or would this be a completely new installation? Also, where would you like the charger installed (garage, outside wall, etc.), and roughly how far is that from your electrical panel?",
+        "That's an ideal setup! Since you're pre-wired and it's a short run, this should be pretty straightforward. Could I get your name and best contact number to have PJ reach out with a quote? He'll also need your email to send the details.",
+        "Thanks for those photos! I'll make sure PJ gets them. Could I get your name, phone number, and email address so he can reach out with a quote? He'll be able to review everything and get back to you quickly.",
+        "Thanks Raj! I've got all your info - pre-wired house in Sunnyvale with a ChargePoint Flex, 200A service, and a short 5-foot run to the garage. PJ will review the photos and reach out to you very soon with a quote. Is there anything else you'd like to know about our installation process?"
+      ]
+    },
+    {
+      "scenario": "cupertino-customer",
+      "category": "south-bay",
+      "desc": "Cupertino customer, Apple employee vibes",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 10,
+      "total": 11,
+      "pct": 91,
+      "issues": [],
+      "davidResponses": [
+        "Great, Cupertino is within our service area! Are you looking to install this at a house or a condo/apartment?\n\nLet me ask you a few quick questions so we can give you an accurate quote for your setup.",
+        "Nice choice! And I see you have a Mercedes EQS. Have you already purchased an EV charger that you'd like us to install, or would you need us to supply one?",
+        "Perfect, newer homes often have good electrical infrastructure. Is your home already pre-wired for an EV charger, or does it have a dedicated circuit breaker for one? \n\nAlso, where would you like the charger installed (garage, outside wall, etc.), and roughly how far is that from your electrical panel?",
+        "That's good you have 200A service. The garage being attached is ideal too. If you could snap a few photos of your electrical meter, main breaker, and breaker panel with the door open, it really helps us prepare an accurate quote. You can share them right here in the chat.",
+        "Thanks for those details! Since it's a new run about 12 feet from the panel, you're looking at approximately $2,500 to over $3,000, depending on the specific route and any complexities. PJ can give you an exact number after reviewing your setup.\n\nWould you like to share your contact information so PJ can reach out with a detailed quote? I'll need your name, phone number, and email address.",
+        "Thanks for those photos! I'll make sure PJ gets them. \n\nSince we have a good picture of your setup now, let's get your contact information so PJ can prepare an accurate quote for you. Could you share your:\n- Full name\n- Best phone number to reach you\n- Email address for sending the quote",
+        "Thanks Emily! I've got all your information together - the photos of your setup, Mercedes EQS, 200A panel in the garage, and the ~12 foot installation distance. PJ will review everything and reach out to you shortly at 408-333-7777 with a detailed quote.\n\nJust to confirm - would you like us to supply the charger, or do you already have one in mind for your EQS?"
+      ]
+    },
+    {
+      "scenario": "two-cars-one-charger",
+      "category": "edge",
+      "desc": "Household with two EVs wanting one charger",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 11,
+      "total": 11,
+      "pct": 100,
+      "issues": [],
+      "davidResponses": [
+        "That's great! To help find the best charging solution for your two EVs, could you tell me what vehicles you have? Also, is this for a house or condo/apartment?",
+        "Thanks! For those vehicles, we can install either a Tesla charger with an adapter for the Bolt, or a universal charger that works with both cars. And to make sure we're looking at the right options - is this for a house or condo?",
+        "Perfect, we definitely cover San Carlos. To help prepare an accurate quote, could you tell me if your home is already pre-wired for an EV charger, or does it have a dedicated circuit available? Also, where would you like the charger installed (garage, outside wall, etc.)?",
+        "Great that you have 200A service! About how far is your garage from your electrical panel? Also, if you could snap a few photos of your electrical meter, main breaker, and breaker panel with the door open, it really helps us prepare an accurate quote. You can share them right here in the chat.",
+        "Thanks! Since it's a 15-foot run and needs new wiring, I can give you a rough estimate of $2,500-5,000, though PJ can provide an exact quote after reviewing your setup. \n\nWould you like us to supply a charger, or do you already have one in mind? We can provide recommendations for chargers that work well with both Tesla and Chevy vehicles.",
+        "Thanks for those photos! I'll make sure PJ gets them. \n\nTo help us prepare your quote, could I get your:\n- Full name\n- Best phone number\n- Email address\n\nPJ will review everything and reach out with a detailed quote and charger recommendations for your Tesla and Bolt setup.",
+        "Thanks Mike and Lisa! I've got all your information about the two EVs, 200A service, 15-foot garage installation, and the photos. PJ will review everything and reach out to you at 650-666-5555 with a detailed quote and recommendations for a charging solution that works for both your Model Y and Bolt.\n\nIs there anything else you'd like to know while we wrap up?"
+      ]
+    },
+    {
+      "scenario": "commercial-small-biz",
+      "category": "edge",
+      "desc": "Small business wanting charger for employees",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": false,
+          "provided": false,
+          "collected": false,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 9,
+      "total": 11,
+      "pct": 82,
+      "issues": [],
+      "davidResponses": [
+        "Great! Mountain View is definitely in our service area. Are you looking to install Tesla chargers, or universal chargers that work with any EV?\n\nI'll help gather some info so PJ can prepare an accurate quote for your commercial installation.",
+        "Thanks for that detail! For a commercial installation at that distance, we'll definitely want to look at your electrical capacity. A few quick questions:\n\n1. How many chargers are you thinking of installing?\n2. Do you know your building's electrical service size?\n\nCould you share some photos of your electrical panel and meter? That would help us evaluate the best setup for your office.",
+        "Perfect - that 400A service gives us good capacity to work with. For a commercial installation, we'll want to consider future expansion too. \n\nWould you like us to supply the chargers, or do you already have specific ones in mind? We can recommend commercial-grade options that include load sharing features to maximize your available power.",
+        "Got it - we'll be starting fresh. Given it's a commercial installation with a 50-foot run, we'll need to plan the conduit path and ensure code compliance for your parking lot.\n\nCould you share your contact info (name, phone, and email)? PJ can put together a detailed quote and discuss options like power management systems that could let you add more chargers in the future without expensive electrical upgrades.",
+        "Thanks for those photos! I'll make sure PJ gets them.\n\nTo wrap up, could you share:\n1. Your name and best contact number\n2. Email address for sending the quote\n\nPJ will review the photos and can discuss commercial-specific details like ADA compliance requirements and potential business tax credits for EV charging installations.",
+        "Thanks Andrea! I've got all your info:\n- Office location: Mountain View\n- 400A service, 50-foot run to parking lot\n- Photos of panel and parking area\n- Starting fresh (no existing EV infrastructure)\n\nPJ will review everything and reach out to you shortly at 650-999-3333 with a detailed quote and commercial installation options. He can also discuss smart power management solutions that would allow you to expand charging capacity over time.\n\nIs there anything else you'd like to know while I have you?"
+      ]
+    },
+    {
+      "scenario": "outdoor-install-no-garage",
+      "category": "edge",
+      "desc": "No garage, needs outdoor installation",
+      "fields": {
+        "name": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Customer name"
+        },
+        "phone": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Phone number"
+        },
+        "email": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Email address"
+        },
+        "city": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "City/Address"
+        },
+        "housing_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "House or Condo"
+        },
+        "ev_type": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "EV type"
+        },
+        "has_charger": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Has charger already?"
+        },
+        "prewired": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Pre-wired status"
+        },
+        "service_size": {
+          "asked": true,
+          "provided": false,
+          "collected": true,
+          "desc": "Service size (amps)"
+        },
+        "location_distance": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Install location + distance"
+        },
+        "photos": {
+          "asked": true,
+          "provided": true,
+          "collected": true,
+          "desc": "Panel photos requested"
+        }
+      },
+      "collected": 11,
+      "total": 11,
+      "pct": 100,
+      "issues": [],
+      "davidResponses": [
+        "Absolutely! We can install chargers on exterior walls for driveway charging. Could you tell me what type of EV you have or are planning to get? This helps us recommend the best setup for your situation.",
+        "Great choice! Since we'll be installing outside, we'll make sure to use weatherproof components. Is your electrical panel inside the house, and do you know roughly how far it would be from where you park your F-150 in the driveway?",
+        "Thanks for letting me know you're in Palo Alto - that's within our service area. The panel is inside the garage, maybe 25 feet from where I park. Not sure about the panel size though.",
+        "Thanks for clarifying. Would you be able to snap a few photos of your electrical meter, main breaker, and breaker panel with the door open? This will help us determine if you have enough capacity for the F-150's charger and prepare an accurate quote given the 30-foot run to your driveway.",
+        "Thanks for that info! A 200A service is good news. Since this will be a new installation with a longer run to your driveway, the cost would typically range from $2,500 to over $5,000 depending on the exact route and complexity. \n\nWould you like us to supply the charger, or do you already have one you'd like us to install?",
+        "Yes, we can definitely mount the charger on your house's exterior wall! We'll use proper weatherproofing and ensure it's securely mounted. Could you tell me if you'd like us to provide the charger, or do you already have one you'd like installed?",
+        "Thanks for those photos! I'll make sure PJ gets them. \n\nTo help prepare an accurate quote, could I get your contact information? We'll need:\n- Your full name\n- Best phone number to reach you\n- Email address for sending the quote\n\nPJ will review your setup and reach out with options for mounting the charger on your exterior wall.",
+        "Thanks Kevin! I've got all your information and photos for PJ to review - including your F-150 Lightning, 200A service, exterior wall mount location about 30 feet from the panel, and your Palo Alto address.\n\nPJ will reach out to you very soon with a detailed quote. Is there anything else you'd like to know while I have you?"
+      ]
+    }
+  ]
+}
