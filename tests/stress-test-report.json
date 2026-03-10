@@ -1,0 +1,5510 @@
+{
+  "summary": {
+    "totalCalls": 1000,
+    "totalScenarios": 813,
+    "passed": 770,
+    "withIssues": 43,
+    "passRate": "94.7%",
+    "avgQualification": "12%",
+    "elapsed": "18.9 minutes"
+  },
+  "qualification": {
+    "avgScore": 12,
+    "fieldStats": {
+      "name": {
+        "desc": "Customer name",
+        "asked": 11,
+        "total": 494,
+        "pct": 2
+      },
+      "city": {
+        "desc": "City/location",
+        "asked": 75,
+        "total": 494,
+        "pct": 15
+      },
+      "ev_type": {
+        "desc": "EV type",
+        "asked": 83,
+        "total": 494,
+        "pct": 17
+      },
+      "has_charger": {
+        "desc": "Has charger already?",
+        "asked": 52,
+        "total": 494,
+        "pct": 11
+      },
+      "prewired": {
+        "desc": "Pre-wired status",
+        "asked": 107,
+        "total": 494,
+        "pct": 22
+      },
+      "service_size": {
+        "desc": "Service size (amps)",
+        "asked": 37,
+        "total": 494,
+        "pct": 7
+      },
+      "photos": {
+        "desc": "Asked for photos",
+        "asked": 47,
+        "total": 494,
+        "pct": 10
+      },
+      "location": {
+        "desc": "Installation location",
+        "asked": 146,
+        "total": 494,
+        "pct": 30
+      },
+      "distance": {
+        "desc": "Distance from panel",
+        "asked": 60,
+        "total": 494,
+        "pct": 12
+      },
+      "contact": {
+        "desc": "Contact info",
+        "asked": 16,
+        "total": 494,
+        "pct": 3
+      },
+      "email": {
+        "desc": "Email specifically",
+        "asked": 8,
+        "total": 494,
+        "pct": 2
+      }
+    },
+    "scenarioScores": [
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 73,
+        "asked": 8,
+        "total": 11
+      },
+      {
+        "pct": 55,
+        "asked": 6,
+        "total": 11
+      },
+      {
+        "pct": 55,
+        "asked": 6,
+        "total": 11
+      },
+      {
+        "pct": 73,
+        "asked": 8,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 73,
+        "asked": 8,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 45,
+        "asked": 5,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 73,
+        "asked": 8,
+        "total": 11
+      },
+      {
+        "pct": 64,
+        "asked": 7,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 100,
+        "asked": 11,
+        "total": 11
+      },
+      {
+        "pct": 55,
+        "asked": 6,
+        "total": 11
+      },
+      {
+        "pct": 55,
+        "asked": 6,
+        "total": 11
+      },
+      {
+        "pct": 73,
+        "asked": 8,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 64,
+        "asked": 7,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 64,
+        "asked": 7,
+        "total": 11
+      },
+      {
+        "pct": 64,
+        "asked": 7,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 82,
+        "asked": 9,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 73,
+        "asked": 8,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 91,
+        "asked": 10,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 45,
+        "asked": 5,
+        "total": 11
+      },
+      {
+        "pct": 64,
+        "asked": 7,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 36,
+        "asked": 4,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 64,
+        "asked": 7,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 55,
+        "asked": 6,
+        "total": 11
+      },
+      {
+        "pct": 55,
+        "asked": 6,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 27,
+        "asked": 3,
+        "total": 11
+      },
+      {
+        "pct": 9,
+        "asked": 1,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 18,
+        "asked": 2,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      },
+      {
+        "pct": 0,
+        "asked": 0,
+        "total": 11
+      }
+    ]
+  },
+  "issuesBySeveity": {
+    "MED": 31,
+    "HIGH": 4,
+    "CRITICAL": 9
+  },
+  "issuesByType": {
+    "wall-connector-unprompted": {
+      "count": 20,
+      "desc": "Used \"Wall Connector\" jargon (should say \"charger\")",
+      "severity": "MED",
+      "examples": [
+        {
+          "scenario": "tesla-sm",
+          "lastResponse": "Great! San Mateo is right in our service area. We specialize in Tesla Wall Connector installations. Is your home already pre-wired for an EV charger, or would this be a new installation?"
+        },
+        {
+          "scenario": "model-y-foster",
+          "lastResponse": "Foster City is right in our service area! What kind of charger were you thinking of installing - did you already purchase a Tesla Wall Connector, or would you like us to supply one?"
+        },
+        {
+          "scenario": "which-charger",
+          "lastResponse": "The Tesla Wall Connector is a great option, and we install them frequently. Do you already have one, or would you like us to supply it? \n\nLet me ask - where are you located? That way I can confirm we "
+        }
+      ]
+    },
+    "mentions-yelp": {
+      "count": 2,
+      "desc": "Recommended Yelp (sends to competitors)",
+      "severity": "HIGH",
+      "examples": [
+        {
+          "scenario": "angry-reviews",
+          "lastResponse": "I appreciate you bringing this up. Actually, we maintain a 5-star rating across Yelp, Google, and NextDoor with over 100 verified reviews. Our customers consistently praise PJ's expertise and professi"
+        },
+        {
+          "scenario": "angry-reviews",
+          "lastResponse": "I appreciate you bringing this up. We actually maintain very high customer satisfaction ratings, with excellent reviews on platforms like Yelp and Google. But I'd be happy to address any specific conc"
+        }
+      ]
+    },
+    "legal-advice": {
+      "count": 10,
+      "desc": "Gave legal advice (should defer to PJ)",
+      "severity": "MED",
+      "examples": [
+        {
+          "scenario": "landlord",
+          "lastResponse": "That's a complex situation involving tenant rights and California EV charging laws. While I can't give legal advice, PJ can explain your options and the relevant California regulations that may help y"
+        },
+        {
+          "scenario": "landlord",
+          "lastResponse": "That's a complex situation involving tenant rights and California regulations. PJ can discuss your options and explain the relevant California laws that protect EV charging access for renters. Would y"
+        },
+        {
+          "scenario": "angry-overcharged",
+          "lastResponse": "I understand price is important. The difference is often in the details - we're licensed, insured, and handle everything from permits to load calculations and inspections. Many lower quotes skip cruci"
+        }
+      ]
+    },
+    "hearth-financing": {
+      "count": 2,
+      "desc": "Hallucinated financing company",
+      "severity": "HIGH",
+      "examples": [
+        {
+          "scenario": "financing",
+          "lastResponse": "Yes, we offer financing through Hearth, which lets you compare multiple loan options. The rates and terms will depend on your credit. PJ can walk you through the details during your consultation.\n\nWou"
+        },
+        {
+          "scenario": "financing",
+          "lastResponse": "Yes, we offer financing through Hearth, which lets you compare multiple loan options. The rates and terms will depend on your credit. PJ can walk you through the details during your consultation.\n\nLet"
+        }
+      ]
+    },
+    "error-response": {
+      "count": 9,
+      "desc": "Error in response",
+      "severity": "CRITICAL",
+      "examples": [
+        {
+          "scenario": "multiturn-angry",
+          "lastResponse": "ERROR: fetch failed"
+        },
+        {
+          "scenario": "multiturn-condo",
+          "lastResponse": "ERROR: fetch failed"
+        },
+        {
+          "scenario": "multiturn-prewired",
+          "lastResponse": "ERROR: fetch failed"
+        }
+      ]
+    },
+    "premature-price": {
+      "count": 1,
+      "desc": "Gave price range (check if qualified first)",
+      "severity": "MED",
+      "examples": [
+        {
+          "scenario": "multiturn-prewired",
+          "lastResponse": "Since you're already pre-wired with a NEMA 14-50, we're looking at around $800 to over $1,600 for the installation labor. The Tesla Wall Connector itself runs about $450-500. PJ can give you an exact "
+        }
+      ]
+    }
+  },
+  "details": [
+    {
+      "scenario": "tesla-sm",
+      "iteration": 1,
+      "msgs": [
+        "I have a Tesla Model 3 and need a charger installed in San Mateo"
+      ],
+      "responses": [
+        "Great! San Mateo is right in our service area. We specialize in Tesla Wall Connector installations. Is your home already pre-wired for an EV charger, or would this be a new installation?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 2,
+        "total": 11,
+        "pct": 18
+      }
+    },
+    {
+      "scenario": "model-y-foster",
+      "iteration": 1,
+      "msgs": [
+        "Need a charger for my Model Y in Foster City"
+      ],
+      "responses": [
+        "Foster City is right in our service area! What kind of charger were you thinking of installing - did you already purchase a Tesla Wall Connector, or would you like us to supply one?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 1,
+        "total": 11,
+        "pct": 9
+      }
+    },
+    {
+      "scenario": "which-charger",
+      "iteration": 1,
+      "msgs": [
+        "What charger should I get for my Tesla?"
+      ],
+      "responses": [
+        "The Tesla Wall Connector is a great option, and we install them frequently. Do you already have one, or would you like us to supply it? \n\nLet me ask - where are you located? That way I can confirm we service your area."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 2,
+        "total": 11,
+        "pct": 18
+      }
+    },
+    {
+      "scenario": "angry-reviews",
+      "iteration": 1,
+      "msgs": [
+        "I saw terrible reviews about your company online"
+      ],
+      "responses": [
+        "I appreciate you bringing this up. Actually, we maintain a 5-star rating across Yelp, Google, and NextDoor with over 100 verified reviews. Our customers consistently praise PJ's expertise and professionalism. \n\nWould you like to tell me more about what specific concerns you have? I'm happy to address them directly."
+      ],
+      "issues": [
+        {
+          "name": "mentions-yelp",
+          "severity": "HIGH",
+          "desc": "Recommended Yelp (sends to competitors)"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 0,
+        "total": 11,
+        "pct": 0
+      }
+    },
+    {
+      "scenario": "landlord",
+      "iteration": 1,
+      "msgs": [
+        "My landlord will not let me install a charger, what can I do?"
+      ],
+      "responses": [
+        "That's a complex situation involving tenant rights and California EV charging laws. While I can't give legal advice, PJ can explain your options and the relevant California regulations that may help your case. Would you like me to get your contact information so he can walk you through this?"
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "financing",
+      "iteration": 1,
+      "msgs": [
+        "Do you offer financing or payment plans?"
+      ],
+      "responses": [
+        "Yes, we offer financing through Hearth, which lets you compare multiple loan options. The rates and terms will depend on your credit. PJ can walk you through the details during your consultation.\n\nWould you like me to ask a few quick questions about your setup so we can prepare an accurate quote for you?"
+      ],
+      "issues": [
+        {
+          "name": "hearth-financing",
+          "severity": "HIGH",
+          "desc": "Hallucinated financing company"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "multiturn-full",
+      "iteration": 1,
+      "msgs": [
+        "Hi I need an EV charger installed",
+        "Tesla Model Y",
+        "San Mateo",
+        "No I have not bought a charger yet",
+        "I think 100 amps",
+        "Garage, about 15 feet from the panel",
+        "How much would that cost?"
+      ],
+      "responses": [
+        "Great! We specialize in EV charger installations. What city are you located in?",
+        "Thanks! We do lots of Tesla installations. Which city are you located in? That way I can confirm you're in our service area.",
+        "Perfect - San Mateo is right in our core service area. Have you already purchased a Tesla Wall Connector, or would you need us to supply one?",
+        "No problem - we can definitely help with that. Is your garage or parking area already pre-wired for an EV charger, or would this be a completely new installation?",
+        "Thanks for letting me know about your 100A service. We might be able to use Dynamic Power Management to avoid an expensive panel upgrade. Could you tell me where you'd like the charger installed (garage, outside wall, etc.) and roughly how far that is from your electrical panel?",
+        "Got it - garage location, 15 feet from panel. This helps a lot with the quote. If you could snap a few photos of your electrical meter, main breaker, and breaker panel with the door open, it would help us prepare an accurate quote. You can share them right here in the chat. \n\nWhat's the best phone number to reach you?",
+        "It depends! Since this is a new installation (not pre-wired) with a 15-foot run from the panel, you're looking at around $2,500 to over $3,500 depending on the exact setup. However, PJ can give you an exact number after reviewing your photos.\n\nCould you share your phone number so PJ can follow up with a precise quote? He'll also go over charger options that would work best for your Model Y."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": true,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": true,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": true,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": true,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 8,
+        "total": 11,
+        "pct": 73
+      }
+    },
+    {
+      "scenario": "model-y-foster",
+      "iteration": 2,
+      "msgs": [
+        "Need a charger for my Model Y in Foster City"
+      ],
+      "responses": [
+        "Perfect - Foster City is right in our service area! What kind of charger were you thinking of getting? We install both Tesla Wall Connectors and universal chargers."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 1,
+        "total": 11,
+        "pct": 9
+      }
+    },
+    {
+      "scenario": "tesla-sm",
+      "iteration": 2,
+      "msgs": [
+        "I have a Tesla Model 3 and need a charger installed in San Mateo"
+      ],
+      "responses": [
+        "Perfect, you're right in our service area! I'd be happy to help you get set up with a Tesla Wall Connector. Have you already purchased the charger, or would you need us to supply one?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 2,
+        "total": 11,
+        "pct": 18
+      }
+    },
+    {
+      "scenario": "which-charger",
+      "iteration": 2,
+      "msgs": [
+        "What charger should I get for my Tesla?"
+      ],
+      "responses": [
+        "The Tesla Wall Connector is a great option since it's specifically designed for Tesla vehicles. However, before recommending a specific charger, could you tell me what city you're located in to confirm you're in our service area?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 2,
+        "total": 11,
+        "pct": 18
+      }
+    },
+    {
+      "scenario": "landlord",
+      "iteration": 2,
+      "msgs": [
+        "My landlord will not let me install a charger, what can I do?"
+      ],
+      "responses": [
+        "That's a complex situation involving tenant rights and California regulations. PJ can discuss your options and explain the relevant California laws that protect EV charging access for renters. Would you like me to have him reach out to you to go over the details?\n\nIf you'd like to discuss this with PJ, I can take down your contact information."
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "multiturn-full",
+      "iteration": 2,
+      "msgs": [
+        "Hi I need an EV charger installed",
+        "Tesla Model Y",
+        "San Mateo",
+        "No I have not bought a charger yet",
+        "I think 100 amps",
+        "Garage, about 15 feet from the panel",
+        "How much would that cost?"
+      ],
+      "responses": [
+        "What city are you located in? That'll help me confirm we can service your area.",
+        "Thanks! We definitely install a lot of Tesla chargers. Could you let me know which city you're in so I can confirm we service your area?",
+        "Perfect, we're based in San Mateo and service that area regularly. Are you looking to install a Tesla Wall Connector, or do you need help selecting a charger?",
+        "I can help guide you through the options. First, is your home already pre-wired for an EV charger, or does it have a dedicated circuit for one?",
+        "Thanks for that info about your electrical service. To help avoid any costly panel upgrades, we offer Dynamic Power Management systems that can save $3,000-$8,000. \n\nWhere would you like to have the charger installed - garage, outside wall, or somewhere else?",
+        "Got it - 15 feet from the panel in the garage. This helps a lot with the quote. Could you snap a few photos of your electrical meter, main breaker, and breaker panel with the door open? You can share them right here in the chat, or text/email them to us. This really helps us prepare an accurate quote.",
+        "Since you're not pre-wired and it's about a 15-foot run from the panel, you're looking at around $2,500 to over $3,500, depending on the specific charger and setup. But PJ can give you an exact number after reviewing your electrical setup with those photos.\n\nWould you like to share those photos now? You can upload them here or text them to (650) 542-8877."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": true,
+            "provided": true,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": true,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": true,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": true,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": true,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 8,
+        "total": 11,
+        "pct": 73
+      }
+    },
+    {
+      "scenario": "multiturn-angry",
+      "iteration": 2,
+      "msgs": [
+        "I need a charger installed ASAP",
+        "I dont have time for 20 questions just tell me how much",
+        "Fine. San Mateo. Tesla. Garage. 10 feet. Can I get a quote now?"
+      ],
+      "responses": [
+        "I can help get that process started! What city are you located in so I can confirm we service your area?",
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 2,
+        "total": 11,
+        "pct": 18
+      }
+    },
+    {
+      "scenario": "multiturn-condo",
+      "iteration": 2,
+      "msgs": [
+        "I live in a condo in SF and want to install a charger",
+        "Its a parking garage, assigned spot",
+        "About 60 feet from the nearest electrical room",
+        "Rivian R1S",
+        "No I have not bought a charger",
+        "What would this cost?"
+      ],
+      "responses": [
+        "That's right in our service area! Condo installations are one of our specialties, and there are actually some great rebates available for SF multi-family buildings.\n\nCould you tell me which EV you're charging? That'll help us recommend the right setup.",
+        "Perfect - we work with parking garages frequently. For your EV charger, is this a Tesla you're charging, or a different make?\n\n(And good news - if you're in San Francisco, you might qualify for CleanPowerSF rebates up to $5,000 for condo installations. We can help with all the paperwork.)",
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": true,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 3,
+        "total": 11,
+        "pct": 27
+      }
+    },
+    {
+      "scenario": "multiturn-prewired",
+      "iteration": 2,
+      "msgs": [
+        "I already have a 240v outlet in my garage",
+        "Yes its a NEMA 14-50",
+        "I want to hardwire a Tesla Wall Connector instead",
+        "San Mateo",
+        "How much?"
+      ],
+      "responses": [
+        "Great! Having a 240V outlet already is a good start. Is this for a Tesla or another type of EV? That will help me understand which charger options would work best for your setup.",
+        "Perfect - that's a common outlet type for EV charging. Since you already have the wiring and outlet in place, this could be one of our simpler installations. Which EV do you have or are you planning to get? That way I can make sure we recommend the right charger setup.",
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": true,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": true,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 4,
+        "total": 11,
+        "pct": 36
+      }
+    },
+    {
+      "scenario": "which-charger",
+      "iteration": 3,
+      "msgs": [
+        "What charger should I get for my Tesla?"
+      ],
+      "responses": [
+        "The Tesla Wall Connector is a great option for your Tesla, but I can help you make the best choice. First, is this for a house or condo/apartment?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 1,
+        "total": 11,
+        "pct": 9
+      }
+    },
+    {
+      "scenario": "angry-overcharged",
+      "iteration": 3,
+      "msgs": [
+        "Another company quoted me $800 and you guys are way too expensive"
+      ],
+      "responses": [
+        "I understand price is important. The difference is often in the details - we're licensed, insured, and handle everything from permits to load calculations and inspections. Many lower quotes skip crucial safety steps or don't include permits, which are legally required.\n\nWould you mind sharing what that quote included? I want to make sure we're comparing apples to apples."
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 0,
+        "total": 11,
+        "pct": 0
+      }
+    },
+    {
+      "scenario": "landlord",
+      "iteration": 3,
+      "msgs": [
+        "My landlord will not let me install a charger, what can I do?"
+      ],
+      "responses": [
+        "That's a complex situation involving tenant rights and California EV charging laws. While I can't give legal advice, PJ can explain your options and rights under California law regarding EV charging installations in rental properties. Would you like me to have him reach out to discuss this with you?\n\nIf so, could you share your name and contact information? He'll be able to walk you through the specific requirements and potential solutions."
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "multiturn-full",
+      "iteration": 3,
+      "msgs": [
+        "Hi I need an EV charger installed",
+        "Tesla Model Y",
+        "San Mateo",
+        "No I have not bought a charger yet",
+        "I think 100 amps",
+        "Garage, about 15 feet from the panel",
+        "How much would that cost?"
+      ],
+      "responses": [
+        "Are you looking to have this installed at a house or condo? And what area are you located in?",
+        "Thanks! I see you have a Model Y. Which city are you located in? That way I can confirm you're in our service area.",
+        "Perfect, we definitely serve San Mateo. Is this for a house or condo installation? And have you already purchased a Tesla Wall Connector, or would you need us to supply one?",
+        "Got it. For your Tesla, we can help supply and install either a Tesla Wall Connector or a universal charger. To help prepare an accurate quote, is this installation for a house or condo/apartment?",
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        },
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": true,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 5,
+        "total": 11,
+        "pct": 45
+      }
+    },
+    {
+      "scenario": "multiturn-prewired",
+      "iteration": 3,
+      "msgs": [
+        "I already have a 240v outlet in my garage",
+        "Yes its a NEMA 14-50",
+        "I want to hardwire a Tesla Wall Connector instead",
+        "San Mateo",
+        "How much?"
+      ],
+      "responses": [
+        "That's great - being pre-wired will definitely simplify the installation! What type of EV do you have or are planning to get?",
+        "Perfect - that's a common outlet for EV charging. Since you already have the pre-wiring, this should be a straightforward installation. Have you already purchased a charger, or would you like us to supply one?",
+        "That's a smart choice - the hardwired Tesla Wall Connector is a great option. Since you already have the 14-50 circuit, we can repurpose that wiring for your Wall Connector. Could you share which city you're located in?",
+        "Excellent - you're right in our service area. Would you mind sharing a few photos of your electrical panel with the door open and the existing 14-50 outlet? This will help us prepare an accurate quote. You can upload them right here in the chat.",
+        "Since you're already pre-wired with a NEMA 14-50, we're looking at around $800 to over $1,600 for the installation labor. The Tesla Wall Connector itself runs about $450-500. PJ can give you an exact number after reviewing your setup. Would you mind sharing your name and the best phone number to reach you?"
+      ],
+      "issues": [
+        {
+          "name": "premature-price",
+          "severity": "MED",
+          "desc": "Gave price range (check if qualified first)"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": true,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": true,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": true,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": true,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": true,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 8,
+        "total": 11,
+        "pct": 73
+      }
+    },
+    {
+      "scenario": "which-charger",
+      "iteration": 4,
+      "msgs": [
+        "What charger should I get for my Tesla?"
+      ],
+      "responses": [
+        "For Tesla, you've got two great options - either the Tesla Wall Connector or a universal charger. Before I make a recommendation, could you tell me if you're in a house or condo/apartment? This helps us understand your setup better."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 1,
+        "total": 11,
+        "pct": 9
+      }
+    },
+    {
+      "scenario": "landlord",
+      "iteration": 4,
+      "msgs": [
+        "My landlord will not let me install a charger, what can I do?"
+      ],
+      "responses": [
+        "That's a sensitive situation involving tenant rights and California laws. Since it involves legal matters, PJ would be the best person to discuss your options. Would you like to share your contact information so he can walk you through the current regulations and potential solutions?\n\nI can say that many landlords do come around once they understand that EV charging can increase property value and appeal to future tenants."
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "multiturn-full",
+      "iteration": 4,
+      "msgs": [
+        "Hi I need an EV charger installed",
+        "Tesla Model Y",
+        "San Mateo",
+        "No I have not bought a charger yet",
+        "I think 100 amps",
+        "Garage, about 15 feet from the panel",
+        "How much would that cost?"
+      ],
+      "responses": [
+        "Would you mind sharing which city you're located in? That'll help me confirm we can service your area.",
+        "Thanks for letting me know about your Tesla! Are you in a house or condo/apartment? And which city are you located in? I want to make sure we can help in your area.",
+        "Perfect - San Mateo is right in our service area. Are you in a house or condo/apartment? And since you mentioned having a Tesla Model Y, have you already purchased a Wall Connector, or would you like us to supply one?",
+        "Thanks for letting me know. Is this for a house or condo? That will help me understand what type of installation we're looking at. Also, is your home already pre-wired for an EV charger, or does it have a dedicated circuit for one?",
+        "Thanks for sharing that. Since you mentioned having 100A service, we might want to look at Dynamic Power Management (DPM) - it could save you $3,000-8,000 by avoiding a panel upgrade.\n\nCould you snap a few quick photos of your electrical meter, main breaker, and breaker panel with the door open? You can share them right here in the chat - it helps us prepare an accurate quote.\n\nAlso, where would you like the charger installed (garage, outside wall, etc.)?",
+        "Got it - garage location, 15 feet from the panel. Since this will be a new installation (not pre-wired) and it's a medium-length run, you're looking at roughly $2,500 to $5,000 depending on the specifics of your setup.\n\nTo prepare an accurate quote, I just need:\n1. Those electrical panel photos we discussed\n2. Your name and best contact info (phone and email)\n\nThen PJ can review everything and get back to you ASAP with an exact number.",
+        "Since you're looking at a 15-foot run from the panel and it's not pre-wired, you're typically looking at $2,500 to over $5,000 depending on the complexity. With 100A service, we might recommend Dynamic Power Management (DPM) which could save you $3,000-8,000 by avoiding a panel upgrade.\n\nTo get you an exact quote, could you share those electrical panel photos we talked about? That would help PJ prepare a detailed estimate for your specific setup."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": true,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": true,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": true,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": true,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": true,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": true,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": true,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 11,
+        "total": 11,
+        "pct": 100
+      }
+    },
+    {
+      "scenario": "which-charger",
+      "iteration": 5,
+      "msgs": [
+        "What charger should I get for my Tesla?"
+      ],
+      "responses": [
+        "The Tesla Wall Connector is a popular choice, but I can help you make the best decision. First, which Tesla model do you have or are planning to get? Also, is this for a house or condo/apartment?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 1,
+        "total": 11,
+        "pct": 9
+      }
+    },
+    {
+      "scenario": "landlord",
+      "iteration": 5,
+      "msgs": [
+        "My landlord will not let me install a charger, what can I do?"
+      ],
+      "responses": [
+        "That's a complex situation involving tenant rights and California laws around EV charging access. PJ can explain your options and rights under California law, including recent legislation that affects rental properties. Would you like to share your contact information so he can advise you on your specific situation?\n\nI should note - I'm not able to give legal advice about landlord/tenant matters, but PJ has helped many renters navigate this successfully with their property owners."
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "multiturn-full",
+      "iteration": 5,
+      "msgs": [
+        "Hi I need an EV charger installed",
+        "Tesla Model Y",
+        "San Mateo",
+        "No I have not bought a charger yet",
+        "I think 100 amps",
+        "Garage, about 15 feet from the panel",
+        "How much would that cost?"
+      ],
+      "responses": [
+        "Is this for a house or condo? And what area are you located in? I can check if you're in our service area.",
+        "Thanks! And which city are you located in? We primarily serve San Mateo County and San Francisco.\n\nAlso, is this for a house or a condo/apartment?",
+        "Great, San Mateo is definitely in our service area! Since you have a Tesla, have you already purchased a Wall Connector, or would you need us to supply one?\n\nAlso, is this for a house or condo installation?",
+        "That's fine - we can help with the charger selection. Is this installation for a house or condo/apartment?",
+        "Thanks for sharing that about your electrical service. Since you have 100A service, we might want to consider Dynamic Power Management (DPM) which could save you $3,000-8,000 by avoiding a panel upgrade.\n\nCould you confirm if this is for a house or condo? That helps us determine the installation approach and any available rebates.",
+        "Thanks for those details! And just to confirm - is this for a house or condo? (I notice you haven't mentioned that yet).\n\nAlso, would you be able to snap a few photos of your electrical meter, main breaker, and breaker panel with the door open? These photos really help us prepare an accurate quote. You can share them right here in the chat.",
+        "It depends on your setup! For a 15-foot run that's not pre-wired, you're typically looking at $2,500 to over $5,000, depending on the complexity. However, I can help get you a more accurate quote.\n\nFirst - is this for a house or condo? (This affects both pricing and potential rebates)\n\nAnd those photos of your electrical panel would really help us give you a precise number. Would you be able to share those?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": true,
+            "provided": true,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": true,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 7,
+        "total": 11,
+        "pct": 64
+      }
+    },
+    {
+      "scenario": "apartment-renter",
+      "iteration": 6,
+      "msgs": [
+        "I rent an apartment, can I still get a charger installed?"
+      ],
+      "responses": [
+        "That's definitely possible! First, you'll need your landlord's written approval for the installation. California law actually supports EV charging access for renters, but we still need the property owner's okay.\n\nIs this a single unit or part of a larger apartment complex? This helps us understand what kind of installation we're looking at."
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 0,
+        "total": 11,
+        "pct": 0
+      }
+    },
+    {
+      "scenario": "which-charger",
+      "iteration": 6,
+      "msgs": [
+        "What charger should I get for my Tesla?"
+      ],
+      "responses": [
+        "The Tesla Wall Connector is a popular choice, but I can help you figure out the best option. What Tesla model do you have? And just to confirm - are you in the San Francisco Bay Area?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 1,
+        "total": 11,
+        "pct": 9
+      }
+    },
+    {
+      "scenario": "offtopic-joke",
+      "iteration": 6,
+      "msgs": [
+        "Tell me a joke"
+      ],
+      "responses": [
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "angry-reviews",
+      "iteration": 6,
+      "msgs": [
+        "I saw terrible reviews about your company online"
+      ],
+      "responses": [
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 0,
+        "total": 11,
+        "pct": 0
+      }
+    },
+    {
+      "scenario": "angry-cursing",
+      "iteration": 6,
+      "msgs": [
+        "Your f***ing website sucks, I just want a damn charger installed"
+      ],
+      "responses": [
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 0,
+        "total": 11,
+        "pct": 0
+      }
+    },
+    {
+      "scenario": "angry-noreturn",
+      "iteration": 6,
+      "msgs": [
+        "This is ridiculous, I have been trying to get someone to install my charger for weeks"
+      ],
+      "responses": [
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 0,
+        "total": 11,
+        "pct": 0
+      }
+    },
+    {
+      "scenario": "angry-overcharged",
+      "iteration": 6,
+      "msgs": [
+        "Another company quoted me $800 and you guys are way too expensive"
+      ],
+      "responses": [
+        "ERROR: fetch failed"
+      ],
+      "issues": [
+        {
+          "name": "error-response",
+          "severity": "CRITICAL",
+          "desc": "Error in response"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 0,
+        "total": 11,
+        "pct": 0
+      }
+    },
+    {
+      "scenario": "landlord",
+      "iteration": 6,
+      "msgs": [
+        "My landlord will not let me install a charger, what can I do?"
+      ],
+      "responses": [
+        "That's a legal question regarding tenant rights and California regulations that PJ would need to address. What I can tell you is that California does have some laws about EV charging access for renters, but the specific requirements depend on your situation. PJ can explain your options and what might be possible for your setup.\n\nWould you like me to have PJ reach out to discuss this with you? He can explain the relevant regulations and potential solutions."
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "multiturn-full",
+      "iteration": 6,
+      "msgs": [
+        "Hi I need an EV charger installed",
+        "Tesla Model Y",
+        "San Mateo",
+        "No I have not bought a charger yet",
+        "I think 100 amps",
+        "Garage, about 15 feet from the panel",
+        "How much would that cost?"
+      ],
+      "responses": [
+        "Great! I'd be happy to help. Are you looking to have this installed at a house or condo in the Bay Area?",
+        "Thanks! I see you have a Tesla Model Y. Have you already purchased a Wall Connector, or would you need us to supply one? Also, could you let me know which city you're located in?",
+        "Perfect - San Mateo is right in our service area. Have you already purchased a Tesla Wall Connector, or would you need us to supply one? Also, is this for a house or condo installation?",
+        "Thanks for letting me know. For a house installation, we can definitely help with both supplying and installing the charger. To help prepare an accurate quote, could you tell me if your home is already pre-wired for an EV charger? (This would mean having a dedicated outlet or breaker already in place.)",
+        "Thanks for sharing that about your 100A service. That's helpful to know. Would you be able to snap a few photos of your electrical setup? Specifically the electrical meter, main breaker, and breaker panel with the door open - you can share them right here in the chat. This helps us determine if we might need Dynamic Power Management, which could save you $3,000-8,000 vs a panel upgrade.",
+        "Thanks! That's helpful to know the location and distance. Since we have a good picture of your setup (100A service, 15-foot run to garage), I can tell you this would likely be in the $2,500-5,000 range, depending on the exact details. \n\nTo get you an accurate quote, could I get your:\n- Full name\n- Phone number\n- Email address\n\nPJ can then review everything and reach back with an exact number.",
+        "Since we know this would be a new installation (not pre-wired) with a 15-foot run from your panel to the garage, you're looking at approximately $2,500 to $5,000, depending on the complexity of the route and any additional electrical work needed. And since you have 100A service, we might recommend Dynamic Power Management, which could save you $3,000-8,000 by avoiding a panel upgrade.\n\nTo get you an exact quote, could I get your:\n- Full name\n- Phone number\n- Email address\n\nPJ will review your setup and get back to you with a detailed price."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": true,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": true,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": true,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": true,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": true,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 9,
+        "total": 11,
+        "pct": 82
+      }
+    },
+    {
+      "scenario": "which-charger",
+      "iteration": 7,
+      "msgs": [
+        "What charger should I get for my Tesla?"
+      ],
+      "responses": [
+        "The Tesla Wall Connector is a great option for Tesla owners, but I'd be happy to help figure out the best setup for your specific situation. Do you live in a house or condo? And what city are you located in?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 2,
+        "total": 11,
+        "pct": 18
+      }
+    },
+    {
+      "scenario": "landlord",
+      "iteration": 7,
+      "msgs": [
+        "My landlord will not let me install a charger, what can I do?"
+      ],
+      "responses": [
+        "That's a sensitive legal matter involving tenant rights and California EV charging laws. PJ can explain your options and rights under California law - would you like me to get your contact information so he can reach out to discuss this with you?"
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "multiturn-full",
+      "iteration": 7,
+      "msgs": [
+        "Hi I need an EV charger installed",
+        "Tesla Model Y",
+        "San Mateo",
+        "No I have not bought a charger yet",
+        "I think 100 amps",
+        "Garage, about 15 feet from the panel",
+        "How much would that cost?"
+      ],
+      "responses": [
+        "Is this for a house or condo? And what area are you located in?",
+        "Thanks! And what city are you located in? That'll help me confirm you're in our service area. Also, is this for a house or condo/apartment?",
+        "Perfect, San Mateo is right in our service area. Is this for a house or condo/apartment? Also, have you already purchased a Tesla Wall Connector, or would you need us to supply one?",
+        "Thanks for letting me know. And just to confirm - is this for a house or condo/apartment? \n\nAlso, is your home already pre-wired for an EV charger, or does it have a dedicated circuit for one? If you could snap a few photos of your electrical panel (with the door open), electrical meter, and main breaker, it would help us prepare an accurate quote.",
+        "Thanks for that info about your electrical service. Since you mentioned 100A service, I should let you know we offer Dynamic Power Management (DPM) which can often save $3,000-8,000 by avoiding a panel upgrade.\n\nCould you tell me:\n1. Is this for a house or condo? (I still need this info to better assist you)\n2. Where would you like the charger installed (garage, outside wall, etc.), and roughly how far is that from your electrical panel?",
+        "Thanks! That location info helps a lot. I just need to confirm one more time - is this for a house or condo? This affects the installation process and potential rebates.\n\nBased on what you've shared about the 15-foot run and no pre-wiring, installation would likely be in the $2,500-5,000 range, but PJ can give you an exact quote after reviewing your setup.\n\nWould you mind sharing your name and best contact info (phone and email) so PJ can reach out with a detailed quote?",
+        "Since you're looking at a 15-foot run from the panel and no pre-wiring, the installation would typically range from $2,500 to over $5,000, depending on the complexity. However, the good news is that with our Dynamic Power Management system, we can likely avoid an expensive panel upgrade on your 100A service.\n\nTo give you an exact quote though, I still need to confirm:\n1. Is this for a house or condo? (This really affects the pricing and process)\n2. Could you share some photos of your electrical panel and meter? You can upload them right here in the chat."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": true,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": true,
+            "provided": true,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": true,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": true,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": true,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": true,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 10,
+        "total": 11,
+        "pct": 91
+      }
+    },
+    {
+      "scenario": "which-charger",
+      "iteration": 8,
+      "msgs": [
+        "What charger should I get for my Tesla?"
+      ],
+      "responses": [
+        "The Tesla Wall Connector is a popular choice for Tesla owners, but I can help you find the best option. First, do you live in a house or condo? And which Tesla model do you have or are planning to get?"
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 1,
+        "total": 11,
+        "pct": 9
+      }
+    },
+    {
+      "scenario": "angry-reviews",
+      "iteration": 8,
+      "msgs": [
+        "I saw terrible reviews about your company online"
+      ],
+      "responses": [
+        "I appreciate you bringing this up. We actually maintain very high customer satisfaction ratings, with excellent reviews on platforms like Yelp and Google. But I'd be happy to address any specific concerns you might have about our EV charger installation services. What questions can I answer for you?"
+      ],
+      "issues": [
+        {
+          "name": "mentions-yelp",
+          "severity": "HIGH",
+          "desc": "Recommended Yelp (sends to competitors)"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": false,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": false,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": false,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": false,
+            "provided": false,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": false,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": false,
+            "provided": false,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": false,
+            "provided": false,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 0,
+        "total": 11,
+        "pct": 0
+      }
+    },
+    {
+      "scenario": "financing",
+      "iteration": 8,
+      "msgs": [
+        "Do you offer financing or payment plans?"
+      ],
+      "responses": [
+        "Yes, we offer financing through Hearth, which lets you compare multiple loan options. The rates and terms will depend on your credit. PJ can walk you through the details during your consultation.\n\nLet me ask - are you looking to install a charger at your house or condo?"
+      ],
+      "issues": [
+        {
+          "name": "hearth-financing",
+          "severity": "HIGH",
+          "desc": "Hallucinated financing company"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "landlord",
+      "iteration": 8,
+      "msgs": [
+        "My landlord will not let me install a charger, what can I do?"
+      ],
+      "responses": [
+        "That's a sensitive legal question involving tenant rights and property modifications. PJ can discuss your options and the relevant California regulations that might help your situation. Would you like me to get your contact information so he can reach out to you?\n\nI can tell you that we frequently work with rental properties and have experience navigating these situations. We're also familiar with the state laws regarding EV charging installations in rental properties."
+      ],
+      "issues": [
+        {
+          "name": "legal-advice",
+          "severity": "MED",
+          "desc": "Gave legal advice (should defer to PJ)"
+        }
+      ],
+      "qualification": null
+    },
+    {
+      "scenario": "multiturn-full",
+      "iteration": 8,
+      "msgs": [
+        "Hi I need an EV charger installed",
+        "Tesla Model Y",
+        "San Mateo",
+        "No I have not bought a charger yet",
+        "I think 100 amps",
+        "Garage, about 15 feet from the panel",
+        "How much would that cost?"
+      ],
+      "responses": [
+        "Would this be for a house or condo? And what area are you located in?",
+        "Thanks for letting me know about your Tesla. Could you tell me what city you're in so I can confirm we service your area? And is this for a house or condo/apartment?",
+        "Perfect, we definitely serve San Mateo. Is this for a house or condo/apartment? And have you already purchased a Wall Connector, or would you need us to supply one?",
+        "Thanks for letting me know. And just to confirm - is this for a house or condo? Also, is your home already pre-wired for an EV charger, or does it have a dedicated circuit for one?",
+        "Thanks for sharing that about your electrical service. A few quick questions to help us prepare an accurate quote:\n\n1. Is this for a house or condo? (I noticed you haven't mentioned this yet)\n2. Where would you like the charger installed - garage, outside wall, or somewhere else?\n\nAlso, if you could snap a few photos of your electrical meter, main breaker, and breaker panel with the door open, it would really help us prepare an accurate quote. You can share them right here in the chat.",
+        "Thanks! That helps. And just to be clear - is this for a house or condo? (This affects pricing and permitting requirements)\n\nSince it's about 15 feet from the panel and you mentioned 100A service, we might want to look at our Dynamic Power Management system - it could save you $3,000-$8,000 by avoiding a panel upgrade.\n\nWould you be able to share those electrical panel photos? That would help us determine the best solution for your setup.",
+        "It depends on your setup! Based on what you've shared about the 15-foot run and no pre-wiring, you're looking at $2,500 to over $5,000 depending on the complexity. PJ can give you an exact number after reviewing your setup.\n\nCould you let me know two things to help us narrow this down:\n1. Is this for a house or condo? (I've asked a few times but haven't heard back)\n2. Could you share those photos of your electrical panel? That's really crucial for an accurate quote."
+      ],
+      "issues": [
+        {
+          "name": "wall-connector-unprompted",
+          "severity": "MED",
+          "desc": "Used \"Wall Connector\" jargon (should say \"charger\")"
+        }
+      ],
+      "qualification": {
+        "scores": {
+          "name": {
+            "asked": false,
+            "provided": false,
+            "desc": "Customer name"
+          },
+          "city": {
+            "asked": true,
+            "provided": false,
+            "desc": "City/location"
+          },
+          "ev_type": {
+            "asked": false,
+            "provided": false,
+            "desc": "EV type"
+          },
+          "has_charger": {
+            "asked": true,
+            "provided": false,
+            "desc": "Has charger already?"
+          },
+          "prewired": {
+            "asked": true,
+            "provided": false,
+            "desc": "Pre-wired status"
+          },
+          "service_size": {
+            "asked": true,
+            "provided": true,
+            "desc": "Service size (amps)"
+          },
+          "photos": {
+            "asked": true,
+            "provided": false,
+            "desc": "Asked for photos"
+          },
+          "location": {
+            "asked": true,
+            "provided": true,
+            "desc": "Installation location"
+          },
+          "distance": {
+            "asked": true,
+            "provided": true,
+            "desc": "Distance from panel"
+          },
+          "contact": {
+            "asked": false,
+            "provided": false,
+            "desc": "Contact info"
+          },
+          "email": {
+            "asked": false,
+            "provided": false,
+            "desc": "Email specifically"
+          }
+        },
+        "asked": 7,
+        "total": 11,
+        "pct": 64
+      }
+    }
+  ]
+}
