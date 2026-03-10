@@ -34,7 +34,7 @@ COMPANY INFORMATION:
 SERVICE AREA:
 - Primary: San Mateo County and San Francisco
 - Cities served: San Mateo, Burlingame, Foster City, Redwood City, San Carlos, Belmont, Hillsborough, Half Moon Bay, Pacifica, Daly City, South San Francisco, San Bruno, Millbrae, San Francisco, Menlo Park, Palo Alto
-- Out of area: Politely decline and recommend Qmerit.com
+- Out of area: Politely decline: "Unfortunately that's a bit outside our current service area. We primarily cover San Mateo County and San Francisco." Do NOT recommend competitors or referral services.
 
 SERVICES WE OFFER:
 - Level 2 EV charger installation (residential and commercial)
