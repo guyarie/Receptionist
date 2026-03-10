@@ -227,6 +227,7 @@
       padding-bottom: max(14px, env(safe-area-inset-bottom));
       background: white;
       border-top: 0.5px solid var(--gray-200);
+      overflow: visible;
     }
 
     .chat-input-form {
@@ -235,7 +236,7 @@
       align-items: center;
       background: var(--gray-100);
       border-radius: 24px;
-      padding: 4px 4px 4px 6px;
+      padding: 4px 6px;
       border: 1px solid transparent;
       transition: border-color 0.2s, background 0.2s;
     }
@@ -264,8 +265,9 @@
       background: var(--blue);
       color: white;
       border: none;
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
       border-radius: 50%;
       font-size: 16px;
       cursor: pointer;
