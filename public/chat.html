@@ -112,13 +112,14 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--blue) 0%, #4a9ff5 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(26,115,232,0.3);
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .header-text h1 {
@@ -164,14 +165,16 @@
       width: 26px;
       height: 26px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--blue) 0%, #4a9ff5 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
       flex-shrink: 0;
       margin-right: 8px;
       margin-bottom: 2px;
+      overflow: hidden;
+    }
+
+    .msg-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .message.user .msg-avatar { display: none; }
@@ -369,7 +372,7 @@
 
   <div class="chat-container">
     <div class="chat-header">
-      <div class="avatar">⚡</div>
+      <div class="avatar"><img src="https://static.wixstatic.com/media/a8309b_c2b62d0e09004a0e9e2e10c3773f66c3~mv2.png" alt="CW"></div>
       <div class="header-text">
         <h1>David</h1>
         <p>EV Charging Specialist</p>
@@ -511,7 +514,7 @@
     function addMessage(type, content) {
       const div = document.createElement('div');
       div.className = `message ${type}`;
-      const avatarHtml = type === 'ai' ? '<div class="msg-avatar">⚡</div>' : '';
+      const avatarHtml = type === 'ai' ? '<div class="msg-avatar"><img src="https://static.wixstatic.com/media/a8309b_c2b62d0e09004a0e9e2e10c3773f66c3~mv2.png" alt="CW"></div>' : '';
       div.innerHTML = `${avatarHtml}<div class="message-content">${content}</div>`;
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -520,7 +523,7 @@
     function addTypingIndicator() {
       const div = document.createElement('div');
       div.className = 'message ai';
-      div.innerHTML = `<div class="msg-avatar">⚡</div><div class="typing-indicator active"><span></span><span></span><span></span></div>`;
+      div.innerHTML = `<div class="msg-avatar"><img src="https://static.wixstatic.com/media/a8309b_c2b62d0e09004a0e9e2e10c3773f66c3~mv2.png" alt="CW"></div><div class="typing-indicator active"><span></span><span></span><span></span></div>`;
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
       return div;
