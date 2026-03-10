@@ -8,7 +8,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --blue: #1a73e8;
@@ -56,6 +56,10 @@
       max-height: none;
       border: none;
       box-shadow: none;
+      overflow: hidden;
+    }
+    body.in-iframe .chat-input-container {
+      padding-right: 20px;
     }
     body.in-iframe .powered-by { display: none; }
 
