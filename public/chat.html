@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ChargeWizards — Chat with David</title>
-  <link rel="icon" href="https://static.wixstatic.com/media/a8309b_c2b62d0e09004a0e9e2e10c3773f66c3~mv2.png" type="image/png">
+  <link rel="icon" href="/logo.png" type="image/png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
@@ -365,14 +365,14 @@
 </head>
 <body>
   <div class="brand-bar">
-    <img class="brand-logo" src="https://static.wixstatic.com/media/a8309b_c2b62d0e09004a0e9e2e10c3773f66c3~mv2.png" alt="CW" onerror="this.style.display='none'">
+    <img class="brand-logo" src="/logo.png" alt="CW" onerror="this.style.display='none'">
     <span class="brand-name">ChargeWizards</span>
     <span class="brand-status"><span class="status-dot"></span> Online</span>
   </div>
 
   <div class="chat-container">
     <div class="chat-header">
-      <div class="avatar"><img src="https://static.wixstatic.com/media/a8309b_c2b62d0e09004a0e9e2e10c3773f66c3~mv2.png" alt="CW"></div>
+      <div class="avatar"><img src="/logo.png" alt="CW"></div>
       <div class="header-text">
         <h1>David</h1>
         <p>EV Charging Specialist</p>
@@ -514,7 +514,7 @@
     function addMessage(type, content) {
       const div = document.createElement('div');
       div.className = `message ${type}`;
-      const avatarHtml = type === 'ai' ? '<div class="msg-avatar"><img src="https://static.wixstatic.com/media/a8309b_c2b62d0e09004a0e9e2e10c3773f66c3~mv2.png" alt="CW"></div>' : '';
+      const avatarHtml = type === 'ai' ? '<div class="msg-avatar"><img src="/logo.png" alt="CW"></div>' : '';
       div.innerHTML = `${avatarHtml}<div class="message-content">${content}</div>`;
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -523,7 +523,7 @@
     function addTypingIndicator() {
       const div = document.createElement('div');
       div.className = 'message ai';
-      div.innerHTML = `<div class="msg-avatar"><img src="https://static.wixstatic.com/media/a8309b_c2b62d0e09004a0e9e2e10c3773f66c3~mv2.png" alt="CW"></div><div class="typing-indicator active"><span></span><span></span><span></span></div>`;
+      div.innerHTML = `<div class="msg-avatar"><img src="/logo.png" alt="CW"></div><div class="typing-indicator active"><span></span><span></span><span></span></div>`;
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
       return div;
