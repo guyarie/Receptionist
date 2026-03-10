@@ -1,0 +1,13 @@
+{
+  "name": "Multi-Question Customer",
+  "description": "Customer asks many questions before providing their own information",
+  "messages": [
+    "Hi, I have a few questions before I book anything",
+    "What services do you offer?",
+    "Do you accept insurance? What about Blue Cross?",
+    "How long is a typical appointment?",
+    "Ok I think I'm ready to book. I'm Jennifer Lee",
+    "I'm in Austin, Texas. My number is 512-555-0671 and email is jen.lee@email.com",
+    "I'd like a consultation please"
+  ]
+}

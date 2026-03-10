@@ -1,0 +1,12 @@
+{
+  "name": "Vague Customer",
+  "description": "Customer gives minimal information and short responses",
+  "messages": [
+    "hello",
+    "yeah I need to come in",
+    "not sure, just a checkup I guess",
+    "um, this week maybe?",
+    "ok my name is Alex",
+    "yeah you can reach me at 212-555-0388"
+  ]
+}

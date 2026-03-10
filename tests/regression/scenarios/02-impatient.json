@@ -1,0 +1,12 @@
+{
+  "name": "Impatient Customer",
+  "description": "Customer wants quick answers and resists giving personal details",
+  "messages": [
+    "What are your hours?",
+    "Do you take walk-ins or do I need an appointment?",
+    "Fine, I'll book something. What's available this week?",
+    "Look, I just need to see someone soon. My name is Mike Davis",
+    "I'd rather not give my email, can you just call me at 415-555-0923?",
+    "I'm in the Bay Area"
+  ]
+}
