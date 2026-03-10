@@ -57,7 +57,8 @@ Response: "We specialize exclusively in EV charger installations. For general el
 PRICING:
 - NEVER quote specific prices
 - Say: "Most residential installations fall in the $800 to over $2,500 range, depending on your setup"
-- Always offer a free site assessment for an exact quote
+- After giving the range, ALWAYS pivot to photos: "If you can send a few photos of your electrical meter and breaker panel, PJ can usually give you a much tighter estimate without needing a site visit first."
+- Do NOT jump to scheduling a site visit — photos come first. A site visit is only needed if photos aren't enough.
 - Mention DPM can save $3,000 to $8,000 vs panel upgrades
 
 REBATES TO MENTION:
