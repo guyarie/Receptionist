@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Chat with David</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --blue: #1a73e8;
+      --gray-50: #fafafa;
+      --gray-100: #f5f5f7;
+      --gray-200: #e8e8ed;
+      --gray-400: #a1a1a6;
+      --gray-500: #86868b;
+      --gray-900: #1d1d1f;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .chat {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      background: white;
+    }
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: var(--gray-50);
+      scroll-behavior: smooth;
+    }
+    .messages::-webkit-scrollbar { width: 0; }
+    .message {
+      margin-bottom: 10px;
+      display: flex;
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message.user { justify-content: flex-end; }
+    .bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .message.ai .bubble {
+      background: white;
+      color: var(--gray-900);
+      border: 0.5px solid var(--gray-200);
+      border-bottom-left-radius: 4px;
+    }
+    .message.user .bubble {
+      background: var(--blue);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .input-area {
+      padding: 12px;
+      background: white;
+      border-top: 0.5px solid var(--gray-200);
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: var(--gray-100);
+      border-radius: 24px;
+      padding: 4px 6px;
+    }
+    .input-row:focus-within {
+      background: white;
+      box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+    }
+    .attach {
+      cursor: pointer;
+      padding: 6px;
+      color: var(--gray-400);
+      display: flex;
+      align-items: center;
+    }
+    .attach svg { width: 20px; height: 20px; }
+    input[type="text"] {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      padding: 8px 4px;
+      color: var(--gray-900);
+      min-width: 0;
+    }
+    input::placeholder { color: var(--gray-400); }
+    .send {
+      background: var(--blue);
+      color: white;
+      border: none;
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 50%;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .send:disabled { opacity: 0.3; }
+    .typing span {
+      height: 6px; width: 6px; background: var(--gray-400); border-radius: 50%;
+      display: inline-block; margin-right: 3px; animation: t 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; margin-right: 0; }
+    @keyframes t {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat">
+    <div class="messages" id="msgs"></div>
+    <div class="input-area">
+      <form class="input-row" id="form">
+        <label class="attach">
+          <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </label>
+        <input type="text" id="input" placeholder="Message David..." autocomplete="off">
+        <button type="submit" class="send" id="sendBtn">↑</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    var msgs = document.getElementById('msgs');
+    var form = document.getElementById('form');
+    var input = document.getElementById('input');
+    var sendBtn = document.getElementById('sendBtn');
+    var sid = 'embed-' + Date.now() + '-' + Math.random().toString(36).substr(2,6);
+
+    function add(type, text) {
+      var d = document.createElement('div');
+      d.className = 'message ' + type;
+      d.innerHTML = '<div class="bubble">' + text + '</div>';
+      msgs.appendChild(d);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function addTyping() {
+      var d = document.createElement('div');
+      d.className = 'message ai';
+      d.id = 'typing';
+      d.innerHTML = '<div class="bubble typing"><span></span><span></span><span></span></div>';
+      msgs.appendChild(d);
+      msgs.scrollTop = msgs.scrollHeight;
+      return d;
+    }
+
+    fetch('/api/greeting').then(r=>r.json()).then(d=>add('ai',d.greeting)).catch(()=>add('ai',"Hi! I'm David from ChargeWizards — How can I help?"));
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var msg = input.value.trim();
+      if (!msg) return;
+      add('user', msg);
+      input.value = '';
+      var t = addTyping();
+      input.disabled = true;
+      sendBtn.disabled = true;
+
+      var history = [];
+      msgs.querySelectorAll('.message').forEach(function(m) {
+        if (m.id === 'typing') return;
+        var isUser = m.classList.contains('user');
+        var text = m.querySelector('.bubble').textContent.trim();
+        if (text) history.push({role: isUser ? 'user' : 'assistant', content: text});
+      });
+
+      try {
+        var res = await fetch('/api/webchat', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({sessionId: sid, messages: history})
+        });
+        var data = await res.json();
+        t.remove();
+        add('ai', data.response);
+      } catch(err) {
+        t.remove();
+        add('ai', "Sorry, having trouble connecting. Call us at (650) 542-8877.");
+      }
+      input.disabled = false;
+      sendBtn.disabled = false;
+      input.focus();
+    });
+  </script>
+</body>
+</html>
