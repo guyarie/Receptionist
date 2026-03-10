@@ -365,13 +365,7 @@
     </div>
 
     <div class="chat-messages" id="messages">
-      <!-- Greeting loads here first, then suggestions appear below -->
-      <div class="suggestions" id="suggestions" style="display:none">
-        <button class="suggestion-btn" onclick="sendSuggestion('I want to install an EV charger')">I want to install an EV charger</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('I live in a condo, can I even install an EV charger?')">I live in a condo, can I even install an EV charger?</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('Do I need a panel upgrade?')">Do I need a panel upgrade?</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('How much does it cost?')">How much does it cost?</button>
-      </div>
+
     </div>
 
     <div class="chat-input-container">
@@ -427,11 +421,7 @@
       } catch (e) {
         addMessage('ai', "Hi! I'm David with ChargeWizards. How can I help with your EV charger installation?");
       }
-      // Show suggestions after greeting with a slight delay
-      setTimeout(() => {
-        const s = document.getElementById('suggestions');
-        if (s) s.style.display = '';
-      }, 400);
+
     }
     loadGreeting();
 
@@ -439,9 +429,6 @@
       e.preventDefault();
       const message = messageInput.value.trim();
       if (!message && pendingFiles.length === 0) return;
-
-      const suggestions = document.getElementById('suggestions');
-      if (suggestions) suggestions.style.display = 'none';
 
       let uploadedFiles = [];
       if (pendingFiles.length > 0) {
