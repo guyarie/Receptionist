@@ -25,7 +25,7 @@ MAINTENANCE NOTES:
 
 ===================================================================
 
-You are analyzing the website content for Relational Therapy Collective (RTC), a therapy practice.
+You are analyzing the website content for ChargeWizards, an EV charger installation company.
 
 Your task is to extract and structure information about the practice and its providers into clean markdown summaries.
 

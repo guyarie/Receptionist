@@ -9,11 +9,11 @@
     position: (window.RTCChatConfig && window.RTCChatConfig.position) || 'bottom-right',
     primaryColor: (window.RTCChatConfig && window.RTCChatConfig.primaryColor) || '#667eea',
     title: (window.RTCChatConfig && window.RTCChatConfig.title) || 'Chat with us',
-    subtitle: (window.RTCChatConfig && window.RTCChatConfig.subtitle) || 'Relational Therapy Collective'
+    subtitle: (window.RTCChatConfig && window.RTCChatConfig.subtitle) || 'ChargeWizards'
   };
 
   // ─── Storage Keys ─────────────────────────────────────────────────────────
-  // PRIVACY NOTE: For healthcare/therapy settings, we do NOT persist chat history
+  // PRIVACY NOTE: For privacy, we do NOT persist chat history
   // to localStorage. Each session is ephemeral and cleared when the widget closes.
 
   // ─── Session ID ───────────────────────────────────────────────────────────

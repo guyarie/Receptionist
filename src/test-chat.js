@@ -31,8 +31,8 @@ async function main() {
   
   console.log('Type your messages below. Type "exit" to quit.\n');
   console.log('Try asking:');
-  console.log('  - "What types of therapy do you offer?"');
-  console.log('  - "Do you have Spanish-speaking therapists?"');
+  console.log('  - "What types of chargers do you install?"');
+  console.log('  - "Do you serve San Mateo?"');
   console.log('  - "Who specializes in trauma?"');
   console.log('  - "Can you help with child anxiety?"\n');
   console.log('=' .repeat(50));

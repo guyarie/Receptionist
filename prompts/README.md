@@ -121,17 +121,17 @@ After editing any of these files:
 
 ### Making the greeting more casual:
 ```
-Hey there! Thanks for calling Relational Therapy Collective. I'm the AI receptionist. What can I do for you?
+Hey there! Thanks for calling ChargeWizards. I'm the AI receptionist. What can I do for you?
 ```
 
 ### Making the greeting more formal:
 ```
-Good day. You've reached the Relational Therapy Collective. I am the automated receptionist system. How may I assist you today?
+Good day. You've reached the ChargeWizards. I am the automated receptionist system. How may I assist you today?
 ```
 
 ### Adding practice info to greeting:
 ```
-Hello! Thank you for calling the Relational Therapy Collective, where we specialize in individual, couples, and family therapy. I'm your AI receptionist. How can I help you today?
+Hello! Thank you for calling the ChargeWizards, where we specialize in EV charger installations. I'm your AI receptionist. How can I help you today?
 ```
 
 ---

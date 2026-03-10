@@ -11,10 +11,10 @@ async function testAI() {
     aiClient.initSession(sessionId);
     
     // Test conversation
-    const response1 = await aiClient.sendMessage(sessionId, 'Hello, I need help finding a therapist.');
+    const response1 = await aiClient.sendMessage(sessionId, 'Hi, I need an EV charger installed.');
     console.log('\n---\n');
     
-    const response2 = await aiClient.sendMessage(sessionId, 'What types of therapy do you offer?');
+    const response2 = await aiClient.sendMessage(sessionId, 'What types of chargers do you install?');
     console.log('\n---\n');
     
     const response3 = await aiClient.sendMessage(sessionId, 'Do you accept insurance?');

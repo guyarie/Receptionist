@@ -1,7 +1,7 @@
 /**
  * Provider Profile Scraper for AI Phone Receptionist
  * 
- * This script scrapes the Relational Therapy Collective (RTC) website to extract
+ * This script scrapes the ChargeWizards website to extract
  * practice information and individual provider profiles. It uses OpenRouter API
  * for AI-powered content extraction and generates structured markdown files.
  * 
@@ -788,7 +788,7 @@ async function callLLMForProvider(providerName, text) {
  * @returns {Promise<string|null>} Practice overview markdown content or null on error
  * @example
  * const overview = await extractPracticeOverview(homepageHtml, homepageText);
- * // returns "# Relational Therapy Collective\n\nWe are a group practice..." or null
+ * // returns "# ChargeWizards\n\nWe are a group practice..." or null
  */
 async function extractPracticeOverview(html, text) {
   console.log(`🏢 Extracting practice overview from homepage`);
