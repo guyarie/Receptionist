@@ -38,7 +38,26 @@
       padding: 24px;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      overflow: hidden;
     }
+
+    /* Detect iframe and go edge-to-edge */
+    body.in-iframe {
+      padding: 0;
+      background: white;
+    }
+    body.in-iframe .brand-bar { display: none; }
+    body.in-iframe .chat-container {
+      border-radius: 0;
+      max-width: 100%;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      max-height: none;
+      border: none;
+      box-shadow: none;
+    }
+    body.in-iframe .powered-by { display: none; }
 
     /* Brand Bar */
     .brand-bar {
@@ -348,6 +367,23 @@
       .chat-header { padding: 16px 20px; }
       .powered-by { display: none; }
     }
+
+    /* When embedded in an iframe */
+    @media(max-width: 768px) {
+      body { padding: 0; }
+      .brand-bar { display: none; }
+      .chat-container {
+        border-radius: 0;
+        max-width: 100%;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        max-height: none;
+        border: none;
+        box-shadow: none;
+      }
+      .powered-by { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -507,6 +543,11 @@
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
       return div;
+    }
+
+    // Detect if we're in an iframe
+    if (window.self !== window.top) {
+      document.body.classList.add('in-iframe');
     }
 
     function sendSuggestion(text) {
