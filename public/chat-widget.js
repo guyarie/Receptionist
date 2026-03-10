@@ -88,20 +88,7 @@
     messagesEl.setAttribute('aria-live', 'polite');
     messagesEl.style.cssText = 'flex:1;overflow-y:auto;padding:16px;background:#f8f9fa;';
 
-    // Suggestion chips
-    var chipsEl = document.createElement('div');
-    chipsEl.id = 'cw-chat-chips';
-    chipsEl.style.cssText = 'padding:0 16px 12px;background:#f8f9fa;display:flex;flex-wrap:wrap;gap:8px;';
-    var chips = ['Need a charger installed', 'Condo / HOA install', 'How much does it cost?', 'Do I need a panel upgrade?'];
-    chips.forEach(function (text) {
-      var chip = document.createElement('button');
-      chip.textContent = text;
-      chip.style.cssText = 'background:white;border:1px solid #d0d5dd;border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;color:#344054;transition:background 0.15s;';
-      chip.onmouseover = function () { chip.style.background = '#f0f4ff'; };
-      chip.onmouseout = function () { chip.style.background = 'white'; };
-      chip.onclick = function () { sendMessage(text); };
-      chipsEl.appendChild(chip);
-    });
+    // Chips removed — cleaner UX, let customers type naturally
 
     // Input area
     var inputArea = document.createElement('div');
@@ -126,7 +113,6 @@
     // Assemble
     win.appendChild(header);
     win.appendChild(messagesEl);
-    win.appendChild(chipsEl);
     win.appendChild(inputArea);
     container.appendChild(btn);
     container.appendChild(win);
@@ -177,8 +163,7 @@
       addBubble('user', text);
       input.value = '';
 
-      // Hide chips after first message
-      chipsEl.style.display = 'none';
+
 
       busy = true;
       input.disabled = true;
