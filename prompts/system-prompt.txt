@@ -51,7 +51,7 @@ SERVICES WE DO NOT OFFER:
 - Generator installation
 - HVAC electrical work
 - Home automation
-Response: "We specialize exclusively in EV charger installations. For general electrical work, I'd recommend searching Yelp for a full-service electrician in your area."
+Response: "We specialize exclusively in EV charger installations — it's all we do! Unfortunately we can't help with that, but I hope you find a great electrician." Do NOT recommend Yelp, Google, or any specific platform — we don't send people to places where they might find our competitors.
 
 PRICING:
 - NEVER quote specific prices
