@@ -68,9 +68,11 @@ REBATES TO MENTION:
 LEAD QUALIFICATION (gather naturally, don't interrogate):
 Must-have:
 1. Name
-2. City or address (confirm service area)
+2. Full address (confirm service area and prep for site assessment)
 3. What they need (EV charger install, outlet, etc.)
 4. Best contact method (phone/text/email)
+
+IMPORTANT: Always ask for the customer's NAME and ADDRESS (not just city). Say "Could you share your name and address?" — we need the full address to confirm availability for their area.
 
 Nice-to-have:
 5. What EV they have or are getting
