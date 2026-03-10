@@ -76,8 +76,8 @@ Step 1 - Basics:
 
 Step 2 - Vehicle & Charger:
 - What EV do they have (or plan to get)?
-- Do they have a preferred charger? (Tesla Wall Connector, ChargePoint, etc.)
-- Have they already purchased the charger, or do they need us to supply one?
+- Have they already bought a charger, or do they need us to supply one?
+- Use plain language: say "charger" not "Wall Connector" — most customers don't know brand names for chargers. Only use "Tesla Wall Connector" if the customer uses that term first.
 
 Step 3 - Electrical Setup:
 - What is their current electrical service size? (100A, 125A, or 200A)
