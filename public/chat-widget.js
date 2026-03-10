@@ -45,11 +45,9 @@
     ].join('\n');
     document.head.appendChild(style);
 
-    // Don't show widget on contact page (David is embedded inline there)
-    if (window.location.pathname.toLowerCase().indexOf('contact') !== -1 ||
-        window.location.href.toLowerCase().indexOf('contact') !== -1) {
-      return;
-    }
+    // Auto-open on contact page
+    var isContactPage = window.location.pathname.toLowerCase().indexOf('contact') !== -1 ||
+        window.location.href.toLowerCase().indexOf('contact') !== -1;
 
     // Container
     var container = document.createElement('div');
@@ -157,6 +155,11 @@
     btn.addEventListener('click', function () { isOpen ? close() : open(); });
     closeBtn.addEventListener('click', close);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) close(); });
+
+    // Auto-open on contact page
+    if (isContactPage) {
+      setTimeout(function() { open(); }, 500);
+    }
 
     // Handle mobile keyboard resize
     if (window.visualViewport) {
