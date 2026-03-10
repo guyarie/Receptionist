@@ -426,7 +426,10 @@
           : `<img src="${f.url}" onclick="window.open('${f.url}')">`
       ).join('');
       
-      const displayMsg = message + (imageHtml ? `<div class="message-images">${imageHtml}</div>` : '');
+      const fileNote = uploadedFiles.length > 0 
+        ? `[Attached ${uploadedFiles.length} photo(s): ${uploadedFiles.map(f=>f.originalName).join(', ')}]` 
+        : '';
+      const displayMsg = (message || '') + (imageHtml ? `<div class="message-images">${imageHtml}</div>` : '') + (fileNote ? `<div style="font-size:12px;color:#888;margin-top:4px">${fileNote}</div>` : '');
       addMessage('user', displayMsg);
       messageInput.value = '';
       
