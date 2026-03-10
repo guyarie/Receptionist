@@ -114,7 +114,7 @@ class AIClient {
         model: this.model,
         messages: messages,
         temperature: 0.7,
-        max_tokens: 150 // Keep responses concise for phone calls
+        max_tokens: 250 // Concise for phone but enough room for Sonnet
       });
       
       // Log the actual model used by OpenRouter
