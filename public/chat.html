@@ -191,8 +191,9 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 16px;
-      padding: 0 4px;
+      margin-top: 8px;
+      padding: 12px 4px;
+      border-top: 0.5px solid var(--gray-200);
     }
 
     .suggestion-btn {
@@ -364,7 +365,8 @@
     </div>
 
     <div class="chat-messages" id="messages">
-      <div class="suggestions" id="suggestions">
+      <!-- Greeting loads here first, then suggestions appear below -->
+      <div class="suggestions" id="suggestions" style="display:none">
         <button class="suggestion-btn" onclick="sendSuggestion('I want to install an EV charger')">I want to install an EV charger</button>
         <button class="suggestion-btn" onclick="sendSuggestion('I live in a condo, can I even install an EV charger?')">I live in a condo, can I even install an EV charger?</button>
         <button class="suggestion-btn" onclick="sendSuggestion('Do I need a panel upgrade?')">Do I need a panel upgrade?</button>
@@ -425,6 +427,11 @@
       } catch (e) {
         addMessage('ai', "Hi! I'm David with ChargeWizards. How can I help with your EV charger installation?");
       }
+      // Show suggestions after greeting with a slight delay
+      setTimeout(() => {
+        const s = document.getElementById('suggestions');
+        if (s) s.style.display = '';
+      }, 400);
     }
     loadGreeting();
 
