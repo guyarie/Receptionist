@@ -5,13 +5,18 @@ const prompts = require('./prompts');
 
 class AIClient {
   constructor() {
-    // Primary: OpenAI direct (if key available) — GPT-4o Mini for webchat
+    // Primary: Anthropic direct for webchat (Sonnet, no OpenRouter markup)
+    this.anthropicApiKey = config.anthropic ? config.anthropic.apiKey : null;
+    if (this.anthropicApiKey) {
+      this.webchatModel = 'claude-sonnet-4-20250514';
+      console.log('✅ Anthropic direct configured (webchat: Sonnet)');
+    }
+    // Secondary: OpenAI direct (for voice pipeline)
     if (config.openai.apiKey) {
       this.openaiClient = new OpenAI({
         apiKey: config.openai.apiKey,
       });
-      this.webchatModel = 'gpt-4o-mini';
-      console.log('✅ OpenAI direct client initialized (webchat: gpt-4o-mini)');
+      console.log('✅ OpenAI client initialized (voice ready)');
     }
 
     // Fallback: OpenRouter
@@ -172,38 +177,59 @@ class AIClient {
 
     const messages = [systemPrompt, ...clientMessages];
 
-    // Try OpenAI direct first (25x cheaper), fallback to OpenRouter on any error
-    let response;
-    if (this.openaiClient) {
+    let assistantMessage;
+
+    // Try Anthropic direct first (no OpenRouter markup), fallback to OpenRouter
+    if (this.anthropicApiKey) {
       try {
-        console.log(`💬 [webchat] Sending ${clientMessages.length} msg(s) to ${this.webchatModel} via OpenAI`);
-        response = await this.openaiClient.chat.completions.create({
-          model: this.webchatModel,
-          messages: messages,
-          temperature: 0.7,
-          max_tokens: 500
+        console.log(`💬 [webchat] Sending ${clientMessages.length} msg(s) to Sonnet via Anthropic direct`);
+        
+        // Anthropic Messages API: separate system from messages
+        const systemContent = messages[0].role === 'system' ? messages[0].content : '';
+        const apiMessages = messages.filter(m => m.role !== 'system');
+
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': this.anthropicApiKey,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: this.webchatModel,
+            max_tokens: 500,
+            system: systemContent,
+            messages: apiMessages,
+            temperature: 0.7,
+          })
         });
-      } catch (openaiErr) {
-        console.warn(`⚠️ [webchat] OpenAI failed (${openaiErr.message}), falling back to OpenRouter`);
-        response = null;
+
+        const data = await res.json();
+        if (data.content && data.content[0]) {
+          assistantMessage = data.content[0].text;
+          console.log(`🔍 [webchat] Model: ${data.model || this.webchatModel} via Anthropic`);
+        } else {
+          throw new Error(data.error?.message || 'Unexpected Anthropic response');
+        }
+      } catch (anthropicErr) {
+        console.warn(`⚠️ [webchat] Anthropic failed (${anthropicErr.message}), falling back to OpenRouter`);
+        assistantMessage = null;
       }
     }
 
-    if (!response) {
+    if (!assistantMessage) {
       console.log(`💬 [webchat] Sending ${clientMessages.length} msg(s) to ${this.model} via OpenRouter`);
-      response = await this.client.chat.completions.create({
+      const response = await this.client.chat.completions.create({
         model: this.model,
         messages: messages,
         temperature: 0.7,
         max_tokens: 500
       });
+      if (response.model) {
+        console.log(`🔍 [webchat] Model: ${response.model}`);
+      }
+      assistantMessage = response.choices[0].message.content;
     }
-
-    if (response.model) {
-      console.log(`🔍 [webchat] Model: ${response.model}`);
-    }
-
-    const assistantMessage = response.choices[0].message.content;
     console.log(`🤖 [webchat] AI: ${assistantMessage}`);
 
     return assistantMessage;

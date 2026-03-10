@@ -40,6 +40,9 @@ const config = {
     apiKey: process.env.OPENROUTER_API_KEY,
     model: process.env.OPENROUTER_MODEL || 'openai/gpt-4'
   },
+  anthropic: {
+    apiKey: process.env.ANTHROPIC_API_KEY || null,
+  },
   openai: {
     apiKey: process.env.OPENAI_API_KEY || null,
     realtimeVoice: process.env.OPENAI_REALTIME_VOICE || 'alloy'
