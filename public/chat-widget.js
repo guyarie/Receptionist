@@ -45,6 +45,12 @@
     ].join('\n');
     document.head.appendChild(style);
 
+    // Don't show widget on contact page (David is embedded inline there)
+    if (window.location.pathname.toLowerCase().indexOf('contact') !== -1 ||
+        window.location.href.toLowerCase().indexOf('contact') !== -1) {
+      return;
+    }
+
     // Container
     var container = document.createElement('div');
     container.id = 'cw-chat-widget';
