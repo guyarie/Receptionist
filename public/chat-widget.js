@@ -41,7 +41,7 @@
       '#cw-chat-input:focus{border-color:' + PRIMARY + '!important}',
       '#cw-chat-messages::-webkit-scrollbar{width:5px}',
       '#cw-chat-messages::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}',
-      '@media(max-width:420px){#cw-chat-window{width:calc(100vw - 20px)!important;height:calc(100vh - 100px)!important;bottom:70px!important;' + (isRight ? 'right:-10px!important' : 'left:-10px!important') + '}}'
+      '@media(max-width:420px){#cw-chat-window{width:100vw!important;height:100%!important;max-height:100%!important;bottom:0!important;top:0!important;left:0!important;right:0!important;border-radius:0!important;position:fixed!important;}#cw-chat-btn{z-index:99998!important;}}'
     ].join('\n');
     document.head.appendChild(style);
 
@@ -99,7 +99,7 @@
     var input = document.createElement('input');
     input.type = 'text';
     input.id = 'cw-chat-input';
-    input.placeholder = 'Type your message...';
+    input.placeholder = 'Message David...';
     input.autocomplete = 'off';
     input.style.cssText = 'flex:1;padding:10px 16px;border:2px solid #e5e7eb;border-radius:24px;font-size:14px;outline:none;';
     var sendBtn = document.createElement('button');
@@ -125,22 +125,40 @@
     var busy = false;
     var greeted = false;
 
+    var isMobile = window.innerWidth <= 420;
+
     function open() {
       isOpen = true;
       win.style.display = 'flex';
       dot.style.display = 'none';
+      if (isMobile) btn.style.display = 'none';
       if (!greeted) { greeted = true; fetchGreeting(); }
-      input.focus();
+      setTimeout(function() { input.focus(); }, 100);
     }
 
     function close() {
       isOpen = false;
       win.style.display = 'none';
+      btn.style.display = 'flex';
+      // Reset height in case keyboard changed it
+      win.style.height = '';
+      win.style.top = '';
     }
 
     btn.addEventListener('click', function () { isOpen ? close() : open(); });
     closeBtn.addEventListener('click', close);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) close(); });
+
+    // Handle mobile keyboard resize
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', function () {
+        if (!isOpen) return;
+        var vp = window.visualViewport;
+        win.style.height = vp.height + 'px';
+        win.style.top = vp.offsetTop + 'px';
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      });
+    }
 
     async function fetchGreeting() {
       try {
