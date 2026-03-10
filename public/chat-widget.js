@@ -7,8 +7,8 @@
   var API_URL = cfg.apiUrl || 'https://receptionist.chargewizards.com';
   var PRIMARY = cfg.primaryColor || '#1a73e8';
   var ACCENT = cfg.accentColor || '#0d5bba';
-  var TITLE = cfg.title || 'Chat with David';
-  var SUBTITLE = cfg.subtitle || 'ChargeWizards EV Charging';
+  var TITLE = cfg.title || 'David';
+  var SUBTITLE = cfg.subtitle || 'EV Charging Specialist';
   var POSITION = cfg.position || 'bottom-right';
   var isRight = POSITION.includes('right');
 
