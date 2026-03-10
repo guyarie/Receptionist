@@ -168,7 +168,7 @@ class AIClient {
       model: this.model,
       messages: messages,
       temperature: 0.7,
-      max_tokens: 300 // Slightly more generous for web chat vs. phone
+      max_tokens: 500 // Web chat can be more detailed than phone
     });
 
     if (response.model) {

@@ -443,10 +443,19 @@
       }
       
       try {
-        const response = await fetch('/api/chat', {
+        // Build full message history for stateless webchat API
+        const historyMsgs = [];
+        document.querySelectorAll('.message').forEach(m => {
+          if (m.querySelector('.typing-indicator')) return;
+          const isUser = m.classList.contains('user');
+          const content = m.querySelector('.message-content')?.textContent?.trim();
+          if (content) historyMsgs.push({ role: isUser ? 'user' : 'assistant', content });
+        });
+        
+        const response = await fetch('/api/webchat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId, message: aiMessage })
+          body: JSON.stringify({ sessionId, messages: historyMsgs })
         });
         const data = await response.json();
         typingIndicator.remove();
