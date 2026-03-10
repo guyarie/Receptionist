@@ -74,7 +74,7 @@
     // Header
     var header = document.createElement('div');
     header.style.cssText = 'background:' + PRIMARY + ';color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;';
-    header.innerHTML = '<div><div style="font-size:17px;font-weight:600;margin-bottom:2px;">⚡ ' + TITLE + '</div><div style="font-size:12px;opacity:0.85;">' + SUBTITLE + '</div></div>';
+    header.innerHTML = '<div style="display:flex;align-items:center;gap:10px;"><img src="' + API_URL + '/logo.png" alt="CW" style="height:32px;width:auto;"><div><div style="font-size:17px;font-weight:600;margin-bottom:2px;">' + TITLE + '</div><div style="font-size:12px;opacity:0.85;">' + SUBTITLE + '</div></div></div>';
 
     var closeBtn = document.createElement('button');
     closeBtn.setAttribute('aria-label', 'Close chat');
