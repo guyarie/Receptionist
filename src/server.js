@@ -57,11 +57,31 @@ if (realtimeAvailable) {
   console.log('⚠️ OPENAI_API_KEY not set — real-time voice streaming unavailable, using Gather fallback');
 }
 
+// File upload support
+const multer = require('multer');
+const path = require('path');
+const uploadDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadDir),
+    filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB max
+  fileFilter: (req, file, cb) => {
+    const allowed = /jpeg|jpg|png|gif|webp|heic|mp4|mov|avi/;
+    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
+    const mime = allowed.test(file.mimetype) || file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/');
+    cb(null, ext || mime);
+  }
+});
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Required for CSRF token validation
 app.use(express.static('public'));
+app.use('/uploads', express.static(uploadDir));
 
 // ============================================================================
 // CORS Configuration for Web Chat Widget
@@ -275,6 +295,28 @@ app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
     console.error('❌ Webchat API error:', error);
     errorBuffer.add(error, 'webchat-api');
     res.status(500).json({ error: 'Failed to process message', details: error.message });
+  }
+});
+
+// Photo/video upload endpoint
+app.post('/api/upload', upload.array('files', 5), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+    const files = req.files.map(f => ({
+      filename: f.filename,
+      originalName: f.originalname,
+      size: f.size,
+      url: `/uploads/${f.filename}`,
+      type: f.mimetype
+    }));
+    const sessionId = req.body.sessionId || 'unknown';
+    console.log(`📸 ${files.length} file(s) uploaded for session ${sessionId}:`, files.map(f => f.originalName).join(', '));
+    res.json({ success: true, files });
+  } catch (error) {
+    console.error('❌ Upload error:', error);
+    res.status(500).json({ error: 'Upload failed' });
   }
 });
 
