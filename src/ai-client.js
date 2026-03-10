@@ -172,19 +172,32 @@ class AIClient {
 
     const messages = [systemPrompt, ...clientMessages];
 
-    // Use OpenAI direct if available (25x cheaper), fallback to OpenRouter
-    const useOpenAI = !!this.openaiClient;
-    const client = useOpenAI ? this.openaiClient : this.client;
-    const model = useOpenAI ? this.webchatModel : this.model;
+    // Try OpenAI direct first (25x cheaper), fallback to OpenRouter on any error
+    let response;
+    if (this.openaiClient) {
+      try {
+        console.log(`💬 [webchat] Sending ${clientMessages.length} msg(s) to ${this.webchatModel} via OpenAI`);
+        response = await this.openaiClient.chat.completions.create({
+          model: this.webchatModel,
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 500
+        });
+      } catch (openaiErr) {
+        console.warn(`⚠️ [webchat] OpenAI failed (${openaiErr.message}), falling back to OpenRouter`);
+        response = null;
+      }
+    }
 
-    console.log(`💬 [webchat] Sending ${clientMessages.length} message(s) to ${model} via ${useOpenAI ? 'OpenAI' : 'OpenRouter'}`);
-
-    const response = await client.chat.completions.create({
-      model: model,
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 500
-    });
+    if (!response) {
+      console.log(`💬 [webchat] Sending ${clientMessages.length} msg(s) to ${this.model} via OpenRouter`);
+      response = await this.client.chat.completions.create({
+        model: this.model,
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 500
+      });
+    }
 
     if (response.model) {
       console.log(`🔍 [webchat] Model: ${response.model}`);
