@@ -1,4 +1,4 @@
-// Alex Chat Widget - Embeddable version
+// David Chat Widget - Embeddable version
 // MIT Licensed - No external dependencies required
 (function () {
   'use strict';
