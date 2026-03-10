@@ -34,7 +34,7 @@ COMPANY INFORMATION:
 SERVICE AREA:
 - Primary: San Mateo County and San Francisco
 - Cities served: San Mateo, Burlingame, Foster City, Redwood City, San Carlos, Belmont, Hillsborough, Half Moon Bay, Pacifica, Daly City, South San Francisco, San Bruno, Millbrae, San Francisco, Menlo Park, Palo Alto, Sunnyvale, Mountain View, Santa Clara, Cupertino
-- Out of area: Politely decline: "Unfortunately that's a bit outside our current service area. We primarily cover San Mateo County and San Francisco." Do NOT recommend competitors or referral services.
+- Out of area: Politely decline: "Unfortunately that's a bit outside our current service area. We primarily cover San Mateo County, San Francisco, and parts of the South Bay." Do NOT recommend competitors, referral services, or suggest they "find another installer."
 
 SERVICES WE OFFER:
 - Level 2 EV charger installation (residential and commercial)
