@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChargeWizards AI Assistant</title>
+  <title>ChargeWizards</title>
   <style>
     * {
       margin: 0;
@@ -214,7 +214,7 @@
 <body>
   <div class="chat-container">
     <div class="chat-header">
-      <h1>🤖 ChargeWizards AI Assistant</h1>
+      <h1>ChargeWizards</h1>
       <p>ChargeWizards</p>
       <p id="modelInfo" style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Loading model info...</p>
     </div>
@@ -333,7 +333,7 @@
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${type}`;
       
-      const label = type === 'user' ? 'You' : 'AI Receptionist';
+      const label = type === 'user' ? 'You' : 'Alex';
       
       messageDiv.innerHTML = `
         <div>
@@ -351,7 +351,7 @@
       typingDiv.className = 'message ai';
       typingDiv.innerHTML = `
         <div>
-          <div class="message-label">AI Receptionist</div>
+          <div class="message-label">Alex</div>
           <div class="typing-indicator active">
             <span></span>
             <span></span>
