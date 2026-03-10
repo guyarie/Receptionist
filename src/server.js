@@ -80,7 +80,7 @@ const upload = multer({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Required for CSRF token validation
-app.use(express.static('public'));
+app.use(express.static('public', { maxAge: 0, etag: false }));
 app.use('/uploads', express.static(uploadDir));
 
 // ============================================================================
