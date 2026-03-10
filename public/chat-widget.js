@@ -1,369 +1,240 @@
-// David Chat Widget - Embeddable version
-// MIT Licensed - No external dependencies required
+// ChargeWizards Chat Widget — Embeddable on any site
+// Usage: <script src="https://receptionist.chargewizards.com/chat-widget.js"></script>
 (function () {
   'use strict';
 
-  // ─── Configuration ────────────────────────────────────────────────────────
-  const config = {
-    apiUrl: (window.RTCChatConfig && window.RTCChatConfig.apiUrl) || 'http://localhost:3000',
-    position: (window.RTCChatConfig && window.RTCChatConfig.position) || 'bottom-right',
-    primaryColor: (window.RTCChatConfig && window.RTCChatConfig.primaryColor) || '#667eea',
-    title: (window.RTCChatConfig && window.RTCChatConfig.title) || 'Chat with us',
-    subtitle: (window.RTCChatConfig && window.RTCChatConfig.subtitle) || 'ChargeWizards'
-  };
+  var cfg = window.ChargeWizardsChatConfig || {};
+  var API_URL = cfg.apiUrl || 'https://receptionist.chargewizards.com';
+  var PRIMARY = cfg.primaryColor || '#1a73e8';
+  var ACCENT = cfg.accentColor || '#0d5bba';
+  var TITLE = cfg.title || 'Chat with David';
+  var SUBTITLE = cfg.subtitle || 'ChargeWizards EV Charging';
+  var POSITION = cfg.position || 'bottom-right';
+  var isRight = POSITION.includes('right');
 
-  // ─── Storage Keys ─────────────────────────────────────────────────────────
-  // PRIVACY NOTE: For privacy, we do NOT persist chat history
-  // to localStorage. Each session is ephemeral and cleared when the widget closes.
-
-  // ─── Session ID ───────────────────────────────────────────────────────────
-  /**
-   * Generate a RFC4122 v4 UUID without external dependencies.
-   * @returns {string}
-   */
-  function generateUUID() {
+  function uuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       var r = (Math.random() * 16) | 0;
-      var v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
+      return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
     });
   }
 
-  /**
-   * Generate a new session ID for each widget instance.
-   * PRIVACY: Does NOT persist to localStorage - generates fresh ID each time.
-   * @returns {string}
-   */
-  function getOrCreateSessionId() {
-    return generateUUID();
-  }
-
-  // ─── Conversation History ─────────────────────────────────────────────────
-  // PRIVACY: No localStorage persistence - history only exists in memory during session
-
-  // ─── API ──────────────────────────────────────────────────────────────────
-  /**
-   * Send the full conversation history to /api/webchat and return the
-   * assistant's reply text.
-   * @param {string} sessionId
-   * @param {Array<{role: string, content: string}>} messages
-   * @returns {Promise<string>}
-   */
-  async function sendToAPI(sessionId, messages) {
-    const response = await fetch(config.apiUrl + '/api/webchat', {
+  async function callAPI(sessionId, messages) {
+    var res = await fetch(API_URL + '/api/webchat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId: sessionId, messages: messages })
     });
-
-    if (!response.ok) {
-      throw new Error('Server responded with status ' + response.status);
-    }
-
-    const data = await response.json();
-
-    // Support both {response: "..."} and {message: "..."} shapes
-    const reply = data.response || data.message;
-    if (typeof reply !== 'string') {
-      throw new Error('Unexpected response format from server');
-    }
+    if (!res.ok) throw new Error('Server error ' + res.status);
+    var data = await res.json();
+    var reply = data.response || data.message;
+    if (typeof reply !== 'string') throw new Error('Bad response format');
     return reply;
   }
 
-  // ─── Widget HTML ──────────────────────────────────────────────────────────
-  const isRight = config.position.includes('right');
-  const positionStyle = isRight ? 'right: 20px;' : 'left: 20px;';
-  const windowAlignStyle = isRight ? 'right: 0;' : 'left: 0;';
-
-  const widgetHTML = `
-    <div id="rtc-chat-widget" style="position:fixed;${positionStyle}bottom:20px;z-index:9999;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-
-      <!-- Floating bubble button -->
-      <button id="rtc-chat-button" aria-label="Open chat" style="
-        width:60px;height:60px;border-radius:30px;
-        background:linear-gradient(135deg,${config.primaryColor} 0%,#764ba2 100%);
-        border:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);
-        cursor:pointer;display:flex;align-items:center;justify-content:center;
-        transition:transform 0.2s;
-      ">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-      </button>
-
-      <!-- Chat panel -->
-      <div id="rtc-chat-window" role="dialog" aria-label="Chat window" style="
-        display:none;flex-direction:column;
-        position:absolute;bottom:80px;${windowAlignStyle}
-        width:380px;max-width:calc(100vw - 40px);
-        height:600px;max-height:calc(100vh - 120px);
-        background:white;border-radius:12px;
-        box-shadow:0 10px 40px rgba(0,0,0,0.2);overflow:hidden;
-      ">
-        <!-- Header -->
-        <div style="
-          background:linear-gradient(135deg,${config.primaryColor} 0%,#764ba2 100%);
-          color:white;padding:20px;
-          display:flex;justify-content:space-between;align-items:center;
-          flex-shrink:0;
-        ">
-          <div>
-            <div style="font-size:18px;font-weight:600;margin-bottom:4px;">${config.title}</div>
-            <div style="font-size:13px;opacity:0.9;">${config.subtitle}</div>
-          </div>
-          <button id="rtc-chat-close" aria-label="Close chat" style="
-            background:none;border:none;color:white;font-size:24px;
-            cursor:pointer;padding:0;width:30px;height:30px;
-            display:flex;align-items:center;justify-content:center;
-          ">×</button>
-        </div>
-
-        <!-- Messages -->
-        <div id="rtc-chat-messages" aria-live="polite" style="
-          flex:1;overflow-y:auto;padding:20px;background:#f7f7f7;
-        "></div>
-
-        <!-- Input area -->
-        <div style="padding:15px;background:white;border-top:1px solid #e0e0e0;flex-shrink:0;">
-          <form id="rtc-chat-form" style="display:flex;gap:10px;">
-            <input
-              type="text"
-              id="rtc-chat-input"
-              placeholder="Type your message..."
-              autocomplete="off"
-              style="
-                flex:1;padding:12px 16px;
-                border:2px solid #e0e0e0;border-radius:24px;
-                font-size:14px;outline:none;
-              "
-            >
-            <button type="submit" id="rtc-chat-send" style="
-              background:linear-gradient(135deg,${config.primaryColor} 0%,#764ba2 100%);
-              color:white;border:none;padding:12px 20px;
-              border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;
-            ">Send</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // ─── Styles ───────────────────────────────────────────────────────────────
-  const widgetStyles = `
-    @keyframes rtc-typing {
-      0%,60%,100% { transform:translateY(0); }
-      30%          { transform:translateY(-8px); }
-    }
-    #rtc-chat-button:hover { transform:scale(1.05); }
-    #rtc-chat-input:focus  { border-color:${config.primaryColor} !important; }
-    #rtc-chat-send:hover   { opacity:0.9; }
-    #rtc-chat-messages::-webkit-scrollbar { width:6px; }
-    #rtc-chat-messages::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
-  `;
-
-  // ─── Bootstrap ────────────────────────────────────────────────────────────
   function init() {
-    // Inject styles
-    const styleEl = document.createElement('style');
-    styleEl.textContent = widgetStyles;
-    document.head.appendChild(styleEl);
+    // Styles
+    var style = document.createElement('style');
+    style.textContent = [
+      '@keyframes cw-typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}',
+      '#cw-chat-btn:hover{transform:scale(1.08)!important}',
+      '#cw-chat-input:focus{border-color:' + PRIMARY + '!important}',
+      '#cw-chat-messages::-webkit-scrollbar{width:5px}',
+      '#cw-chat-messages::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}',
+      '@media(max-width:420px){#cw-chat-window{width:calc(100vw - 20px)!important;height:calc(100vh - 100px)!important;bottom:70px!important;' + (isRight ? 'right:-10px!important' : 'left:-10px!important') + '}}'
+    ].join('\n');
+    document.head.appendChild(style);
 
-    // Inject widget markup
-    document.body.insertAdjacentHTML('beforeend', widgetHTML);
+    // Container
+    var container = document.createElement('div');
+    container.id = 'cw-chat-widget';
+    container.style.cssText = 'position:fixed;' + (isRight ? 'right:20px' : 'left:20px') + ';bottom:20px;z-index:99999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;';
 
-    // Element references
-    const chatButton   = document.getElementById('rtc-chat-button');
-    const chatWindow   = document.getElementById('rtc-chat-window');
-    const chatClose    = document.getElementById('rtc-chat-close');
-    const chatForm     = document.getElementById('rtc-chat-form');
-    const chatInput    = document.getElementById('rtc-chat-input');
-    const chatMessages = document.getElementById('rtc-chat-messages');
+    // Button
+    var btn = document.createElement('button');
+    btn.id = 'cw-chat-btn';
+    btn.setAttribute('aria-label', 'Chat with ChargeWizards');
+    btn.style.cssText = 'width:60px;height:60px;border-radius:30px;background:' + PRIMARY + ';border:none;box-shadow:0 4px 15px rgba(0,0,0,0.25);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;';
+    btn.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+
+    // Notification dot
+    var dot = document.createElement('span');
+    dot.id = 'cw-chat-dot';
+    dot.style.cssText = 'position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#e53e3e;border-radius:50%;border:2px solid white;';
+    btn.style.position = 'relative';
+    btn.appendChild(dot);
+
+    // Chat window
+    var win = document.createElement('div');
+    win.id = 'cw-chat-window';
+    win.setAttribute('role', 'dialog');
+    win.setAttribute('aria-label', 'Chat window');
+    win.style.cssText = 'display:none;flex-direction:column;position:absolute;bottom:75px;' + (isRight ? 'right:0' : 'left:0') + ';width:380px;max-width:calc(100vw - 40px);height:550px;max-height:calc(100vh - 120px);background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2);overflow:hidden;';
+
+    // Header
+    var header = document.createElement('div');
+    header.style.cssText = 'background:' + PRIMARY + ';color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;';
+    header.innerHTML = '<div><div style="font-size:17px;font-weight:600;margin-bottom:2px;">⚡ ' + TITLE + '</div><div style="font-size:12px;opacity:0.85;">' + SUBTITLE + '</div></div>';
+
+    var closeBtn = document.createElement('button');
+    closeBtn.setAttribute('aria-label', 'Close chat');
+    closeBtn.style.cssText = 'background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;opacity:0.8;';
+    closeBtn.textContent = '×';
+    header.appendChild(closeBtn);
+
+    // Messages area
+    var messagesEl = document.createElement('div');
+    messagesEl.id = 'cw-chat-messages';
+    messagesEl.setAttribute('aria-live', 'polite');
+    messagesEl.style.cssText = 'flex:1;overflow-y:auto;padding:16px;background:#f8f9fa;';
+
+    // Suggestion chips
+    var chipsEl = document.createElement('div');
+    chipsEl.id = 'cw-chat-chips';
+    chipsEl.style.cssText = 'padding:0 16px 12px;background:#f8f9fa;display:flex;flex-wrap:wrap;gap:8px;';
+    var chips = ['Need a charger installed', 'Condo / HOA install', 'How much does it cost?', 'Do I need a panel upgrade?'];
+    chips.forEach(function (text) {
+      var chip = document.createElement('button');
+      chip.textContent = text;
+      chip.style.cssText = 'background:white;border:1px solid #d0d5dd;border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;color:#344054;transition:background 0.15s;';
+      chip.onmouseover = function () { chip.style.background = '#f0f4ff'; };
+      chip.onmouseout = function () { chip.style.background = 'white'; };
+      chip.onclick = function () { sendMessage(text); };
+      chipsEl.appendChild(chip);
+    });
+
+    // Input area
+    var inputArea = document.createElement('div');
+    inputArea.style.cssText = 'padding:12px 16px;background:white;border-top:1px solid #e5e7eb;flex-shrink:0;';
+    var form = document.createElement('form');
+    form.id = 'cw-chat-form';
+    form.style.cssText = 'display:flex;gap:8px;';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'cw-chat-input';
+    input.placeholder = 'Type your message...';
+    input.autocomplete = 'off';
+    input.style.cssText = 'flex:1;padding:10px 16px;border:2px solid #e5e7eb;border-radius:24px;font-size:14px;outline:none;';
+    var sendBtn = document.createElement('button');
+    sendBtn.type = 'submit';
+    sendBtn.style.cssText = 'background:' + PRIMARY + ';color:white;border:none;padding:10px 18px;border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;';
+    sendBtn.textContent = 'Send';
+    form.appendChild(input);
+    form.appendChild(sendBtn);
+    inputArea.appendChild(form);
+
+    // Assemble
+    win.appendChild(header);
+    win.appendChild(messagesEl);
+    win.appendChild(chipsEl);
+    win.appendChild(inputArea);
+    container.appendChild(btn);
+    container.appendChild(win);
+    document.body.appendChild(container);
 
     // State
-    const sessionId = getOrCreateSessionId();
-    let conversationHistory = []; // PRIVACY: In-memory only, not persisted
-    let isOpen = false;
-    let isBusy = false;
+    var sessionId = uuid();
+    var history = [];
+    var isOpen = false;
+    var busy = false;
+    var greeted = false;
 
-    // ── Render persisted history on first open ──────────────────────────────
-    // PRIVACY: No history to render - each session starts fresh
-
-    // ── Toggle panel ────────────────────────────────────────────────────────
-    function openChat() {
+    function open() {
       isOpen = true;
-      chatWindow.style.display = 'flex';
-      chatButton.setAttribute('aria-expanded', 'true');
-
-      // Always fetch greeting on first open since we don't persist history
-      if (conversationHistory.length === 0) {
-        fetchGreeting();
-      }
-
-      chatInput.focus();
+      win.style.display = 'flex';
+      dot.style.display = 'none';
+      if (!greeted) { greeted = true; fetchGreeting(); }
+      input.focus();
     }
 
-    function closeChat() {
+    function close() {
       isOpen = false;
-      chatWindow.style.display = 'none';
-      chatButton.setAttribute('aria-expanded', 'false');
+      win.style.display = 'none';
     }
 
-    chatButton.addEventListener('click', function () {
-      if (isOpen) {
-        closeChat();
-      } else {
-        openChat();
-      }
-    });
+    btn.addEventListener('click', function () { isOpen ? close() : open(); });
+    closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) close(); });
 
-    chatClose.addEventListener('click', closeChat);
-
-    // Close on Escape key
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && isOpen) closeChat();
-    });
-
-    // ── Greeting ────────────────────────────────────────────────────────────
     async function fetchGreeting() {
       try {
-        const response = await fetch(config.apiUrl + '/api/greeting');
-        if (!response.ok) throw new Error('Greeting fetch failed');
-        const data = await response.json();
-        const greetingText = data.greeting || 'Hello! How can I help you today?';
-        conversationHistory.push({ role: 'assistant', content: greetingText }); // In-memory only
-        renderMessage('ai', greetingText);
+        var res = await fetch(API_URL + '/api/greeting');
+        var data = await res.json();
+        var text = (data && data.greeting) || 'Hi! My name is David from ChargeWizards — How can I help?';
+        history.push({ role: 'assistant', content: text });
+        addBubble('ai', text);
       } catch (e) {
-        const fallback = 'Hello! How can I help you today?';
-        conversationHistory.push({ role: 'assistant', content: fallback }); // In-memory only
-        renderMessage('ai', fallback);
+        var fb = 'Hi! My name is David from ChargeWizards — How can I help?';
+        history.push({ role: 'assistant', content: fb });
+        addBubble('ai', fb);
       }
     }
 
-    // ── Form submit ─────────────────────────────────────────────────────────
-    chatForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      if (isBusy) return;
+    function sendMessage(text) {
+      if (busy || !text.trim()) return;
+      text = text.trim();
+      history.push({ role: 'user', content: text });
+      addBubble('user', text);
+      input.value = '';
 
-      const text = chatInput.value.trim();
-      if (!text) return;
+      // Hide chips after first message
+      chipsEl.style.display = 'none';
 
-      // Add to in-memory history and render
-      conversationHistory.push({ role: 'user', content: text });
-      renderMessage('user', text);
-      chatInput.value = '';
+      busy = true;
+      input.disabled = true;
+      var typing = addTyping();
 
-      // Show typing indicator
-      isBusy = true;
-      chatInput.disabled = true;
-      const typingEl = renderTypingIndicator();
+      callAPI(sessionId, history).then(function (reply) {
+        typing.remove();
+        history.push({ role: 'assistant', content: reply });
+        addBubble('ai', reply);
+      }).catch(function () {
+        typing.remove();
+        addBubble('ai', "Sorry, something went wrong. Please try again or call us at (650) 542-8877.");
+      }).finally(function () {
+        busy = false;
+        input.disabled = false;
+        input.focus();
+      });
+    }
 
-      try {
-        const reply = await sendToAPI(sessionId, conversationHistory);
-        typingEl.remove();
-        conversationHistory.push({ role: 'assistant', content: reply }); // In-memory only
-        renderMessage('ai', reply);
-      } catch (err) {
-        typingEl.remove();
-        const errMsg = 'Sorry, something went wrong. Please try again.';
-        renderMessage('ai', errMsg);
-        console.error('[ChatWidget] API error:', err);
-      } finally {
-        isBusy = false;
-        chatInput.disabled = false;
-        chatInput.focus();
-      }
-    });
+    form.addEventListener('submit', function (e) { e.preventDefault(); sendMessage(input.value); });
 
-    // ── DOM helpers ─────────────────────────────────────────────────────────
-    /**
-     * Render a single chat bubble.
-     * @param {'user'|'ai'} type
-     * @param {string} content
-     */
-    function renderMessage(type, content) {
-      const row = document.createElement('div');
-      row.style.cssText = [
-        'margin-bottom:15px;',
-        'display:flex;',
-        type === 'user' ? 'justify-content:flex-end;' : ''
-      ].join('');
-
-      const bubble = document.createElement('div');
-      bubble.style.cssText = [
-        'max-width:75%;',
-        'padding:12px 16px;',
-        'border-radius:18px;',
-        'line-height:1.5;',
-        'font-size:14px;',
-        'word-wrap:break-word;',
-        type === 'ai'
-          ? 'background:white;color:#333;border-bottom-left-radius:4px;box-shadow:0 2px 5px rgba(0,0,0,0.08);'
-          : 'background:' + config.primaryColor + ';color:white;border-bottom-right-radius:4px;'
-      ].join('');
-
-      // Use textContent to prevent XSS
+    function addBubble(type, content) {
+      var row = document.createElement('div');
+      row.style.cssText = 'margin-bottom:12px;display:flex;' + (type === 'user' ? 'justify-content:flex-end;' : '');
+      var bubble = document.createElement('div');
+      bubble.style.cssText = 'max-width:80%;padding:10px 14px;border-radius:16px;line-height:1.5;font-size:14px;word-wrap:break-word;' +
+        (type === 'ai'
+          ? 'background:white;color:#1a1a2e;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.08);'
+          : 'background:' + PRIMARY + ';color:white;border-bottom-right-radius:4px;');
       bubble.textContent = content;
-
       row.appendChild(bubble);
-      chatMessages.appendChild(row);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      return row;
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    /**
-     * Render an animated typing indicator and return its element.
-     * @returns {HTMLElement}
-     */
-    function renderTypingIndicator() {
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'margin-bottom:15px;';
-      wrapper.setAttribute('aria-label', 'Assistant is typing');
-
-      const bubble = document.createElement('div');
-      bubble.style.cssText = [
-        'display:inline-block;',
-        'padding:12px 16px;',
-        'background:white;',
-        'border-radius:18px;',
-        'border-bottom-left-radius:4px;',
-        'box-shadow:0 2px 5px rgba(0,0,0,0.08);'
-      ].join('');
-
-      [0, 0.2, 0.4].forEach(function (delay) {
-        const dot = document.createElement('span');
-        dot.style.cssText = [
-          'display:inline-block;',
-          'width:8px;height:8px;',
-          'background:#aaa;',
-          'border-radius:50%;',
-          'margin-right:4px;',
-          'animation:rtc-typing 1.4s infinite ' + delay + 's;'
-        ].join('');
+    function addTyping() {
+      var row = document.createElement('div');
+      row.style.cssText = 'margin-bottom:12px;';
+      row.setAttribute('aria-label', 'David is typing');
+      var bubble = document.createElement('div');
+      bubble.style.cssText = 'display:inline-flex;gap:4px;padding:10px 16px;background:white;border-radius:16px;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.08);';
+      [0, 0.15, 0.3].forEach(function (d) {
+        var dot = document.createElement('span');
+        dot.style.cssText = 'width:7px;height:7px;background:#aaa;border-radius:50%;animation:cw-typing 1.2s infinite ' + d + 's;';
         bubble.appendChild(dot);
       });
-
-      wrapper.appendChild(bubble);
-      chatMessages.appendChild(wrapper);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      return wrapper;
+      row.appendChild(bubble);
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return row;
     }
-
-    // PRIVACY: No history rendering - each session starts fresh
   }
 
-  // Run after DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
-
-  // ─── Public API (for testing) ─────────────────────────────────────────────
-  // PRIVACY: Removed localStorage functions - no persistent storage
-  window._RTCChatWidget = {
-    generateUUID: generateUUID,
-    getOrCreateSessionId: getOrCreateSessionId,
-    sendToAPI: sendToAPI
-  };
-
 })();
