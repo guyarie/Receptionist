@@ -404,72 +404,26 @@ function createLoginRouter(adminPassword, options = {}) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login</title>
+  <title>Admin Login — ChargeWizards</title>
   <link rel="stylesheet" href="/admin/admin.css">
-  <style>
-    .login-container {
-      max-width: 400px;
-      margin: 100px auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .form-group label {
-      font-weight: 500;
-    }
-    .form-group input {
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    .btn-primary {
-      padding: 0.75rem;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    .btn-primary:hover {
-      background: #0056b3;
-    }
-    .error-message {
-      padding: 0.75rem;
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      border-radius: 4px;
-      display: none;
-    }
-    .error-message.show {
-      display: block;
-    }
-  </style>
 </head>
-<body>
-  <div class="login-container">
-    <h1>Admin Login</h1>
-    <div id="error-message" class="error-message"></div>
-    <form class="login-form" method="POST" action="/admin/login">
+<body class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">⚡</div>
+      <div class="login-title">ChargeWizards</div>
+      <div class="login-sub">AI Receptionist Admin</div>
+    </div>
+    <form method="POST" action="/admin/login">
       <input type="hidden" name="csrf_token" value="${token}">
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required autofocus>
+        <input type="password" id="password" name="password" required autofocus
+               placeholder="Enter admin password" style="font-size:14px;">
       </div>
-      <button type="submit" class="btn-primary">Login</button>
+      <button type="submit" class="btn btn-primary" style="width:100%;padding:11px;font-size:14px;justify-content:center;">
+        Sign In
+      </button>
     </form>
   </div>
 </body>
@@ -495,27 +449,17 @@ function createLoginRouter(adminPassword, options = {}) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Too Many Attempts</title>
+  <title>Too Many Attempts — ChargeWizards</title>
   <link rel="stylesheet" href="/admin/admin.css">
-  <style>
-    .error-container {
-      max-width: 400px;
-      margin: 100px auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    .error-container h1 {
-      color: #dc3545;
-    }
-  </style>
 </head>
-<body>
-  <div class="error-container">
-    <h1>Too Many Attempts</h1>
-    <p>Too many login attempts. Please try again later.</p>
+<body class="login-page">
+  <div class="login-card" style="text-align:center">
+    <div class="login-logo">
+      <div class="login-logo-icon">⚡</div>
+      <div class="login-title">Too Many Attempts</div>
+      <div class="login-sub" style="color:var(--red)">Please try again later.</div>
+    </div>
+    <a href="/admin/login" class="btn btn-secondary" style="display:inline-flex;margin-top:8px;">← Back to Login</a>
   </div>
 </body>
 </html>
@@ -530,27 +474,17 @@ function createLoginRouter(adminPassword, options = {}) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Invalid Request</title>
+  <title>Invalid Request — ChargeWizards</title>
   <link rel="stylesheet" href="/admin/admin.css">
-  <style>
-    .error-container {
-      max-width: 400px;
-      margin: 100px auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    .error-container h1 {
-      color: #dc3545;
-    }
-  </style>
 </head>
-<body>
-  <div class="error-container">
-    <h1>Invalid Request</h1>
-    <p>Invalid request. Please try again.</p>
+<body class="login-page">
+  <div class="login-card" style="text-align:center">
+    <div class="login-logo">
+      <div class="login-logo-icon">⚡</div>
+      <div class="login-title">Invalid Request</div>
+      <div class="login-sub" style="color:var(--red)">Please try again.</div>
+    </div>
+    <a href="/admin/login" class="btn btn-secondary" style="display:inline-flex;margin-top:8px;">← Back to Login</a>
   </div>
 </body>
 </html>
@@ -578,68 +512,27 @@ function createLoginRouter(adminPassword, options = {}) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login</title>
+  <title>Admin Login — ChargeWizards</title>
   <link rel="stylesheet" href="/admin/admin.css">
-  <style>
-    .login-container {
-      max-width: 400px;
-      margin: 100px auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .form-group label {
-      font-weight: 500;
-    }
-    .form-group input {
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    .btn-primary {
-      padding: 0.75rem;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    .btn-primary:hover {
-      background: #0056b3;
-    }
-    .error-message {
-      padding: 0.75rem;
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      border-radius: 4px;
-    }
-  </style>
 </head>
-<body>
-  <div class="login-container">
-    <h1>Admin Login</h1>
-    <div class="error-message">Invalid credentials. Please try again.</div>
-    <form class="login-form" method="POST" action="/admin/login">
+<body class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">⚡</div>
+      <div class="login-title">ChargeWizards</div>
+      <div class="login-sub">AI Receptionist Admin</div>
+    </div>
+    <div class="login-error show">Incorrect password. Please try again.</div>
+    <form method="POST" action="/admin/login">
       <input type="hidden" name="csrf_token" value="${token}">
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required autofocus>
+        <input type="password" id="password" name="password" required autofocus
+               placeholder="Enter admin password" style="font-size:14px;">
       </div>
-      <button type="submit" class="btn-primary">Login</button>
+      <button type="submit" class="btn btn-primary" style="width:100%;padding:11px;font-size:14px;justify-content:center;">
+        Sign In
+      </button>
     </form>
   </div>
 </body>
