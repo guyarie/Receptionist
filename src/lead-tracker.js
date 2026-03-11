@@ -32,9 +32,10 @@ class LeadTracker {
     
     // Name detection - look for patterns like "my name is X", "I'm X", "this is X"
     const namePatterns = [
-      /(?:my name is|i'm|i am|this is|name:?)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/gi,
+      /(?:my name is|i'm|i am|this is|name:?)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)(?:\s|,|\.|\!|$)/gi,
       /(?:^|\n)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:here|speaking)/gi
     ];
+    const stopWords = ['and', 'in', 'from', 'at', 'the', 'a', 'my', 'i', 'we', 'or', 'but', 'so', 'looking', 'need', 'want', 'have', 'got'];
 
     let phone = null;
     let email = null;
@@ -58,8 +59,17 @@ class LeadTracker {
     for (const pattern of namePatterns) {
       const match = pattern.exec(userText);
       if (match) {
-        name = match[1].trim();
-        break;
+        let candidate = match[1].trim();
+        // Remove trailing stop words
+        const parts = candidate.split(/\s+/);
+        while (parts.length > 1 && stopWords.includes(parts[parts.length - 1].toLowerCase())) {
+          parts.pop();
+        }
+        candidate = parts.join(' ');
+        if (candidate.length >= 2 && !stopWords.includes(candidate.toLowerCase())) {
+          name = candidate;
+          break;
+        }
       }
     }
 
