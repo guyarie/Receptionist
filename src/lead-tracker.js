@@ -1,6 +1,7 @@
 // Lead Tracker - Detects and stores qualified leads from webchat conversations
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
 class LeadTracker {
   constructor() {
@@ -119,6 +120,7 @@ class LeadTracker {
       existing.lastUpdated = new Date().toISOString();
       if (updated) {
         this.saveLeads(leads);
+        this.sendTelegramAlert(existing);
         return { ...existing, isUpdate: true };
       }
       return null; // No new info
@@ -139,6 +141,10 @@ class LeadTracker {
     leads.push(lead);
     this.saveLeads(leads);
     console.log(`🎯 New lead detected: ${contact.name || 'Unknown'} - ${contact.phone || contact.email}`);
+    
+    // Instant push notification
+    this.sendTelegramAlert(lead);
+    
     return lead;
   }
 
@@ -172,6 +178,62 @@ class LeadTracker {
       }
     }
     this.saveLeads(leads);
+  }
+
+  /**
+   * Send instant Telegram notification for new lead
+   */
+  sendTelegramAlert(lead) {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const threadId = process.env.TELEGRAM_THREAD_ID;
+    
+    if (!botToken || !chatId) {
+      console.log('⚠️ Telegram notifications not configured (set TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID)');
+      return;
+    }
+
+    const name = lead.name || 'Unknown';
+    const phone = lead.phone || 'not provided';
+    const email = lead.email || 'not provided';
+    const msgs = lead.messageCount || 0;
+    const time = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', hour: '2-digit', minute: '2-digit', hour12: true });
+
+    let text = `🎯 *New Lead from David!*\n\n`;
+    text += `👤 *Name:* ${name}\n`;
+    text += `📱 *Phone:* ${phone}\n`;
+    text += `📧 *Email:* ${email}\n`;
+    text += `💬 *Messages:* ${msgs}\n`;
+    text += `🕐 *Time:* ${time} PT\n\n`;
+    text += `[View in Admin](https://receptionist.chargewizards.com/admin/leads.html)`;
+
+    const payload = JSON.stringify({
+      chat_id: chatId,
+      text: text,
+      parse_mode: 'Markdown',
+      message_thread_id: threadId ? parseInt(threadId) : undefined,
+      disable_web_page_preview: true
+    });
+
+    const req = https.request({
+      hostname: 'api.telegram.org',
+      path: `/bot${botToken}/sendMessage`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        if (res.statusCode === 200) {
+          console.log(`📨 Telegram alert sent for lead: ${name} (${phone})`);
+        } else {
+          console.error(`❌ Telegram alert failed: ${res.statusCode} - ${data}`);
+        }
+      });
+    });
+    req.on('error', (e) => console.error('❌ Telegram alert error:', e.message));
+    req.write(payload);
+    req.end();
   }
 
   saveLeads(leads) {
