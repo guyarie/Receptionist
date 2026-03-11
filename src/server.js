@@ -359,6 +359,17 @@ app.post('/api/leads/ack', (req, res) => {
   res.json({ acknowledged: sessionIds.length });
 });
 
+// pSEO static site preview at /site/
+app.use('/site', express.static('/opt/cw-site', { extensions: ['html'], index: 'index.html' }));
+app.get('/site/*', (req, res) => {
+  const cleanPath = req.path.replace(/^\/site/, '') || '/';
+  const tryPath = path.join('/opt/cw-site', cleanPath, 'index.html');
+  if (fs.existsSync(tryPath)) return res.sendFile(tryPath);
+  const fallback = path.join('/opt/cw-site', '404.html');
+  if (fs.existsSync(fallback)) return res.status(404).sendFile(fallback);
+  res.status(404).send('Not found');
+});
+
 // Photo/video upload endpoint
 app.post('/api/upload', upload.array('files', 5), (req, res) => {
   try {
