@@ -359,8 +359,9 @@ app.post('/api/leads/ack', (req, res) => {
   res.json({ acknowledged: sessionIds.length });
 });
 
-// pSEO static site preview at /site/
-// First, serve _next static assets directly
+// pSEO static site — serve _next assets at BOTH paths (HTML uses root-relative /_next/)
+app.use('/_next', express.static('/opt/cw-site/_next'));
+// Also serve at /site/_next for direct access
 app.use('/site/_next', express.static('/opt/cw-site/_next'));
 // Then handle page routing
 app.use('/site', (req, res, next) => {
