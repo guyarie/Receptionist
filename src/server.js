@@ -305,8 +305,17 @@ app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
       const safeSessionId = sessionId.trim().replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 128);
       const sessionFile = path.join(webchatSessionsDir, `${safeSessionId}.json`);
       const keepMessages = allMessages.slice(-100); // keep last 100 messages
+      // Preserve createdAt from existing file
+      let createdAt = new Date().toISOString();
+      if (fs.existsSync(sessionFile)) {
+        try {
+          const existing = JSON.parse(fs.readFileSync(sessionFile, 'utf-8'));
+          if (existing.createdAt) createdAt = existing.createdAt;
+        } catch {}
+      }
       const sessionData = {
         sessionId: sessionId.trim(),
+        createdAt,
         updatedAt: new Date().toISOString(),
         messageCount: keepMessages.length,
         messages: keepMessages
@@ -708,9 +717,47 @@ app.get('/admin/api/leads', (req, res) => {
   try {
     const leadTracker = require('./lead-tracker');
     const limit = parseInt(req.query.limit) || 0;
-    let leads = leadTracker.getLeads().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    if (limit > 0) leads = leads.slice(0, limit);
-    res.json({ leads, total: leads.length });
+    const qualifiedLeads = leadTracker.getLeads();
+
+    // Also include all webchat sessions (even without contact info)
+    const webchatSessionsDir = path.join(__dirname, '..', 'webchat-sessions');
+    const allConversations = [];
+    const trackedSessionIds = new Set(qualifiedLeads.map(l => l.sessionId));
+
+    // Add qualified leads first
+    for (const lead of qualifiedLeads) {
+      allConversations.push({ ...lead, hasContact: true });
+    }
+
+    // Add webchat sessions that aren't already tracked as leads
+    if (fs.existsSync(webchatSessionsDir)) {
+      const files = fs.readdirSync(webchatSessionsDir).filter(f => f.endsWith('.json'));
+      for (const file of files) {
+        try {
+          const data = JSON.parse(fs.readFileSync(path.join(webchatSessionsDir, file), 'utf-8'));
+          if (!trackedSessionIds.has(data.sessionId) && !data.sessionId.startsWith('test-')) {
+            // Extract first user message as preview
+            const firstUserMsg = (data.messages || []).find(m => m.role === 'user');
+            allConversations.push({
+              sessionId: data.sessionId,
+              name: null,
+              phone: null,
+              email: null,
+              messageCount: data.messageCount || 0,
+              createdAt: data.createdAt || data.updatedAt,
+              lastUpdated: data.updatedAt,
+              status: 'new',
+              hasContact: false,
+              preview: firstUserMsg ? firstUserMsg.content.substring(0, 100) : null
+            });
+          }
+        } catch {}
+      }
+    }
+
+    allConversations.sort((a, b) => new Date(b.lastUpdated || b.createdAt) - new Date(a.lastUpdated || a.createdAt));
+    const result = limit > 0 ? allConversations.slice(0, limit) : allConversations;
+    res.json({ leads: result, total: result.length });
   } catch (error) {
     errorBuffer.add(error, 'admin-leads-list-api');
     res.status(500).json({ error: 'Failed to retrieve leads', details: error.message });

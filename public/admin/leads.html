@@ -141,9 +141,9 @@ function renderList() {
   document.getElementById('leadList').innerHTML = filtered.map(lead => {
     const status = (lead.status || 'new').toLowerCase();
     const isActive = lead.sessionId === currentLeadId ? 'active' : '';
-    const displayName = lead.name || 'Unknown';
-    const displayContact = lead.phone || lead.email || 'No contact info';
-    const preview = lead.lastMessage || '';
+    const displayName = lead.name || (lead.preview ? lead.preview.substring(0, 30) + '...' : 'New Visitor');
+    const displayContact = lead.phone || lead.email || (lead.hasContact === false ? '⏳ Chatting...' : 'No contact info');
+    const preview = lead.lastMessage || lead.preview || '';
 
     return `<div class="folder-item ${isActive}" onclick="selectLead('${UI.escapeHtml(lead.sessionId)}')"
              id="item-${UI.escapeHtml(lead.sessionId)}">
