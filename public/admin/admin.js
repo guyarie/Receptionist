@@ -1,4 +1,4 @@
-// Admin UI Shared JavaScript
+// Admin UI Shared JavaScript — ChargeWizards AI Receptionist
 
 // API fetch wrapper with error handling
 async function apiFetch(url, options = {}) {
@@ -12,12 +12,10 @@ async function apiFetch(url, options = {}) {
     });
 
     if (!response.ok) {
-      // Handle 401 Unauthorized by redirecting to login
       if (response.status === 401) {
         window.location.href = '/admin/login';
         return;
       }
-
       const error = await response.json().catch(() => ({ error: 'Request failed' }));
       throw new Error(error.error || `HTTP ${response.status}`);
     }
@@ -32,71 +30,49 @@ async function apiFetch(url, options = {}) {
 // Toast notification system
 const Toast = {
   show(message, type = 'info') {
+    // Remove existing toasts
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.textContent = message;
     document.body.appendChild(toast);
 
     setTimeout(() => {
-      toast.style.animation = 'slideIn 0.3s ease-out reverse';
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
+      toast.style.animation = 'toastIn .25s ease-out reverse';
+      setTimeout(() => toast.remove(), 250);
+    }, 3200);
   },
-
-  success(message) {
-    this.show(message, 'success');
-  },
-
-  error(message) {
-    this.show(message, 'error');
-  },
-
-  info(message) {
-    this.show(message, 'info');
-  }
+  success(message) { this.show(message, 'success'); },
+  error(message)   { this.show(message, 'error'); },
+  info(message)    { this.show(message, 'info'); }
 };
 
-// Navigation component
+// Render sidebar navigation
 function renderNav(activePage) {
-  const nav = document.querySelector('nav ul');
+  const nav = document.getElementById('sidebar-nav');
   if (!nav) return;
 
   const pages = [
-    { name: 'Dashboard', path: 'index.html' },
-    { name: 'Prompts', path: 'prompts.html' },
-    { name: 'Call Logs', path: 'calls.html' },
-    { name: 'Availability', path: 'availability.html' },
-    { name: 'Provider Profiles', path: 'providers.html' }
+    { name: 'Dashboard',   path: 'index.html',        icon: '📊' },
+    { name: 'Leads',       path: 'leads.html',         icon: '🎯' },
+    { name: 'Call Logs',   path: 'calls.html',         icon: '📞' },
+    { name: 'Prompts',     path: 'prompts.html',       icon: '📝' },
+    { name: 'Availability',path: 'availability.html',  icon: '📅' },
+    { name: 'Providers',   path: 'providers.html',     icon: '👷' },
   ];
 
   nav.innerHTML = pages.map(page => {
     const isActive = activePage === page.path ? 'active' : '';
-    return `<li><a href="${page.path}" class="${isActive}">${page.name}</a></li>`;
-  }).join('') + `
-    <li style="margin-left: auto;">
-      <a href="#" id="logout-btn" style="color: #dc3545;">Logout</a>
-    </li>
-  `;
-
-  // Attach logout handler
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        await fetch('/admin/logout', { method: 'POST' });
-        window.location.href = '/admin/login';
-      } catch (error) {
-        console.error('Logout error:', error);
-        // Redirect to login anyway
-        window.location.href = '/admin/login';
-      }
-    });
-  }
+    return `<a href="${page.path}" class="${isActive}">
+      <span class="nav-icon">${page.icon}</span>${page.name}
+    </a>`;
+  }).join('');
 }
 
 // Format timestamp in Pacific time
 function formatTimestamp(isoString) {
+  if (!isoString) return '—';
   const date = new Date(isoString);
   return date.toLocaleString('en-US', {
     timeZone: 'America/Los_Angeles',
@@ -110,8 +86,31 @@ function formatTimestamp(isoString) {
   });
 }
 
+// Format timestamp relative/short
+function formatDate(isoString) {
+  if (!isoString) return '—';
+  const date = new Date(isoString);
+  const now = new Date();
+  const diff = now - date;
+
+  if (diff < 60000)        return 'Just now';
+  if (diff < 3600000)      return `${Math.floor(diff/60000)}m ago`;
+  if (diff < 86400000)     return `${Math.floor(diff/3600000)}h ago`;
+  if (diff < 604800000)    return `${Math.floor(diff/86400000)}d ago`;
+
+  return date.toLocaleString('en-US', {
+    timeZone: 'America/Los_Angeles',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
 // Format duration
 function formatDuration(seconds) {
+  if (seconds == null) return '—';
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${mins}m ${secs}s`;
@@ -119,59 +118,66 @@ function formatDuration(seconds) {
 
 // Format uptime
 function formatUptime(seconds) {
-  const hours = Math.floor(seconds / 3600);
+  const hours   = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  } else if (minutes > 0) {
-    return `${minutes}m ${secs}s`;
-  } else {
-    return `${secs}s`;
-  }
+  const secs    = seconds % 60;
+  if (hours > 0)   return `${hours}h ${minutes}m`;
+  if (minutes > 0) return `${minutes}m ${secs}s`;
+  return `${secs}s`;
 }
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
+  if (text == null) return '';
   const div = document.createElement('div');
-  div.textContent = text;
+  div.textContent = String(text);
   return div.innerHTML;
 }
 
 // Show loading spinner
 function showLoading(container) {
-  container.innerHTML = '<div class="spinner"></div>';
+  container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
 }
 
 // Show error message
 function showError(container, message) {
-  container.innerHTML = `<p class="text-muted text-center">${escapeHtml(message)}</p>`;
+  container.innerHTML = `<p class="text-muted text-center" style="padding:24px">${escapeHtml(message)}</p>`;
 }
 
-// Debounce function for input handlers
+// Debounce
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
+    const later = () => { clearTimeout(timeout); func(...args); };
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
 }
 
-// Export for use in other scripts
+// Logout handler — attached by each page that calls renderNav
+function attachLogout() {
+  const btn = document.getElementById('logout-btn');
+  if (btn) {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try { await fetch('/admin/logout', { method: 'POST' }); } catch {}
+      window.location.href = '/admin/login';
+    });
+  }
+}
+
+// Export
 window.AdminUI = {
   apiFetch,
   Toast,
   renderNav,
   formatTimestamp,
+  formatDate,
   formatDuration,
   formatUptime,
   escapeHtml,
   showLoading,
   showError,
-  debounce
+  debounce,
+  attachLogout
 };

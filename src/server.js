@@ -290,12 +290,30 @@ app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
     const reply = await aiClient.sendMessageWithHistory(messages);
 
     // --- Lead detection (async, don't block response) ---
+    const allMessages = [...messages, { role: 'assistant', content: reply }];
     try {
       const leadTracker = require('./lead-tracker');
-      const allMessages = [...messages, { role: 'assistant', content: reply }];
       leadTracker.processConversation(sessionId.trim(), allMessages);
     } catch (e) {
       console.error('Lead tracking error:', e.message);
+    }
+
+    // --- Webchat session storage (save last 100 messages per session) ---
+    try {
+      const webchatSessionsDir = path.join(__dirname, '..', 'webchat-sessions');
+      if (!fs.existsSync(webchatSessionsDir)) fs.mkdirSync(webchatSessionsDir, { recursive: true });
+      const safeSessionId = sessionId.trim().replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 128);
+      const sessionFile = path.join(webchatSessionsDir, `${safeSessionId}.json`);
+      const keepMessages = allMessages.slice(-100); // keep last 100 messages
+      const sessionData = {
+        sessionId: sessionId.trim(),
+        updatedAt: new Date().toISOString(),
+        messageCount: keepMessages.length,
+        messages: keepMessages
+      };
+      fs.writeFileSync(sessionFile, JSON.stringify(sessionData, null, 2));
+    } catch (e) {
+      console.error('Webchat session storage error:', e.message);
     }
 
     res.json({ response: reply, sessionId: sessionId.trim() });
@@ -682,6 +700,93 @@ app.post('/admin/api/reload', (req, res) => {
   } catch (error) {
     errorBuffer.add(error, 'admin-reload-api');
     res.status(500).json({ error: 'Failed to reload data', details: error.message });
+  }
+});
+
+// Admin leads list endpoint
+app.get('/admin/api/leads', (req, res) => {
+  try {
+    const leadTracker = require('./lead-tracker');
+    const limit = parseInt(req.query.limit) || 0;
+    let leads = leadTracker.getLeads().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (limit > 0) leads = leads.slice(0, limit);
+    res.json({ leads, total: leads.length });
+  } catch (error) {
+    errorBuffer.add(error, 'admin-leads-list-api');
+    res.status(500).json({ error: 'Failed to retrieve leads', details: error.message });
+  }
+});
+
+// Admin lead status update endpoint
+app.post('/admin/api/leads/status', (req, res) => {
+  try {
+    const { sessionId, status } = req.body || {};
+    if (!sessionId || !status) {
+      return res.status(400).json({ error: 'sessionId and status are required' });
+    }
+    const allowedStatuses = ['new', 'contacted', 'quoted', 'won', 'lost'];
+    if (!allowedStatuses.includes(status.toLowerCase())) {
+      return res.status(400).json({ error: `Status must be one of: ${allowedStatuses.join(', ')}` });
+    }
+    const leadTracker = require('./lead-tracker');
+    const leads = leadTracker.getLeads();
+    const lead = leads.find(l => l.sessionId === sessionId);
+    if (!lead) return res.status(404).json({ error: 'Lead not found' });
+    lead.status = status.toLowerCase();
+    lead.lastUpdated = new Date().toISOString();
+    leadTracker.saveLeads(leads);
+    res.json({ success: true, lead });
+  } catch (error) {
+    errorBuffer.add(error, 'admin-lead-status-api');
+    res.status(500).json({ error: 'Failed to update lead status', details: error.message });
+  }
+});
+
+// Admin webchat sessions list endpoint
+app.get('/admin/api/webchat-sessions', (req, res) => {
+  try {
+    const webchatSessionsDir = path.join(__dirname, '..', 'webchat-sessions');
+    if (!fs.existsSync(webchatSessionsDir)) return res.json({ sessions: [], total: 0 });
+
+    const files = fs.readdirSync(webchatSessionsDir).filter(f => f.endsWith('.json'));
+    const sessions = [];
+
+    for (const file of files) {
+      try {
+        const data = JSON.parse(fs.readFileSync(path.join(webchatSessionsDir, file), 'utf-8'));
+        sessions.push({
+          sessionId: data.sessionId,
+          updatedAt: data.updatedAt,
+          messageCount: data.messageCount || 0
+        });
+      } catch {}
+    }
+
+    sessions.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    res.json({ sessions, total: sessions.length });
+  } catch (error) {
+    errorBuffer.add(error, 'admin-webchat-sessions-list-api');
+    res.status(500).json({ error: 'Failed to retrieve webchat sessions', details: error.message });
+  }
+});
+
+// Admin webchat session detail endpoint
+app.get('/admin/api/webchat-sessions/:sessionId', (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const webchatSessionsDir = path.join(__dirname, '..', 'webchat-sessions');
+    const safeSessionId = sessionId.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 128);
+    const sessionFile = path.join(webchatSessionsDir, `${safeSessionId}.json`);
+
+    if (!fs.existsSync(sessionFile)) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    const data = JSON.parse(fs.readFileSync(sessionFile, 'utf-8'));
+    res.json(data);
+  } catch (error) {
+    errorBuffer.add(error, 'admin-webchat-session-detail-api');
+    res.status(500).json({ error: 'Failed to retrieve webchat session', details: error.message });
   }
 });
 

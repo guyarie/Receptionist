@@ -3,197 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Provider Profiles - AI Phone Receptionist</title>
+  <title>Providers — ChargeWizards Admin</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1>👥 Provider Profiles</h1>
-    </div>
-  </header>
+<div class="app-layout">
 
-  <nav>
-    <div class="container">
-      <ul></ul>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div class="card">
-      <h2>Manage Provider Profiles</h2>
-      <p class="text-muted mb-2">Edit provider profile markdown files. These are included in the AI context during calls.</p>
-      
-      <div class="btn-group mb-2">
-        <button onclick="showNewFileForm()" class="btn-success">➕ New Provider Profile</button>
-        <button onclick="reloadProviders()" id="reloadBtn">🔄 Reload from Disk</button>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">⚡</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">ChargeWizards</div>
+        <div class="sidebar-brand-sub">AI Receptionist</div>
       </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <a href="#" id="logout-btn">
+        <span class="nav-icon">🚪</span>Sign Out
+      </a>
+    </div>
+  </aside>
 
-      <!-- New file form (hidden by default) -->
-      <div id="newFileForm" class="hidden" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
-        <h3>Create New Provider Profile</h3>
-        <div class="form-group">
-          <label for="newFilename">Filename (e.g., dr-smith.md)</label>
-          <input type="text" id="newFilename" placeholder="provider-name.md">
+  <!-- Main -->
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Provider Profiles</div>
+        <div class="page-subtitle">Markdown profiles included in AI context during calls</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary" onclick="reloadProviders()" id="reloadBtn">🔄 Reload from Disk</button>
+        <button class="btn btn-primary" onclick="showNewFileForm()">➕ New Profile</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- New file form -->
+      <div id="newFileForm" class="section hidden" style="margin-bottom:20px">
+        <div class="section-header">
+          <span class="section-title">Create New Provider Profile</span>
+          <button class="btn btn-sm btn-secondary" onclick="hideNewFileForm()">Cancel</button>
         </div>
-        <div class="form-group">
-          <label for="newContent">Content</label>
-          <textarea id="newContent" rows="8" placeholder="# Dr. Smith, PhD&#10;&#10;## About&#10;Brief bio and background."></textarea>
-        </div>
-        <div class="btn-group">
-          <button onclick="createNewFile()" class="btn-success">Create File</button>
-          <button onclick="hideNewFileForm()" class="btn-secondary">Cancel</button>
+        <div class="section-body">
+          <div class="form-group">
+            <label for="newFilename">Filename (e.g., installer-name.md)</label>
+            <input type="text" id="newFilename" placeholder="provider-name.md">
+          </div>
+          <div class="form-group">
+            <label for="newContent">Content</label>
+            <textarea id="newContent" rows="8" class="font-mono"
+              placeholder="# Provider Name&#10;&#10;## About&#10;Brief bio and certifications."></textarea>
+          </div>
+          <button class="btn btn-success" onclick="createNewFile()">Create File</button>
         </div>
       </div>
 
       <div id="providersContainer">
-        <div class="spinner"></div>
+        <div class="loading-center"><div class="spinner"></div></div>
       </div>
     </div>
   </div>
+</div>
 
-  <script src="admin.js"></script>
-  <script>
-    const UI = window.AdminUI;
+<script src="admin.js"></script>
+<script>
+  const UI = window.AdminUI;
+  UI.renderNav('providers.html');
+  UI.attachLogout();
 
-    // Set active nav
-    UI.renderNav('providers.html');
+  async function loadProviders() {
+    const container = document.getElementById('providersContainer');
+    try {
+      const data = await UI.apiFetch('/admin/api/providers');
+      if (!data.files || data.files.length === 0) {
+        container.innerHTML = `<div class="empty-state" style="padding:48px">
+          <div class="empty-state-icon">👷</div>
+          <div class="empty-state-title">No provider profiles yet</div>
+          <div class="empty-state-text">Create one to get started</div>
+        </div>`;
+        return;
+      }
 
-    // Load provider profile files
-    async function loadProviders() {
-      const container = document.getElementById('providersContainer');
-      
-      try {
-        const data = await UI.apiFetch('/admin/api/providers');
-        
-        if (!data.files || data.files.length === 0) {
-          container.innerHTML = '<p class="text-muted text-center">No provider profile files found. Create one to get started.</p>';
-          return;
-        }
-
-        container.innerHTML = data.files.map(file => `
-          <div class="form-group">
-            <label for="provider-${UI.escapeHtml(file.filename)}">
-              ${UI.escapeHtml(file.filename)}
-            </label>
-            <textarea 
-              id="provider-${UI.escapeHtml(file.filename)}" 
-              data-filename="${UI.escapeHtml(file.filename)}"
-              rows="10"
-            >${UI.escapeHtml(file.content)}</textarea>
-            <button 
-              onclick="saveProvider('${UI.escapeHtml(file.filename)}')" 
-              class="btn-success"
-              id="save-${UI.escapeHtml(file.filename)}"
-            >
-              💾 Save ${UI.escapeHtml(file.filename)}
+      container.innerHTML = data.files.map(file => `
+        <div class="prompt-item">
+          <div class="prompt-item-header">
+            <div>
+              <div class="prompt-item-name">${UI.escapeHtml(file.filename)}</div>
+              <div class="prompt-item-file">Provider profile</div>
+            </div>
+            <button class="btn btn-sm btn-success"
+                    onclick="saveProvider('${UI.escapeHtml(file.filename)}')"
+                    id="save-${UI.escapeHtml(file.filename)}">
+              💾 Save
             </button>
           </div>
-        `).join('');
-      } catch (error) {
-        UI.showError(container, 'Failed to load provider profiles: ' + error.message);
-        UI.Toast.error('Failed to load provider profiles: ' + error.message);
-      }
+          <div class="prompt-item-body">
+            <textarea
+              id="provider-${UI.escapeHtml(file.filename)}"
+              data-filename="${UI.escapeHtml(file.filename)}"
+              rows="12"
+            >${UI.escapeHtml(file.content)}</textarea>
+          </div>
+        </div>
+      `).join('');
+    } catch (error) {
+      UI.showError(container, 'Failed to load provider profiles: ' + error.message);
     }
+  }
 
-    // Save provider profile file
-    async function saveProvider(filename) {
-      const textarea = document.querySelector(`textarea[data-filename="${filename}"]`);
-      const btn = document.getElementById(`save-${filename}`);
-      const content = textarea.value;
-
-      btn.disabled = true;
-      const originalText = btn.textContent;
-      btn.textContent = '⏳ Saving...';
-
-      try {
-        await UI.apiFetch(`/admin/api/providers/${filename}`, {
-          method: 'PUT',
-          body: JSON.stringify({ content })
-        });
-        UI.Toast.success(`Provider profile "${filename}" saved successfully`);
-      } catch (error) {
-        UI.Toast.error('Save failed: ' + error.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
+  async function saveProvider(filename) {
+    const textarea = document.querySelector(`textarea[data-filename="${filename}"]`);
+    const btn = document.getElementById(`save-${filename}`);
+    const content = textarea.value;
+    btn.disabled = true;
+    btn.textContent = '⏳ Saving…';
+    try {
+      await UI.apiFetch(`/admin/api/providers/${filename}`, {
+        method: 'PUT',
+        body: JSON.stringify({ content })
+      });
+      UI.Toast.success(`"${filename}" saved`);
+    } catch (error) {
+      UI.Toast.error('Save failed: ' + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '💾 Save';
     }
+  }
 
-    // Reload provider profiles from disk
-    async function reloadProviders() {
-      const btn = document.getElementById('reloadBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Reloading...';
-
-      try {
-        await UI.apiFetch('/admin/api/refresh-providers', { method: 'POST' });
-        UI.Toast.success('Provider profiles reloaded from disk');
-        await loadProviders();
-      } catch (error) {
-        UI.Toast.error('Reload failed: ' + error.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '🔄 Reload from Disk';
-      }
+  async function reloadProviders() {
+    const btn = document.getElementById('reloadBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Reloading…';
+    try {
+      await UI.apiFetch('/admin/api/refresh-providers', { method: 'POST' });
+      UI.Toast.success('Provider profiles reloaded');
+      await loadProviders();
+    } catch (error) {
+      UI.Toast.error('Reload failed: ' + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔄 Reload from Disk';
     }
+  }
 
-    // Show new file form
-    function showNewFileForm() {
-      document.getElementById('newFileForm').classList.remove('hidden');
-      document.getElementById('newFilename').focus();
+  function showNewFileForm() {
+    document.getElementById('newFileForm').classList.remove('hidden');
+    document.getElementById('newFilename').focus();
+  }
+
+  function hideNewFileForm() {
+    document.getElementById('newFileForm').classList.add('hidden');
+    document.getElementById('newFilename').value = '';
+    document.getElementById('newContent').value = '';
+  }
+
+  async function createNewFile() {
+    const filename = document.getElementById('newFilename').value.trim();
+    const content = document.getElementById('newContent').value;
+    if (!filename) { UI.Toast.error('Please enter a filename'); return; }
+    if (!filename.endsWith('.md')) { UI.Toast.error('Filename must end with .md'); return; }
+    if (!/^[a-zA-Z0-9-_.]+$/.test(filename)) { UI.Toast.error('Invalid filename'); return; }
+    try {
+      await UI.apiFetch(`/admin/api/providers/${filename}`, {
+        method: 'PUT',
+        body: JSON.stringify({ content })
+      });
+      UI.Toast.success(`"${filename}" created`);
+      hideNewFileForm();
+      await loadProviders();
+    } catch (error) {
+      UI.Toast.error('Create failed: ' + error.message);
     }
+  }
 
-    // Hide new file form
-    function hideNewFileForm() {
-      document.getElementById('newFileForm').classList.add('hidden');
-      document.getElementById('newFilename').value = '';
-      document.getElementById('newContent').value = '';
-    }
+  window.saveProvider = saveProvider;
+  window.reloadProviders = reloadProviders;
+  window.showNewFileForm = showNewFileForm;
+  window.hideNewFileForm = hideNewFileForm;
+  window.createNewFile = createNewFile;
 
-    // Create new provider profile file
-    async function createNewFile() {
-      const filename = document.getElementById('newFilename').value.trim();
-      const content = document.getElementById('newContent').value;
-
-      // Validate filename
-      if (!filename) {
-        UI.Toast.error('Please enter a filename');
-        return;
-      }
-
-      if (!filename.endsWith('.md')) {
-        UI.Toast.error('Filename must end with .md');
-        return;
-      }
-
-      if (!/^[a-zA-Z0-9-_.]+$/.test(filename)) {
-        UI.Toast.error('Filename can only contain letters, numbers, hyphens, underscores, and dots');
-        return;
-      }
-
-      try {
-        await UI.apiFetch(`/admin/api/providers/${filename}`, {
-          method: 'PUT',
-          body: JSON.stringify({ content })
-        });
-        UI.Toast.success(`File "${filename}" created successfully`);
-        hideNewFileForm();
-        await loadProviders();
-      } catch (error) {
-        UI.Toast.error('Create failed: ' + error.message);
-      }
-    }
-
-    // Make functions available globally
-    window.saveProvider = saveProvider;
-    window.reloadProviders = reloadProviders;
-    window.showNewFileForm = showNewFileForm;
-    window.hideNewFileForm = hideNewFileForm;
-    window.createNewFile = createNewFile;
-
-    // Load provider profiles on page load
-    loadProviders();
-  </script>
+  loadProviders();
+</script>
 </body>
 </html>

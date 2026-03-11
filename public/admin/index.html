@@ -3,144 +3,258 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - AI Phone Receptionist</title>
+  <title>Dashboard — ChargeWizards Admin</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1>🤖 AI Phone Receptionist - Admin Dashboard</h1>
-    </div>
-  </header>
+<div class="app-layout">
 
-  <nav>
-    <div class="container">
-      <ul></ul>
-    </div>
-  </nav>
-
-  <div class="container">
-    <!-- System Status -->
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-label">Server Uptime</div>
-        <div class="stat-value" id="uptime">--</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Active Calls</div>
-        <div class="stat-value" id="activeCalls">--</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">AI Model</div>
-        <div class="stat-value" id="model" style="font-size: 1rem;">--</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Phone Number</div>
-        <div class="stat-value" id="phone" style="font-size: 1rem;">--</div>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">⚡</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">ChargeWizards</div>
+        <div class="sidebar-brand-sub">AI Receptionist</div>
       </div>
     </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <a href="#" id="logout-btn">
+        <span class="nav-icon">🚪</span>Sign Out
+      </a>
+    </div>
+  </aside>
 
-    <!-- Quick Actions -->
-    <div class="card">
-      <h2>Quick Actions</h2>
-      <div class="btn-group">
-        <button onclick="reloadAll()" id="reloadBtn">🔄 Reload All</button>
-        <button onclick="refreshWebsite()" id="refreshBtn">🌐 Refresh Website Data</button>
+  <!-- Main -->
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">System status and recent activity</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary" onclick="reloadAll()" id="reloadBtn">🔄 Reload All</button>
+        <button class="btn btn-ghost" onclick="refreshWebsite()" id="refreshBtn">🌐 Refresh Website</button>
       </div>
     </div>
 
-    <!-- Recent Errors -->
-    <div class="card">
-      <h2>Recent Errors</h2>
-      <ul class="error-list" id="errorList">
-        <li class="text-muted text-center">Loading...</li>
-      </ul>
-    </div>
+    <div class="page-body">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <span class="stat-icon">⏱</span>
+          <div class="stat-value" id="uptime">—</div>
+          <div class="stat-label">Uptime</div>
+        </div>
+        <div class="stat-card green">
+          <span class="stat-icon">📞</span>
+          <div class="stat-value" id="activeCalls">—</div>
+          <div class="stat-label">Active Calls</div>
+        </div>
+        <div class="stat-card orange">
+          <span class="stat-icon">🤖</span>
+          <div class="stat-value" id="model" style="font-size:14px;line-height:1.3;margin-bottom:8px;">—</div>
+          <div class="stat-label">AI Model</div>
+        </div>
+        <div class="stat-card purple">
+          <span class="stat-icon">📱</span>
+          <div class="stat-value" id="phone" style="font-size:16px;line-height:1.3;margin-bottom:8px;">—</div>
+          <div class="stat-label">Phone Number</div>
+        </div>
+      </div>
 
-    <!-- System Info -->
-    <div class="card">
-      <h2>System Information</h2>
-      <p><strong>Prompts Loaded:</strong> <span id="promptCount">--</span></p>
-      <p><strong>Availability Files:</strong> <span id="availCount">--</span></p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+        <!-- System Health -->
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">System Health</span>
+            <span id="healthTime" class="text-sm text-muted"></span>
+          </div>
+          <div class="section-body">
+            <div class="health-grid" id="healthGrid">
+              <div class="loading-center"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Errors -->
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">Recent Errors</span>
+            <a href="#" class="text-sm" style="color:var(--blue)" onclick="loadDashboard();return false;">Refresh</a>
+          </div>
+          <div class="section-body" style="padding:0">
+            <ul class="error-list" id="errorList" style="padding:16px">
+              <li class="text-muted text-center text-sm">Loading...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Leads -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">Recent Leads</span>
+          <a href="leads.html" class="btn btn-sm btn-primary">View All →</a>
+        </div>
+        <div id="recentLeads">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
     </div>
   </div>
+</div>
 
-  <script src="admin.js"></script>
-  <script>
-    const UI = window.AdminUI;
+<script src="admin.js"></script>
+<script>
+  const UI = window.AdminUI;
+  UI.renderNav('index.html');
+  UI.attachLogout();
 
-    // Set active nav
-    UI.renderNav('index.html');
+  async function loadDashboard() {
+    try {
+      const data = await UI.apiFetch('/admin/api/status');
 
-    // Load dashboard data
-    async function loadDashboard() {
-      try {
-        const data = await UI.apiFetch('/admin/api/status');
-        
-        // Update stats
-        document.getElementById('uptime').textContent = UI.formatUptime(data.uptime);
-        document.getElementById('activeCalls').textContent = data.activeCalls || 0;
-        document.getElementById('model').textContent = data.model || 'Unknown';
-        document.getElementById('phone').textContent = data.phoneNumber || 'Not configured';
-        document.getElementById('promptCount').textContent = data.promptCount || 0;
-        document.getElementById('availCount').textContent = data.availabilityCount || 0;
+      document.getElementById('uptime').textContent     = UI.formatUptime(data.uptime);
+      document.getElementById('activeCalls').textContent = data.activeCalls || 0;
+      document.getElementById('model').textContent      = data.model || 'Unknown';
+      document.getElementById('phone').textContent      = data.phoneNumber || 'Not configured';
+      document.getElementById('healthTime').textContent = 'Updated just now';
 
-        // Update errors
-        const errorList = document.getElementById('errorList');
-        if (data.recentErrors && data.recentErrors.length > 0) {
-          errorList.innerHTML = data.recentErrors.map(err => `
-            <li class="error-item">
-              <div class="error-time">${UI.formatTimestamp(err.timestamp)}</div>
-              <div class="error-message">${UI.escapeHtml(err.message)}</div>
-              ${err.context ? `<div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Context: ${UI.escapeHtml(err.context)}</div>` : ''}
-            </li>
-          `).join('');
-        } else {
-          errorList.innerHTML = '<li class="text-muted text-center">No recent errors</li>';
-        }
-      } catch (error) {
-        UI.Toast.error('Failed to load dashboard: ' + error.message);
+      // Health grid
+      document.getElementById('healthGrid').innerHTML = `
+        <div class="health-item">
+          <div class="health-dot green"></div>
+          <div>
+            <div class="health-label">Prompts</div>
+            <div class="health-value">${data.promptCount || 0} loaded</div>
+          </div>
+        </div>
+        <div class="health-item">
+          <div class="health-dot ${data.availabilityCount > 0 ? 'green' : 'orange'}"></div>
+          <div>
+            <div class="health-label">Availability</div>
+            <div class="health-value">${data.availabilityCount || 0} files</div>
+          </div>
+        </div>
+        <div class="health-item">
+          <div class="health-dot ${data.providerCount > 0 ? 'green' : 'orange'}"></div>
+          <div>
+            <div class="health-label">Providers</div>
+            <div class="health-value">${data.providerCount || 0} profiles</div>
+          </div>
+        </div>
+        <div class="health-item">
+          <div class="health-dot ${data.activeCalls > 0 ? 'green' : 'orange'}"></div>
+          <div>
+            <div class="health-label">Active Calls</div>
+            <div class="health-value">${data.activeCalls > 0 ? data.activeCalls + ' live' : 'None'}</div>
+          </div>
+        </div>
+      `;
+
+      // Errors
+      const errorList = document.getElementById('errorList');
+      if (data.recentErrors && data.recentErrors.length > 0) {
+        errorList.innerHTML = data.recentErrors.map(err => `
+          <li class="error-item">
+            <div class="error-time">${UI.formatTimestamp(err.timestamp)}</div>
+            <div class="error-message">${UI.escapeHtml(err.message)}</div>
+            ${err.context ? `<div class="error-context">Context: ${UI.escapeHtml(err.context)}</div>` : ''}
+          </li>
+        `).join('');
+      } else {
+        errorList.innerHTML = '<li class="text-muted text-center text-sm" style="padding:8px">No recent errors ✓</li>';
       }
+    } catch (error) {
+      UI.Toast.error('Failed to load dashboard: ' + error.message);
     }
+  }
 
-    // Reload all data
-    async function reloadAll() {
-      const btn = document.getElementById('reloadBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Reloading...';
+  async function loadRecentLeads() {
+    const container = document.getElementById('recentLeads');
+    try {
+      const data = await UI.apiFetch('/admin/api/leads?limit=5');
+      const leads = data.leads || [];
 
-      try {
-        await UI.apiFetch('/admin/api/reload', { method: 'POST' });
-        UI.Toast.success('All data reloaded successfully');
-        await loadDashboard();
-      } catch (error) {
-        UI.Toast.error('Reload failed: ' + error.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '🔄 Reload All';
+      if (leads.length === 0) {
+        container.innerHTML = `<div class="empty-state" style="padding:32px">
+          <div class="empty-state-icon">🎯</div>
+          <div class="empty-state-title">No leads yet</div>
+          <div class="empty-state-text">Leads from web chat will appear here</div>
+        </div>`;
+        return;
       }
+
+      container.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Messages</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${leads.map(lead => `
+                <tr onclick="location.href='leads.html#${UI.escapeHtml(lead.sessionId)}'" style="cursor:pointer">
+                  <td><strong>${UI.escapeHtml(lead.name || 'Unknown')}</strong></td>
+                  <td>
+                    ${lead.phone ? `<div>${UI.escapeHtml(lead.phone)}</div>` : ''}
+                    ${lead.email ? `<div class="text-muted text-sm">${UI.escapeHtml(lead.email)}</div>` : ''}
+                  </td>
+                  <td><span class="badge badge-${UI.escapeHtml((lead.status || 'new').toLowerCase())}">${UI.escapeHtml(lead.status || 'New')}</span></td>
+                  <td class="text-muted">${UI.formatDate(lead.createdAt)}</td>
+                  <td class="text-muted">${lead.messageCount || 0}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    } catch (err) {
+      container.innerHTML = `<p class="text-muted text-center" style="padding:24px">Could not load leads</p>`;
     }
+  }
 
-    // Refresh website data
-    async function refreshWebsite() {
-      const btn = document.getElementById('refreshBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Refreshing...';
-
-      try {
-        await UI.apiFetch('/admin/api/refresh-website', { method: 'POST' });
-        UI.Toast.success('Website data refreshed successfully');
-      } catch (error) {
-        UI.Toast.error('Refresh failed: ' + error.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '🌐 Refresh Website Data';
-      }
+  async function reloadAll() {
+    const btn = document.getElementById('reloadBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Reloading...';
+    try {
+      await UI.apiFetch('/admin/api/reload', { method: 'POST' });
+      UI.Toast.success('All data reloaded successfully');
+      await loadDashboard();
+    } catch (error) {
+      UI.Toast.error('Reload failed: ' + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔄 Reload All';
     }
+  }
 
-    // Auto-refresh every 30 seconds
-    loadDashboard();
-    setInterval(loadDashboard, 30000);
-  </script>
+  async function refreshWebsite() {
+    const btn = document.getElementById('refreshBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Refreshing...';
+    try {
+      await UI.apiFetch('/admin/api/refresh-website', { method: 'POST' });
+      UI.Toast.success('Website data refreshed');
+    } catch (error) {
+      UI.Toast.error('Refresh failed: ' + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🌐 Refresh Website';
+    }
+  }
+
+  loadDashboard();
+  loadRecentLeads();
+  setInterval(loadDashboard, 30000);
+</script>
 </body>
 </html>

@@ -3,195 +3,231 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Call Logs - AI Phone Receptionist</title>
+  <title>Call Logs — ChargeWizards Admin</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1>📞 Call Logs</h1>
-    </div>
-  </header>
+<div class="app-layout">
 
-  <nav>
-    <div class="container">
-      <ul></ul>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div class="card">
-      <h2>Call History</h2>
-      <div id="callsContainer">
-        <div class="spinner"></div>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">⚡</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">ChargeWizards</div>
+        <div class="sidebar-brand-sub">AI Receptionist</div>
       </div>
-      <div class="pagination" id="pagination"></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <a href="#" id="logout-btn">
+        <span class="nav-icon">🚪</span>Sign Out
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content" style="overflow:hidden; display:flex; flex-direction:column;">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Call Logs</div>
+        <div class="page-subtitle">Phone call transcripts and summaries</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary btn-sm" onclick="loadCalls(currentPage)">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Folder layout -->
+    <div class="folder-layout">
+
+      <!-- Call list -->
+      <div class="folder-list">
+        <div class="folder-list-header">
+          <input class="folder-search" id="callSearch" type="text"
+                 placeholder="Search by phone or summary…" oninput="filterCalls()">
+        </div>
+        <div class="list-count" id="callCount">Loading…</div>
+        <div class="folder-items" id="callList">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+        <div class="pagination" id="pagination" style="padding:12px 8px;border-top:1px solid var(--gray-200)"></div>
+      </div>
+
+      <!-- Call detail -->
+      <div class="folder-detail" id="callDetail">
+        <div class="empty-state">
+          <div class="empty-state-icon">📞</div>
+          <div class="empty-state-title">Select a call</div>
+          <div class="empty-state-text">Click a call from the list to view its transcript</div>
+        </div>
+      </div>
+
     </div>
   </div>
+</div>
 
-  <script src="admin.js"></script>
-  <script>
-    const UI = window.AdminUI;
+<script src="admin.js"></script>
+<script>
+const UI = window.AdminUI;
+UI.renderNav('calls.html');
+UI.attachLogout();
 
-    // Set active nav
-    UI.renderNav('calls.html');
+let allCalls = [];
+let currentPage = 1;
+const PAGE_SIZE = 30;
+let currentCallId = null;
 
-    let currentPage = 1;
-    const pageSize = 20;
+// ── Load calls ───────────────────────────────────────────────
+async function loadCalls(page = 1) {
+  const listEl = document.getElementById('callList');
+  listEl.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+  document.getElementById('callCount').textContent = 'Loading…';
 
-    // Load calls
-    async function loadCalls(page = 1) {
-      const container = document.getElementById('callsContainer');
-      container.innerHTML = '<div class="spinner"></div>';
-      
-      try {
-        const data = await UI.apiFetch(`/admin/api/calls?page=${page}&limit=${pageSize}`);
-        
-        if (!data.calls || data.calls.length === 0) {
-          UI.showError(container, 'No call logs found');
-          document.getElementById('pagination').innerHTML = '';
-          return;
-        }
+  try {
+    const data = await UI.apiFetch(`/admin/api/calls?page=${page}&limit=${PAGE_SIZE}`);
+    allCalls = data.calls || [];
+    currentPage = data.page || page;
+    renderList();
+    renderPagination(data.page, data.totalPages);
+  } catch (err) {
+    listEl.innerHTML = `<p class="text-muted text-center" style="padding:24px">Failed to load calls</p>`;
+  }
+}
 
-        currentPage = page;
+function filterCalls() { renderList(); }
 
-        // Render calls table
-        container.innerHTML = `
-          <table>
-            <thead>
-              <tr>
-                <th>Date & Time</th>
-                <th>Caller Phone</th>
-                <th>Duration</th>
-                <th>Summary</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${data.calls.map(call => `
-                <tr>
-                  <td>${UI.formatTimestamp(call.startTime)}</td>
-                  <td>${UI.escapeHtml(call.callerPhone)}</td>
-                  <td>${UI.escapeHtml(call.duration)}</td>
-                  <td>
-                    <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                      ${UI.escapeHtml(call.summary || 'No summary available')}
-                    </div>
-                  </td>
-                  <td>
-                    <span class="expand-toggle" onclick="toggleTranscript('${UI.escapeHtml(call.id)}')">
-                      View Details
-                    </span>
-                  </td>
-                </tr>
-                <tr id="transcript-${UI.escapeHtml(call.id)}" class="hidden">
-                  <td colspan="5">
-                    <div class="expandable" id="content-${UI.escapeHtml(call.id)}">
-                      <div class="spinner"></div>
-                    </div>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        `;
+function renderList() {
+  const query = (document.getElementById('callSearch').value || '').toLowerCase();
+  const filtered = allCalls.filter(call =>
+    !query ||
+    (call.callerPhone || '').includes(query) ||
+    (call.summary || '').toLowerCase().includes(query)
+  );
 
-        // Render pagination
-        renderPagination(data.page, data.totalPages);
-      } catch (error) {
-        UI.showError(container, 'Failed to load call logs: ' + error.message);
-        UI.Toast.error('Failed to load call logs: ' + error.message);
-      }
+  document.getElementById('callCount').textContent =
+    `${filtered.length} call${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    document.getElementById('callList').innerHTML =
+      `<div class="empty-state" style="padding:40px 20px">
+        <div class="empty-state-icon">🔍</div>
+        <div class="empty-state-title">No calls found</div>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('callList').innerHTML = filtered.map(call => {
+    const isActive = call.id === currentCallId ? 'active' : '';
+    const summary = (call.summary || 'No summary').substring(0, 80);
+    return `<div class="folder-item ${isActive}" onclick="selectCall('${UI.escapeHtml(call.id)}')"
+             id="call-item-${UI.escapeHtml(call.id)}">
+      <div class="folder-item-name">
+        <span>${UI.escapeHtml(call.callerPhone || 'Unknown')}</span>
+        <span class="text-sm text-muted">${UI.escapeHtml(call.duration || '')}</span>
+      </div>
+      <div class="folder-item-meta">
+        <span>${UI.formatDate(call.startTime)}</span>
+      </div>
+      <div class="folder-item-preview">${UI.escapeHtml(summary)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Select call ──────────────────────────────────────────────
+async function selectCall(callId) {
+  currentCallId = callId;
+
+  document.querySelectorAll('[id^="call-item-"]').forEach(el =>
+    el.classList.toggle('active', el.id === `call-item-${callId}`)
+  );
+
+  const detail = document.getElementById('callDetail');
+  detail.innerHTML = `<div class="folder-detail-header">
+    <div>
+      <div class="folder-detail-name" id="detailPhone">Loading…</div>
+      <div class="folder-detail-meta" id="detailMeta"></div>
+    </div>
+  </div>
+  <div class="folder-detail-body" id="callBody">
+    <div class="loading-center"><div class="spinner"></div></div>
+  </div>`;
+
+  try {
+    const call = await UI.apiFetch(`/admin/api/calls/${encodeURIComponent(callId)}`);
+    document.getElementById('detailPhone').textContent = call.callerPhone || 'Unknown';
+    document.getElementById('detailMeta').innerHTML = `
+      <span class="detail-meta-item">📅 ${UI.formatTimestamp(call.startTime)}</span>
+      <span class="detail-meta-item">⏱ ${UI.escapeHtml(call.duration || '—')}</span>
+      ${call.twilioNumber ? `<span class="detail-meta-item">📱 ${UI.escapeHtml(call.twilioNumber)}</span>` : ''}
+    `;
+
+    const body = document.getElementById('callBody');
+
+    // Summary
+    let html = '';
+    if (call.summary) {
+      html += `<div class="section" style="margin-bottom:20px">
+        <div class="section-header"><span class="section-title">Summary</span></div>
+        <div class="section-body" style="font-size:13.5px;line-height:1.6">${UI.escapeHtml(call.summary)}</div>
+      </div>`;
     }
 
-    // Toggle transcript display
-    async function toggleTranscript(callId) {
-      const row = document.getElementById(`transcript-${callId}`);
-      const content = document.getElementById(`content-${callId}`);
-      
-      if (row.classList.contains('hidden')) {
-        row.classList.remove('hidden');
-        content.classList.add('open');
-        
-        // Load full call details if not already loaded
-        if (content.innerHTML.includes('spinner')) {
-          try {
-            const call = await UI.apiFetch(`/admin/api/calls/${callId}`);
-            content.innerHTML = `
-              <h3>Call Details</h3>
-              <p><strong>Call SID:</strong> ${UI.escapeHtml(call.callSid)}</p>
-              <p><strong>Caller:</strong> ${UI.escapeHtml(call.callerPhone)}</p>
-              <p><strong>Twilio Number:</strong> ${UI.escapeHtml(call.twilioNumber || 'N/A')}</p>
-              <p><strong>Start Time:</strong> ${UI.formatTimestamp(call.startTime)}</p>
-              <p><strong>End Time:</strong> ${UI.formatTimestamp(call.endTime)}</p>
-              <p><strong>Duration:</strong> ${UI.escapeHtml(call.duration)}</p>
-              
-              <h3 style="margin-top: 1rem;">Summary</h3>
-              <p>${UI.escapeHtml(call.summary || 'No summary available')}</p>
-              
-              <h3 style="margin-top: 1rem;">Full Transcript</h3>
-              <div style="background: white; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto;">
-                ${call.fullTranscript && call.fullTranscript.length > 0 
-                  ? call.fullTranscript.map(msg => `
-                      <p style="margin-bottom: 0.5rem;">
-                        <strong>${UI.escapeHtml(msg.speaker)}:</strong> 
-                        ${UI.escapeHtml(msg.message)}
-                      </p>
-                    `).join('')
-                  : '<p class="text-muted">No transcript available</p>'
-                }
-              </div>
-            `;
-          } catch (error) {
-            content.innerHTML = `<p class="text-muted">Failed to load call details: ${UI.escapeHtml(error.message)}</p>`;
-          }
-        }
-      } else {
-        row.classList.add('hidden');
-        content.classList.remove('open');
-      }
+    // Transcript as chat bubbles
+    if (call.fullTranscript && call.fullTranscript.length > 0) {
+      html += `<div class="section">
+        <div class="section-header"><span class="section-title">Transcript</span></div>
+        <div class="section-body">
+          <div class="chat-thread">
+            ${call.fullTranscript.map(msg => {
+              const isCaller = (msg.speaker || '').toLowerCase().includes('caller') ||
+                               (msg.speaker || '').toLowerCase().includes('user') ||
+                               (msg.speaker || '').toLowerCase().includes('customer');
+              const cls = isCaller ? 'user' : 'assistant';
+              return `<div class="chat-msg ${cls}">
+                <span class="chat-speaker">${UI.escapeHtml(msg.speaker || (isCaller ? 'Caller' : 'AI'))}</span>
+                <div class="chat-bubble">${UI.escapeHtml(msg.message || msg.content || '')}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="empty-state">
+        <div class="empty-state-icon">📄</div>
+        <div class="empty-state-title">No transcript available</div>
+      </div>`;
     }
 
-    // Render pagination controls
-    function renderPagination(currentPage, totalPages) {
-      const pagination = document.getElementById('pagination');
-      
-      if (totalPages <= 1) {
-        pagination.innerHTML = '';
-        return;
-      }
+    body.innerHTML = html;
+  } catch (err) {
+    document.getElementById('callBody').innerHTML =
+      `<p class="text-muted text-center" style="padding:24px">Failed to load call details</p>`;
+  }
+}
 
-      let buttons = [];
-      
-      // Previous button
-      if (currentPage > 1) {
-        buttons.push(`<button onclick="loadCalls(${currentPage - 1})">← Previous</button>`);
-      }
+// ── Pagination ───────────────────────────────────────────────
+function renderPagination(page, totalPages) {
+  const el = document.getElementById('pagination');
+  if (!totalPages || totalPages <= 1) { el.innerHTML = ''; return; }
 
-      // Page numbers
-      for (let i = 1; i <= totalPages; i++) {
-        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
-          const active = i === currentPage ? 'active' : '';
-          buttons.push(`<button class="${active}" onclick="loadCalls(${i})">${i}</button>`);
-        } else if (i === currentPage - 3 || i === currentPage + 3) {
-          buttons.push(`<span style="padding: 0.5rem;">...</span>`);
-        }
-      }
+  let buttons = [];
+  if (page > 1) buttons.push(`<button class="btn btn-sm btn-secondary" onclick="loadCalls(${page-1})">← Prev</button>`);
 
-      // Next button
-      if (currentPage < totalPages) {
-        buttons.push(`<button onclick="loadCalls(${currentPage + 1})">Next →</button>`);
-      }
-
-      pagination.innerHTML = buttons.join('');
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= page - 1 && i <= page + 1)) {
+      const active = i === page ? 'active' : '';
+      buttons.push(`<button class="btn btn-sm btn-secondary ${active}" onclick="loadCalls(${i})">${i}</button>`);
+    } else if (i === page - 2 || i === page + 2) {
+      buttons.push(`<span style="padding:0 4px;color:var(--gray-400)">…</span>`);
     }
+  }
 
-    // Make functions available globally
-    window.toggleTranscript = toggleTranscript;
-    window.loadCalls = loadCalls;
+  if (page < totalPages) buttons.push(`<button class="btn btn-sm btn-secondary" onclick="loadCalls(${page+1})">Next →</button>`);
+  el.innerHTML = buttons.join('');
+}
 
-    // Load calls on page load
-    loadCalls(1);
-  </script>
+loadCalls(1);
+</script>
 </body>
 </html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leads — ChargeWizards Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">⚡</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">ChargeWizards</div>
+        <div class="sidebar-brand-sub">AI Receptionist</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <a href="#" id="logout-btn">
+        <span class="nav-icon">🚪</span>Sign Out
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content" style="overflow:hidden; display:flex; flex-direction:column;">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Leads</div>
+        <div class="page-subtitle">Webchat conversations with contact info</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary btn-sm" onclick="loadLeads()">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Folder layout -->
+    <div class="folder-layout">
+
+      <!-- Lead list -->
+      <div class="folder-list">
+        <!-- Search -->
+        <div class="folder-list-header">
+          <input class="folder-search" id="leadSearch" type="text" placeholder="Search leads…" oninput="filterLeads()">
+        </div>
+
+        <!-- Status filters -->
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-chip active" data-status="all" onclick="setFilter('all')">All</button>
+          <button class="filter-chip" data-status="new" onclick="setFilter('new')">🔵 New</button>
+          <button class="filter-chip" data-status="contacted" onclick="setFilter('contacted')">🟣 Contacted</button>
+          <button class="filter-chip" data-status="quoted" onclick="setFilter('quoted')">🟠 Quoted</button>
+          <button class="filter-chip" data-status="won" onclick="setFilter('won')">🟢 Won</button>
+          <button class="filter-chip" data-status="lost" onclick="setFilter('lost')">⚫ Lost</button>
+        </div>
+
+        <div class="list-count" id="leadCount">Loading…</div>
+        <div class="folder-items" id="leadList">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Lead detail -->
+      <div class="folder-detail" id="leadDetail">
+        <div class="empty-state">
+          <div class="empty-state-icon">🎯</div>
+          <div class="empty-state-title">Select a lead</div>
+          <div class="empty-state-text">Click a lead from the list to view their conversation</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+const UI = window.AdminUI;
+UI.renderNav('leads.html');
+UI.attachLogout();
+
+let allLeads = [];
+let currentFilter = 'all';
+let currentLeadId = null;
+
+// ── Load leads ──────────────────────────────────────────────
+async function loadLeads() {
+  try {
+    const data = await UI.apiFetch('/admin/api/leads');
+    allLeads = (data.leads || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    renderList();
+
+    // Auto-select from URL hash
+    const hash = window.location.hash.slice(1);
+    if (hash) selectLead(hash);
+  } catch (err) {
+    document.getElementById('leadList').innerHTML =
+      `<p class="text-muted text-center" style="padding:24px">Failed to load leads</p>`;
+  }
+}
+
+// ── Filter & render ─────────────────────────────────────────
+function setFilter(status) {
+  currentFilter = status;
+  document.querySelectorAll('.filter-chip').forEach(c =>
+    c.classList.toggle('active', c.dataset.status === status)
+  );
+  renderList();
+}
+
+function filterLeads() { renderList(); }
+
+function renderList() {
+  const query = (document.getElementById('leadSearch').value || '').toLowerCase();
+  const filtered = allLeads.filter(lead => {
+    const matchStatus = currentFilter === 'all' ||
+      (lead.status || 'new').toLowerCase() === currentFilter;
+    const matchQuery = !query ||
+      (lead.name  || '').toLowerCase().includes(query) ||
+      (lead.phone || '').includes(query) ||
+      (lead.email || '').toLowerCase().includes(query);
+    return matchStatus && matchQuery;
+  });
+
+  document.getElementById('leadCount').textContent =
+    `${filtered.length} lead${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    document.getElementById('leadList').innerHTML =
+      `<div class="empty-state" style="padding:40px 20px">
+        <div class="empty-state-icon">🔍</div>
+        <div class="empty-state-title">No leads found</div>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('leadList').innerHTML = filtered.map(lead => {
+    const status = (lead.status || 'new').toLowerCase();
+    const isActive = lead.sessionId === currentLeadId ? 'active' : '';
+    const displayName = lead.name || 'Unknown';
+    const displayContact = lead.phone || lead.email || 'No contact info';
+    const preview = lead.lastMessage || '';
+
+    return `<div class="folder-item ${isActive}" onclick="selectLead('${UI.escapeHtml(lead.sessionId)}')"
+             id="item-${UI.escapeHtml(lead.sessionId)}">
+      <div class="folder-item-name">
+        <span>${UI.escapeHtml(displayName)}</span>
+        <span class="badge badge-${status}">${status}</span>
+      </div>
+      <div class="folder-item-meta">
+        <span>${UI.escapeHtml(displayContact)}</span>
+        <span>·</span>
+        <span>${UI.formatDate(lead.createdAt)}</span>
+      </div>
+      ${preview ? `<div class="folder-item-preview">${UI.escapeHtml(preview)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Select lead ─────────────────────────────────────────────
+async function selectLead(sessionId) {
+  currentLeadId = sessionId;
+  window.location.hash = sessionId;
+
+  // Highlight active
+  document.querySelectorAll('.folder-item').forEach(el =>
+    el.classList.toggle('active', el.id === `item-${sessionId}`)
+  );
+
+  const lead = allLeads.find(l => l.sessionId === sessionId);
+  if (!lead) return;
+
+  // Render header immediately
+  const detail = document.getElementById('leadDetail');
+  const statusOptions = ['new','contacted','quoted','won','lost'].map(s =>
+    `<option value="${s}" ${(lead.status||'new').toLowerCase()===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`
+  ).join('');
+
+  detail.innerHTML = `
+    <div class="folder-detail-header">
+      <div>
+        <div class="folder-detail-name">${UI.escapeHtml(lead.name || 'Unknown')}</div>
+        <div class="folder-detail-meta">
+          ${lead.phone ? `<span class="detail-meta-item">📱 ${UI.escapeHtml(lead.phone)}</span>` : ''}
+          ${lead.email ? `<span class="detail-meta-item">✉️ ${UI.escapeHtml(lead.email)}</span>` : ''}
+          <span class="detail-meta-item">💬 ${lead.messageCount || 0} messages</span>
+          <span class="detail-meta-item">📅 ${UI.formatDate(lead.createdAt)}</span>
+        </div>
+      </div>
+      <div class="folder-detail-actions">
+        ${lead.phone ? `<a class="btn btn-sm btn-secondary" href="tel:${UI.escapeHtml(lead.phone)}">📞 Call</a>` : ''}
+        ${lead.email ? `<a class="btn btn-sm btn-secondary" href="mailto:${UI.escapeHtml(lead.email)}">✉️ Email</a>` : ''}
+        <select id="statusSelect" class="btn btn-sm btn-ghost" style="cursor:pointer;padding:5px 8px"
+                onchange="updateStatus('${UI.escapeHtml(lead.sessionId)}', this.value)">
+          ${statusOptions}
+        </select>
+        <button class="btn btn-sm btn-primary" onclick="markContacted('${UI.escapeHtml(lead.sessionId)}')">
+          ✓ Mark Contacted
+        </button>
+      </div>
+    </div>
+    <div class="folder-detail-body" id="conversationBody">
+      <div class="loading-center"><div class="spinner"></div></div>
+    </div>
+  `;
+
+  // Load conversation
+  await loadConversation(sessionId);
+}
+
+// ── Load conversation ────────────────────────────────────────
+async function loadConversation(sessionId) {
+  const body = document.getElementById('conversationBody');
+  if (!body) return;
+
+  try {
+    const data = await UI.apiFetch(`/admin/api/webchat-sessions/${encodeURIComponent(sessionId)}`);
+    const messages = data.messages || [];
+
+    if (messages.length === 0) {
+      body.innerHTML = `<div class="empty-state">
+        <div class="empty-state-icon">💬</div>
+        <div class="empty-state-title">No conversation recorded</div>
+        <div class="empty-state-text">Conversation history is saved for new chats going forward</div>
+      </div>`;
+      return;
+    }
+
+    body.innerHTML = `<div class="chat-thread">${messages.map(msg => {
+      const isUser = msg.role === 'user';
+      const cls = isUser ? 'user' : 'assistant';
+      const content = UI.escapeHtml(msg.content || '');
+
+      // Detect image URLs in content
+      const imgPattern = /\/uploads\/[\w.-]+\.(jpg|jpeg|png|gif|webp|heic)/gi;
+      const imgMatches = (msg.content || '').match(imgPattern);
+
+      let bubbleContent = content;
+      if (imgMatches) {
+        imgMatches.forEach(imgUrl => {
+          const escaped = UI.escapeHtml(imgUrl);
+          bubbleContent = bubbleContent.replace(
+            UI.escapeHtml(imgUrl),
+            `<a href="${escaped}" target="_blank"><img class="chat-img" src="${escaped}" alt="Uploaded photo"></a>`
+          );
+        });
+      }
+
+      return `<div class="chat-msg ${cls}">
+        <span class="chat-speaker">${isUser ? 'Customer' : 'AI Receptionist'}</span>
+        <div class="chat-bubble">${bubbleContent}</div>
+      </div>`;
+    }).join('')}</div>`;
+
+    // Scroll to bottom
+    body.scrollTop = body.scrollHeight;
+  } catch (err) {
+    body.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">💬</div>
+      <div class="empty-state-title">No conversation stored</div>
+      <div class="empty-state-text">Lead info was captured but the chat history wasn't saved</div>
+    </div>`;
+  }
+}
+
+// ── Status update ────────────────────────────────────────────
+async function updateStatus(sessionId, status) {
+  try {
+    await UI.apiFetch('/admin/api/leads/status', {
+      method: 'POST',
+      body: JSON.stringify({ sessionId, status })
+    });
+    const lead = allLeads.find(l => l.sessionId === sessionId);
+    if (lead) lead.status = status;
+    renderList();
+    UI.Toast.success(`Status updated to ${status}`);
+  } catch (err) {
+    UI.Toast.error('Failed to update status');
+  }
+}
+
+async function markContacted(sessionId) {
+  const select = document.getElementById('statusSelect');
+  if (select) select.value = 'contacted';
+  await updateStatus(sessionId, 'contacted');
+}
+
+// Init
+loadLeads();
+</script>
+</body>
+</html>
