@@ -133,12 +133,13 @@
 
     var form = document.createElement('form');
     form.id = 'cw-chat-form';
-    form.style.cssText = 'display:flex;gap:8px;align-items:center;';
+    form.style.cssText = 'display:flex;gap:6px;align-items:center;min-width:0;';
 
     // Photo button
     var photoBtn = document.createElement('label');
     photoBtn.className = 'cw-photo-btn';
     photoBtn.title = 'Add photos';
+    photoBtn.style.cssText = 'flex-shrink:0;';
     photoBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>';
 
     var fileInput = document.createElement('input');
@@ -153,11 +154,11 @@
     input.id = 'cw-chat-input';
     input.placeholder = 'Message David...';
     input.autocomplete = 'off';
-    input.style.cssText = 'flex:1;padding:10px 16px;border:2px solid #e5e7eb;border-radius:24px;font-size:14px;outline:none;';
+    input.style.cssText = 'flex:1;min-width:0;padding:10px 16px;border:2px solid #e5e7eb;border-radius:24px;font-size:14px;outline:none;';
 
     var sendBtn = document.createElement('button');
     sendBtn.type = 'submit';
-    sendBtn.style.cssText = 'background:' + PRIMARY + ';color:white;border:none;padding:10px 18px;border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;';
+    sendBtn.style.cssText = 'background:' + PRIMARY + ';color:white;border:none;padding:10px 18px;border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0;white-space:nowrap;';
     sendBtn.textContent = 'Send';
 
     form.appendChild(photoBtn);
