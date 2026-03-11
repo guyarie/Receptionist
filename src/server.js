@@ -360,6 +360,9 @@ app.post('/api/leads/ack', (req, res) => {
 });
 
 // pSEO static site preview at /site/
+// First, serve _next static assets directly
+app.use('/site/_next', express.static('/opt/cw-site/_next'));
+// Then handle page routing
 app.use('/site', (req, res, next) => {
   const cleanPath = decodeURIComponent(req.path) || '/';
   const tryFile = path.join('/opt/cw-site', cleanPath);
@@ -368,6 +371,7 @@ app.use('/site', (req, res, next) => {
   if (fs.existsSync(tryIndex)) return res.sendFile(tryIndex);
   next();
 });
+// Finally, serve other static files (favicon.ico, etc.)
 app.use('/site', express.static('/opt/cw-site'));
 
 // Photo/video upload endpoint
