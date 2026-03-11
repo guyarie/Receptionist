@@ -22,7 +22,7 @@
     var res = await fetch(API_URL + '/api/webchat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId: sessionId, messages: messages })
+      body: JSON.stringify({ sessionId: sessionId, messages: messages.filter(function(m) { return m.content && m.content.trim(); }) })
     });
     if (!res.ok) throw new Error('Server error ' + res.status);
     var data = await res.json();
@@ -293,7 +293,9 @@
         }).join('') + '</div>';
       }
 
-      var fullText = (text || '') + (imageHtml ? '\n[Attached ' + uploadedFiles.length + ' photo(s)]' : '');
+      var attachNote = (uploadedFiles && uploadedFiles.length > 0) ? '[Customer attached ' + uploadedFiles.length + ' photo(s)]' : '';
+      var fullText = ((text || '') + (attachNote ? '\n' + attachNote : '')).trim();
+      if (!fullText) return; // Safety: never send empty message
 
       history.push({ role: 'user', content: fullText });
       addBubble('user', (text || '') + imageHtml);

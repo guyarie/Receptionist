@@ -193,7 +193,7 @@
         var res = await fetch('/api/webchat', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({sessionId: sid, messages: history})
+          body: JSON.stringify({sessionId: sid, messages: history.filter(function(m){ return m.content && m.content.trim(); })})
         });
         var data = await res.json();
         t.remove();
