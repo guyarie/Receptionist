@@ -262,6 +262,10 @@
       }
       fileInput.value = '';
       previewArea.style.display = pendingFiles.length > 0 ? 'flex' : 'none';
+      // Auto-send photos immediately
+      if (pendingFiles.length > 0 && !busy) {
+        form.dispatchEvent(new Event('submit'));
+      }
     });
 
     function addPreview(file) {
