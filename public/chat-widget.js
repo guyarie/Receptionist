@@ -264,7 +264,18 @@
       previewArea.style.display = pendingFiles.length > 0 ? 'flex' : 'none';
       // Auto-send photos immediately
       if (pendingFiles.length > 0 && !busy) {
-        form.dispatchEvent(new Event('submit'));
+        var filesToSend = pendingFiles.slice();
+        pendingFiles = [];
+        previewArea.innerHTML = '';
+        previewArea.style.display = 'none';
+        var text = input.value.trim();
+        input.value = '';
+        uploadFiles(filesToSend, sessionId).then(function(uploaded) {
+          sendMessage(text, uploaded);
+        }).catch(function(err) {
+          console.error('Upload error:', err);
+          addBubble('ai', 'Photo upload failed. You can text them to (650) 542-8877 instead.');
+        });
       }
     });
 
