@@ -205,7 +205,8 @@ class LeadTracker {
     text += `📧 *Email:* ${email}\n`;
     text += `💬 *Messages:* ${msgs}\n`;
     text += `🕐 *Time:* ${time} PT\n\n`;
-    text += `[View in Admin](https://receptionist.chargewizards.com/admin/leads.html)`;
+    const encodedId = encodeURIComponent(lead.sessionId);
+    text += `[View Conversation](https://receptionist.chargewizards.com/admin/leads.html?id=${encodedId})`;
 
     const payload = JSON.stringify({
       chat_id: chatId,

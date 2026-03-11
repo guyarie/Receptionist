@@ -94,9 +94,11 @@ async function loadLeads() {
     allLeads = (data.leads || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     renderList();
 
-    // Auto-select from URL hash
+    // Auto-select from URL hash or query param
     const hash = window.location.hash.slice(1);
+    const urlId = new URLSearchParams(window.location.search).get('id');
     if (hash) selectLead(hash);
+    else if (urlId) selectLead(urlId);
   } catch (err) {
     document.getElementById('leadList').innerHTML =
       `<p class="text-muted text-center" style="padding:24px">Failed to load leads</p>`;
