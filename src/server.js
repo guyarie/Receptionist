@@ -289,6 +289,15 @@ app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
     // --- Call stateless AI method ---
     const reply = await aiClient.sendMessageWithHistory(messages);
 
+    // --- Lead detection (async, don't block response) ---
+    try {
+      const leadTracker = require('./lead-tracker');
+      const allMessages = [...messages, { role: 'assistant', content: reply }];
+      leadTracker.processConversation(sessionId.trim(), allMessages);
+    } catch (e) {
+      console.error('Lead tracking error:', e.message);
+    }
+
     res.json({ response: reply, sessionId: sessionId.trim() });
 
   } catch (error) {
@@ -296,6 +305,31 @@ app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
     errorBuffer.add(error, 'webchat-api');
     res.status(500).json({ error: 'Failed to process message', details: error.message });
   }
+});
+
+// Lead notifications API (for external polling via API key)
+app.get('/api/leads', (req, res) => {
+  const apiKey = req.headers['x-api-key'] || req.query.key;
+  if (apiKey !== process.env.LEADS_API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const leadTracker = require('./lead-tracker');
+  const unnotified = leadTracker.getUnnotifiedLeads();
+  res.json({ leads: unnotified, total: unnotified.length });
+});
+
+app.post('/api/leads/ack', (req, res) => {
+  const apiKey = req.headers['x-api-key'] || req.query.key;
+  if (apiKey !== process.env.LEADS_API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { sessionIds } = req.body || {};
+  if (!Array.isArray(sessionIds)) {
+    return res.status(400).json({ error: 'sessionIds must be an array' });
+  }
+  const leadTracker = require('./lead-tracker');
+  leadTracker.markNotified(sessionIds);
+  res.json({ acknowledged: sessionIds.length });
 });
 
 // Photo/video upload endpoint
