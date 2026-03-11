@@ -220,36 +220,7 @@
       toggle: function() { isOpen ? close() : open(); }
     };
 
-    // Auto-intercept "Get a Free Quote" / "Free Estimate" links/buttons on the page
-    function interceptQuoteButtons() {
-      var allClickables = document.querySelectorAll('a, button, [role="button"], [data-testid*="button"]');
-      allClickables.forEach(function(el) {
-        if (el._cwIntercepted) return; // don't double-bind
-        var text = (el.textContent || el.innerText || '').toLowerCase().trim();
-        if (text.indexOf('free quote') !== -1 || text.indexOf('get a quote') !== -1 ||
-            text.indexOf('free estimate') !== -1 || text.indexOf('get started') !== -1 ||
-            text.indexOf('contact us') !== -1) {
-          el._cwIntercepted = true;
-          el.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            open();
-          }, true); // capture phase to beat Wix handlers
-        }
-      });
-    }
 
-    // Run interception after page loads (Wix is slow to render)
-    setTimeout(interceptQuoteButtons, 1500);
-    setTimeout(interceptQuoteButtons, 3000);
-    setTimeout(interceptQuoteButtons, 6000);
-    // Also observe DOM changes for Wix's dynamic rendering
-    if (window.MutationObserver) {
-      var observer = new MutationObserver(function() { interceptQuoteButtons(); });
-      observer.observe(document.body, { childList: true, subtree: true });
-      // Stop observing after 15s to avoid perf hit
-      setTimeout(function() { observer.disconnect(); }, 15000);
-    }
 
     // Auto-open on contact page
     if (isContactPage) {
