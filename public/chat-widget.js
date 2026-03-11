@@ -289,16 +289,19 @@
       var imageHtml = '';
       if (uploadedFiles && uploadedFiles.length > 0) {
         imageHtml = '<div class="cw-message-images">' + uploadedFiles.map(function(f) {
-          return '<img src="' + f.url + '" onclick="window.open(this.src)">';
+          var imgUrl = f.url.startsWith('http') ? f.url : API_URL + f.url;
+          return '<img src="' + imgUrl + '" onclick="window.open(this.src)" style="max-width:200px;border-radius:12px;margin-top:4px;">';
         }).join('') + '</div>';
       }
 
-      var attachNote = (uploadedFiles && uploadedFiles.length > 0) ? '[Customer attached ' + uploadedFiles.length + ' photo(s)]' : '';
+      var attachNote = (uploadedFiles && uploadedFiles.length > 0) ? '[Customer attached ' + uploadedFiles.length + ' photo(s): ' + uploadedFiles.map(function(f){ return f.originalName || f.filename || 'photo'; }).join(', ') + ']' : '';
       var fullText = ((text || '') + (attachNote ? '\n' + attachNote : '')).trim();
       if (!fullText) return; // Safety: never send empty message
 
       history.push({ role: 'user', content: fullText });
-      addBubble('user', (text || '') + imageHtml);
+      var displayHtml = (text || '') + imageHtml;
+      if (!text && imageHtml) displayHtml = '📷 Photo sent' + imageHtml;
+      addBubble('user', displayHtml);
       input.value = '';
 
       busy = true;
