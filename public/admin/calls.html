@@ -21,7 +21,10 @@
 
   <div class="container">
     <div class="card">
-      <h2>Call History</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="margin-bottom: 0;">Call History</h2>
+        <button id="deleteAllBtn" class="btn btn-danger btn-sm" onclick="deleteAllCalls()">🗑️ Delete All</button>
+      </div>
       <div id="callsContainer">
         <div class="spinner"></div>
       </div>
@@ -82,6 +85,7 @@
                     <span class="expand-toggle" onclick="toggleTranscript('${UI.escapeHtml(call.id)}')">
                       View Details
                     </span>
+                    <button class="btn btn-danger btn-sm" style="margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="deleteSingleCall('${UI.escapeHtml(call.id)}', this)" title="Delete this call log">🗑️</button>
                   </td>
                 </tr>
                 <tr id="transcript-${UI.escapeHtml(call.id)}" class="hidden">
@@ -186,9 +190,57 @@
       pagination.innerHTML = buttons.join('');
     }
 
+    // Delete a single call log
+    async function deleteSingleCall(callId, buttonEl) {
+      if (!confirm('Are you sure you want to delete this call log? This action cannot be undone.')) {
+        return;
+      }
+
+      try {
+        await UI.apiFetch(`/admin/api/calls/${encodeURIComponent(callId)}`, { method: 'DELETE' });
+
+        // Remove the call row and its transcript row from the DOM
+        const transcriptRow = document.getElementById(`transcript-${callId}`);
+        if (transcriptRow) {
+          transcriptRow.previousElementSibling.remove();
+          transcriptRow.remove();
+        } else {
+          // Fallback: walk up from the button to the <tr>
+          const row = buttonEl.closest('tr');
+          if (row) row.remove();
+        }
+
+        UI.Toast.success('Call log deleted successfully');
+      } catch (error) {
+        UI.Toast.error('Failed to delete call log: ' + error.message);
+      }
+    }
+
+    // Delete all call logs
+    async function deleteAllCalls() {
+      if (!confirm('Are you sure you want to delete ALL call logs? This action cannot be undone.')) {
+        return;
+      }
+
+      const deleteAllBtn = document.getElementById('deleteAllBtn');
+      deleteAllBtn.disabled = true;
+
+      try {
+        const data = await UI.apiFetch('/admin/api/calls', { method: 'DELETE' });
+        UI.Toast.success(`Deleted ${data.deletedCount} call log(s)`);
+        loadCalls(1);
+      } catch (error) {
+        UI.Toast.error('Failed to delete call logs: ' + error.message);
+      } finally {
+        deleteAllBtn.disabled = false;
+      }
+    }
+
     // Make functions available globally
     window.toggleTranscript = toggleTranscript;
     window.loadCalls = loadCalls;
+    window.deleteSingleCall = deleteSingleCall;
+    window.deleteAllCalls = deleteAllCalls;
 
     // Load calls on page load
     loadCalls(1);

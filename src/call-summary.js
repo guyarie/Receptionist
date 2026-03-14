@@ -226,6 +226,40 @@ ${messages.map(m => `${m.role === 'user' ? 'Caller' : 'Receptionist'}: ${m.conte
       return null;
     }
   }
+
+  /**
+   * Delete a single call summary by ID
+   * @param {string} id - Call summary ID (filename without .json)
+   * @returns {boolean} true if deleted, false if not found
+   */
+  deleteSummaryById(id) {
+    const sanitizedId = path.basename(id);
+    const filename = sanitizedId.endsWith('.json') ? sanitizedId : `${sanitizedId}.json`;
+    const filepath = path.join(this.summariesDir, filename);
+
+    if (!fs.existsSync(filepath)) {
+      return false;
+    }
+
+    fs.unlinkSync(filepath);
+    return true;
+  }
+
+  /**
+   * Delete all call summary JSON files
+   * @returns {number} count of deleted files
+   */
+  deleteAllSummaries() {
+    const files = fs.readdirSync(this.summariesDir)
+      .filter(file => file.endsWith('.json'));
+
+    for (const file of files) {
+      fs.unlinkSync(path.join(this.summariesDir, file));
+    }
+
+    return files.length;
+  }
+
 }
 
 module.exports = new CallSummaryManager();
