@@ -16,3 +16,9 @@ data/
 .aider*
 temp/
 reports/
+uploads/
+webchat-sessions/
+call-summaries/
+call-recordings/
+sms-sessions/
+leads/

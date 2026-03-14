@@ -1,3 +1,4 @@
+require("./http-redirect");
 // AI Phone Receptionist - Main Server
 // This is the minimal demo version to prove the pipeline works
 
@@ -170,8 +171,103 @@ app.use('/admin', express.static('public/admin'));
 
 // Health check endpoint
 app.get('/', (req, res) => {
-  res.send('AI Phone Receptionist is running!');
+  // Serve pSEO homepage (health check moved to /health)
+  res.sendFile('/opt/cw-site/index.html');
 });
+
+// Health check (moved from /)
+
+// ============================================================
+// Warm Transfer - Conference-based with recording
+// ============================================================
+app.post("/transfer-to-pj", async (req, res) => {
+  const callSid = req.body.CallSid || "unknown";
+  const conferenceName = "transfer-" + callSid;
+  console.log("📞 Warm transfer: putting caller " + callSid + " into conference " + conferenceName);
+  
+  const pjPhone = process.env.PJ_PHONE || "+15855208877";
+  const twilioNumber = process.env.TWILIO_PHONE_NUMBER || "+16505428807";
+  
+  // Dial PJ into the conference (async)
+  try {
+    const twilio = require("twilio");
+    const twilioClient = twilio(config.twilio.accountSid, config.twilio.authToken);
+    twilioClient.calls.create({
+      to: pjPhone,
+      from: twilioNumber,
+      twiml: "<Response><Say voice=\"Polly.Matthew\">Incoming transfer from ChargeWizards.</Say><Dial><Conference record=\"record-from-start\" recordingStatusCallback=\"/recording-complete\" recordingStatusCallbackEvent=\"completed\" startConferenceOnEnter=\"true\" endConferenceOnExit=\"true\">" + conferenceName + "</Conference></Dial></Response>",
+      timeout: 30,
+      statusCallback: "https://receptionist.chargewizards.com/transfer-status",
+      statusCallbackEvent: ["completed", "no-answer", "busy", "failed"]
+    }).then(call => {
+      console.log("📞 Dialing PJ: " + call.sid);
+    }).catch(err => {
+      console.log("⚠️ Failed to dial PJ: " + err.message);
+    });
+  } catch (err) {
+    console.log("⚠️ Transfer dial error: " + err.message);
+  }
+  
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Matthew">Please hold while I connect you with PJ.</Say>
+  <Dial action="/transfer-fallback">
+    <Conference record="record-from-start" recordingStatusCallback="/recording-complete" recordingStatusCallbackEvent="completed" startConferenceOnEnter="true" endConferenceOnExit="true" waitUrl="http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical" maxParticipants="2">${conferenceName}</Conference>
+  </Dial>
+</Response>`;
+  
+  res.type("text/xml");
+  res.send(twiml);
+});
+
+// Called when the conference ends for the caller
+app.post("/transfer-fallback", (req, res) => {
+  const dialStatus = req.body.DialCallStatus;
+  console.log("📞 Transfer conference ended — status: " + dialStatus);
+  
+  let twiml;
+  if (dialStatus === "completed" || dialStatus === "answered") {
+    twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response><Hangup/></Response>`;
+  } else {
+    twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Matthew">I apologize, PJ is not available right now. He has your information and will call you back as soon as possible. Thank you for your patience.</Say>
+  <Hangup/>
+</Response>`;
+  }
+  res.type("text/xml");
+  res.send(twiml);
+});
+
+// PJ transfer call status
+app.post("/transfer-status", (req, res) => {
+  const status = req.body.CallStatus;
+  console.log("📞 PJ transfer call status: " + status);
+  res.sendStatus(200);
+});
+
+// Recording completion
+app.post("/recording-complete", (req, res) => {
+  const recordingSid = req.body.RecordingSid;
+  const recordingUrl = req.body.RecordingUrl;
+  const duration = req.body.RecordingDuration;
+  console.log("🎙️ Transfer recording complete: " + recordingSid + " (" + duration + "s)");
+  console.log("🎙️ Recording URL: " + recordingUrl);
+  
+  const path = require("path");
+  const recordingsDir = path.join(__dirname, "..", "call-recordings");
+  if (!fs.existsSync(recordingsDir)) fs.mkdirSync(recordingsDir, { recursive: true });
+  
+  fs.writeFileSync(
+    path.join(recordingsDir, recordingSid + ".json"),
+    JSON.stringify({ recordingSid, recordingUrl: recordingUrl + ".mp3", duration: parseInt(duration), timestamp: new Date().toISOString() }, null, 2)
+  );
+  res.sendStatus(200);
+});
+
+
+app.get("/health", (req, res) => res.send("OK"));
 
 // Chat API endpoint for web interface
 app.post('/api/chat', async (req, res) => {
@@ -363,6 +459,25 @@ app.post('/api/leads/ack', (req, res) => {
 app.use('/_next', express.static('/opt/cw-site/_next'));
 // Also serve at /site/_next for direct access
 app.use('/site/_next', express.static('/opt/cw-site/_next'));
+// Serve cw-site images and assets at root paths (HTML uses root-relative src="/images/...")
+app.use('/images', express.static('/opt/cw-site/images'));
+app.use('/logo.png', express.static('/opt/cw-site/logo.png'));
+app.use('/logo-dark.png', express.static('/opt/cw-site/logo-dark.png'));
+app.use('/sitemap.xml', express.static('/opt/cw-site/sitemap.xml'));app.use('/robots.txt', express.static('/opt/cw-site/robots.txt'));app.use('/llms.txt', express.static('/opt/cw-site/llms.txt'));
+
+// pSEO catch-all: serve city, guide, vehicle, compare, tool pages at root paths
+const cwSitePaths = ['/guides', '/vehicles', '/compare', '/tools', '/san-mateo', '/redwood-city', '/palo-alto', '/menlo-park', '/burlingame', '/daly-city', '/south-san-francisco', '/foster-city', '/belmont', '/san-carlos', '/woodside', '/portola-valley', '/atherton', '/hillsborough', '/half-moon-bay', '/pacifica', '/millbrae', '/san-bruno', '/brisbane', '/colma', '/cupertino', '/los-altos', '/mountain-view', '/san-francisco', '/san-jose', '/santa-clara', '/sunnyvale'];
+cwSitePaths.forEach(prefix => {
+  app.use(prefix, (req, res, next) => {
+    const cleanPath = decodeURIComponent(req.path) || '/';
+    const fullPath = prefix + cleanPath;
+    const tryFile = path.join('/opt/cw-site', fullPath);
+    const tryIndex = path.join('/opt/cw-site', fullPath, 'index.html');
+    if (fs.existsSync(tryIndex)) return res.sendFile(tryIndex);
+    if (fs.existsSync(tryFile) && fs.statSync(tryFile).isFile()) return res.sendFile(tryFile);
+    next();
+  });
+});
 // Then handle page routing
 app.use('/site', (req, res, next) => {
   const cleanPath = decodeURIComponent(req.path) || '/';
@@ -877,6 +992,7 @@ app.post('/incoming-call', (req, res) => {
     console.log(`🎙️ Routing call ${callSid} to realtime streaming via ${protocol}://${host}/media-stream`);
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
+  <Play digits="ww1"></Play>
   <Connect>
     <Stream url="${protocol}://${host}/media-stream">
       <Parameter name="callSid" value="${callSid}" />
@@ -1090,6 +1206,36 @@ wss.on('connection', (ws) => {
           });
           relay.sessionManager = sessionManager;
           sessionManager.addSession(streamSid, relay);
+          
+          // Set transfer callback to warm-transfer call to PJ
+          adapter.transferCallback = async () => {
+            try {
+              console.log('📞 Warm transferring call ' + callSid + ' to PJ');
+              const twilio = require('twilio');
+              const twilioClient = twilio(config.twilio.accountSid, config.twilio.authToken);
+              // Update the call to redirect to our transfer TwiML
+              await twilioClient.calls(callSid).update({
+                url: 'https://receptionist.chargewizards.com/transfer-to-pj',
+                method: 'POST'
+              });
+              console.log('📞 Call redirected to transfer TwiML');
+            } catch (err) {
+              console.log('⚠️ Transfer error: ' + err.message);
+            }
+          };
+          
+          // Set goodbye callback to end call when David says goodbye
+          adapter.goodbyeCallback = async () => {
+            try {
+              console.log('👋 Triggering call hangup for ' + callSid);
+              const twilio = require('twilio');
+              const twilioClient = twilio(config.twilio.accountSid, config.twilio.authToken);
+              await twilioClient.calls(callSid).update({ status: 'completed' });
+              console.log('📞 Twilio call terminated: ' + callSid);
+            } catch (err) {
+              console.log('⚠️ Goodbye hangup error: ' + err.message);
+            }
+          };
           
           await relay.initialize({
             systemPrompt: prompts.systemPrompt,

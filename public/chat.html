@@ -393,7 +393,7 @@
 
   <div class="chat-container">
     <div class="chat-header">
-      <div class="avatar"><img src="/logo.png" alt="CW"></div>
+      <div class="avatar"><img src="/images/david-headshot.jpg" alt="David"></div>
       <div class="header-text">
         <h1>David</h1>
         <p>EV Charging Specialist</p>
@@ -528,7 +528,7 @@
     function addMessage(type, content) {
       const div = document.createElement('div');
       div.className = `message ${type}`;
-      const avatarHtml = type === 'ai' ? '<div class="msg-avatar">CW</div>' : '';
+      const avatarHtml = type === 'ai' ? '<div class="msg-avatar"><img src="/images/david-headshot.jpg" alt="David" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></div>' : '';
       div.innerHTML = `${avatarHtml}<div class="message-content">${content}</div>`;
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -537,7 +537,7 @@
     function addTypingIndicator() {
       const div = document.createElement('div');
       div.className = 'message ai';
-      div.innerHTML = `<div class="msg-avatar">CW</div><div class="typing-indicator active"><span></span><span></span><span></span></div>`;
+      div.innerHTML = `<div class="msg-avatar"><img src="/images/david-headshot.jpg" alt="David" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></div><div class="typing-indicator active"><span></span><span></span><span></span></div>`;
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
       return div;

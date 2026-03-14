@@ -74,7 +74,8 @@ class OpenAIAdapter extends ProviderAdapter {
             turn_detection: {
               type: 'server_vad',
               silence_duration_ms: silenceDurationMs,
-              prefix_padding_ms: prefixPaddingMs
+              prefix_padding_ms: prefixPaddingMs,
+              threshold: parseFloat(process.env.OPENAI_VAD_THRESHOLD || "0.7"),
             },
             input_audio_transcription: {
               model: 'whisper-1'
@@ -147,6 +148,7 @@ class OpenAIAdapter extends ProviderAdapter {
         break;
 
       case 'response.audio_transcript.done':
+        this.lastResponseText = event.transcript || '';
         if (this.onTranscript && event.transcript) {
           this.onTranscript('assistant', event.transcript);
         }
@@ -171,6 +173,18 @@ class OpenAIAdapter extends ProviderAdapter {
 
       case 'response.done':
         console.log('✅ Response turn complete');
+        
+        // Check if AI said goodbye - trigger call end
+        if (this.lastResponseText && /\b(goodbye|bye|take care|have a great day)\b/i.test(this.lastResponseText) && this.goodbyeCallback) {
+          console.log('👋 Goodbye detected in AI response — ending call');
+          setTimeout(() => this.goodbyeCallback(), 2000); // 2 second delay to let audio finish
+        }
+        
+        // Check if AI wants to transfer the call to PJ
+        if (this.lastResponseText && /\b(connect you|transfer|connecting you|let me get PJ|putting you through)\b/i.test(this.lastResponseText) && this.transferCallback) {
+          console.log('📞 Transfer detected in AI response — connecting to PJ');
+          setTimeout(() => this.transferCallback(), 3000); // 3 second delay to let David finish speaking
+        }
         break;
 
       case 'response.cancelled':

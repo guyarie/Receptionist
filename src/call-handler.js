@@ -1,3 +1,5 @@
+const twilio = require('twilio');
+const config = require('./config');
 // Call Handler - Manages individual call sessions
 const aiClient = require('./ai-client');
 const callSummary = require('./call-summary');
@@ -86,6 +88,15 @@ class CallHandler {
         });
         
         console.log(`📞 Call ended: ${callSid} - Summary saved`);
+        
+        // Actually terminate the Twilio call
+        try {
+          const twilioClient = twilio(config.twilio.accountSid, config.twilio.authToken);
+          await twilioClient.calls(callSid).update({ status: 'completed' });
+          console.log(`📞 Twilio call terminated: ${callSid}`);
+        } catch (twilioErr) {
+          console.log(`⚠️ Could not terminate Twilio call: ${twilioErr.message}`);
+        }
       } catch (error) {
         console.error('❌ Error saving call summary:', error);
       }

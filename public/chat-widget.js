@@ -77,7 +77,7 @@
     var container = document.createElement('div');
     container.id = 'cw-chat-widget';
     container.style.cssText = 'position:fixed;' + (isRight ? 'right:20px' : 'left:20px') +
-      ';bottom:20px;z-index:99999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;';
+      ';bottom:20px;z-index:99999;-webkit-transform:translateZ(0);transform:translateZ(0);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;';
 
     // Button
     var btn = document.createElement('button');
@@ -99,14 +99,14 @@
     win.id = 'cw-chat-window';
     win.setAttribute('role', 'dialog');
     win.setAttribute('aria-label', 'Chat window');
-    win.style.cssText = 'display:none;flex-direction:column;position:absolute;bottom:75px;' +
-      (isRight ? 'right:0' : 'left:0') + ';width:380px;max-width:calc(100vw - 40px);height:550px;max-height:calc(100vh - 120px);background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2);overflow:hidden;';
+    win.style.cssText = 'display:none;flex-direction:column;position:fixed;bottom:90px;' +
+      (isRight ? 'right:0' : 'left:0') + ';width:380px;max-width:calc(100vw - 40px);height:550px;max-height:calc(100vh - 120px);background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2);overflow:hidden;-webkit-transform:translateZ(0);transform:translateZ(0);';
 
     // Header
     var header = document.createElement('div');
     header.style.cssText = 'background:' + PRIMARY + ';color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;';
     header.innerHTML = '<div style="display:flex;align-items:center;gap:10px;"><img src="' + API_URL +
-      '/logo-dark.png" alt="CW" style="height:30px;width:auto;" onerror="this.style.display=\'none\'"><div><div style="font-size:17px;font-weight:600;margin-bottom:2px;">' +
+      '/images/david-headshot.jpg" alt="David" style="height:36px;width:36px;border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\'"><div><div style="font-size:17px;font-weight:600;margin-bottom:2px;">' +
       TITLE + '</div><div style="font-size:12px;opacity:0.85;">' + SUBTITLE + '</div></div></div>';
 
     var closeBtn = document.createElement('button');
@@ -196,7 +196,7 @@
         greeted = true;
         fetchGreeting();
       }
-      setTimeout(function() { input.focus(); }, 100);
+      if (!('ontouchstart' in window)) { setTimeout(function() { input.focus(); }, 100); }
     }
 
     function close() {
@@ -204,12 +204,12 @@
       win.style.display = 'none';
       btn.style.display = 'flex';
       if (isMobile) {
-        win.style.cssText = 'display:none;flex-direction:column;position:absolute;bottom:75px;' +
+        win.style.cssText = 'display:none;flex-direction:column;position:fixed;bottom:90px;' +
           (isRight ? 'right:0' : 'left:0') + ';width:380px;max-width:calc(100vw - 40px);height:550px;max-height:calc(100vh - 120px);background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2);overflow:hidden;';
       }
     }
 
-    btn.addEventListener('click', function () { isOpen ? close() : open(); });
+    var lastToggle = 0; btn.addEventListener('click', function (e) { var now = Date.now(); if (now - lastToggle < 400) return; lastToggle = now; isOpen ? close() : open(); });
     closeBtn.addEventListener('click', close);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) close(); });
 
