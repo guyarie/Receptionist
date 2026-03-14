@@ -1,0 +1,12 @@
+{
+  "apiUrl": "http://localhost:3000",
+  "endpoint": "/api/webchat",
+  "threshold": 80,
+  "fields": [
+    { "name": "Customer Name", "keywords": ["name", "who am I speaking", "may I have your name", "your name"] },
+    { "name": "Phone", "keywords": ["phone", "number", "reach you", "call you", "contact number", "phone number"] },
+    { "name": "Email", "keywords": ["email", "e-mail", "email address"] },
+    { "name": "City/Location", "keywords": ["city", "located", "where", "address", "area", "location"] },
+    { "name": "Service Type", "keywords": ["service", "looking for", "help with", "need", "appointment", "reason for"] }
+  ]
+}

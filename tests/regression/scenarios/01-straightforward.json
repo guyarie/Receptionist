@@ -1,0 +1,12 @@
+{
+  "name": "Straightforward Patient",
+  "description": "Patient provides all requested information readily when asked",
+  "messages": [
+    "Hi, I'd like to schedule an appointment",
+    "My name is Sarah Johnson",
+    "I'm located in downtown Portland",
+    "Sure, my phone number is 503-555-0147",
+    "My email is sarah.johnson@email.com",
+    "I need a general checkup and consultation"
+  ]
+}

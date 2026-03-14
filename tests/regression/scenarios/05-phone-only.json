@@ -1,0 +1,12 @@
+{
+  "name": "Phone-Only Customer",
+  "description": "Customer provides phone number but resists giving email address",
+  "messages": [
+    "I need to make an appointment",
+    "My name is Robert Chen",
+    "I'm in Chicago",
+    "My phone is 312-555-0845",
+    "I don't really use email, can we just do phone?",
+    "I need to schedule a follow-up visit"
+  ]
+}
