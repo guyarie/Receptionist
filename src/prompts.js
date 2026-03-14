@@ -4,13 +4,31 @@ const path = require('path');
 
 class PromptLoader {
   constructor() {
+    this.dataPromptsDir = path.join(__dirname, '..', 'data', 'prompts');
     this.promptsDir = path.join(__dirname, '..', 'prompts');
     this.cache = {};
+    this.sources = {};
     this.loadAllPrompts();
   }
   
   /**
-   * Load all prompt files into memory
+   * Resolve a prompt file path. Checks data/prompts/ first (user override),
+   * then falls back to prompts/ (repo default).
+   * @param {string} filename - The prompt filename
+   * @returns {{ filePath: string, source: string }} Resolved path and source label
+   */
+  resolvePromptPath(filename) {
+    const dataPath = path.join(this.dataPromptsDir, filename);
+    if (fs.existsSync(dataPath)) {
+      return { filePath: dataPath, source: 'data' };
+    }
+    return { filePath: path.join(this.promptsDir, filename), source: 'default' };
+  }
+
+  /**
+   * Load all prompt files into memory.
+   * For each prompt, checks data/prompts/ first (deployment-specific override),
+   * then falls back to prompts/ (repo defaults).
    */
   loadAllPrompts() {
     const files = {
@@ -26,13 +44,16 @@ class PromptLoader {
     
     for (const [key, filename] of Object.entries(files)) {
       try {
-        const filePath = path.join(this.promptsDir, filename);
+        const { filePath, source } = this.resolvePromptPath(filename);
         this.cache[key] = fs.readFileSync(filePath, 'utf-8').trim();
-        console.log(`✅ Loaded prompt: ${filename}`);
+        this.sources[key] = source;
+        const label = source === 'data' ? '✅ Loaded prompt (override)' : '✅ Loaded prompt (default)';
+        console.log(`${label}: ${filename}`);
       } catch (error) {
         console.error(`❌ Failed to load ${filename}:`, error.message);
         // Provide fallback defaults
         this.cache[key] = this.getDefaultPrompt(key);
+        this.sources[key] = 'fallback';
       }
     }
   }
@@ -81,7 +102,8 @@ class PromptLoader {
     return Object.entries(promptMap).map(([key, meta]) => ({
       name: meta.name,
       filename: meta.filename,
-      content: this.cache[key] || ''
+      content: this.cache[key] || '',
+      source: this.sources[key] || 'unknown'
     }));
   }
   
@@ -97,11 +119,14 @@ class PromptLoader {
       throw new Error('Prompt content cannot be empty or whitespace-only');
     }
     
-    // Write to disk
-    const filePath = path.join(this.promptsDir, filename);
+    // Always write to data/prompts/ (user override dir), never modify repo defaults
     try {
+      if (!fs.existsSync(this.dataPromptsDir)) {
+        fs.mkdirSync(this.dataPromptsDir, { recursive: true });
+      }
+      const filePath = path.join(this.dataPromptsDir, filename);
       fs.writeFileSync(filePath, content, 'utf-8');
-      console.log(`💾 Saved prompt: ${filename}`);
+      console.log(`💾 Saved prompt (override): ${filename}`);
       
       // Reload all prompts to update cache
       this.reload();
