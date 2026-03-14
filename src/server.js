@@ -475,6 +475,41 @@ app.get('/admin/api/calls/:id', (req, res) => {
   }
 });
 
+// Admin delete all call logs endpoint
+app.delete('/admin/api/calls', (req, res) => {
+  try {
+    const callSummaryManager = require('./call-summary');
+    const deletedCount = callSummaryManager.deleteAllSummaries();
+
+    console.log(`🗑️ All call logs deleted: ${deletedCount} files removed`);
+    res.json({ success: true, deletedCount });
+  } catch (error) {
+    console.error('❌ Error deleting all call logs:', error);
+    errorBuffer.add(error, 'admin-calls-delete-all-api');
+    res.status(500).json({ error: 'Failed to delete call logs', details: error.message });
+  }
+});
+
+// Admin delete single call log endpoint
+app.delete('/admin/api/calls/:id', (req, res) => {
+  try {
+    const id = path.basename(req.params.id);
+    const callSummaryManager = require('./call-summary');
+    const deleted = callSummaryManager.deleteSummaryById(id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'Call log not found' });
+    }
+
+    console.log(`🗑️ Call log deleted: ${id}`);
+    res.json({ success: true, message: 'Call log deleted' });
+  } catch (error) {
+    console.error('❌ Error deleting call log:', error);
+    errorBuffer.add(error, 'admin-call-delete-api');
+    res.status(500).json({ error: 'Failed to delete call log', details: error.message });
+  }
+});
+
 // Admin availability list endpoint
 app.get('/admin/api/availability', (req, res) => {
   try {
