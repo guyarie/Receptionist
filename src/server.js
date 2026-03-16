@@ -20,6 +20,10 @@ const SessionManager = require('./realtime/session-manager');
 const RelayService = require('./realtime/relay-service');
 const { createAuthMiddleware, createLoginRouter } = require('./admin-auth');
 const { setupConsoleTimestamps } = require('./time-utils');
+const emailTransport = require('./email-transport');
+const cron = require('node-cron');
+const { runDailyDigestAgent } = require('./agents/daily-digest-agent');
+const path = require('path');
 
 // Setup console logging with Pacific time timestamps
 setupConsoleTimestamps();
@@ -918,6 +922,42 @@ wss.on('connection', (ws) => {
   });
 });
 
+// ============================================================================
+// Notification System Initialization
+// ============================================================================
+function initializeNotificationSystem() {
+  // --- SMTP transport (lazy — only validates config, no TLS connection yet) ---
+  emailTransport.initialize();
+
+  // --- Verify post-call agent prompt exists ---
+  const promptPath = path.join(__dirname, '..', 'prompts', 'post-call-agent.txt');
+  if (fs.existsSync(promptPath)) {
+    console.log('📋 Post-call agent prompt loaded');
+  } else {
+    console.warn('⚠️ Post-call agent prompt not found at prompts/post-call-agent.txt');
+  }
+
+  // --- Daily digest cron job (configurable hour, Mon-Fri) ---
+  if (config.digestEnabled && config.adminEmail) {
+    const hour = config.digestScheduleHour;
+    cron.schedule(`0 ${hour} * * 1-5`, async () => {
+      console.log('⏰ Running daily digest agent...');
+      try {
+        await runDailyDigestAgent();
+        console.log('✅ Daily digest completed');
+      } catch (err) {
+        console.error('❌ Daily digest failed:', err.message);
+        errorBuffer.add(err, 'daily-digest-cron');
+      }
+    }, { timezone: 'America/Los_Angeles' });
+    console.log(`📅 Daily digest scheduled (${hour}:00 Pacific, Mon-Fri) → ${config.adminEmail}`);
+  } else if (!config.digestEnabled) {
+    console.log('ℹ️ Daily digest disabled (DIGEST_ENABLED is not true)');
+  } else {
+    console.log('ℹ️ Daily digest not configured (no ADMIN_EMAIL set)');
+  }
+}
+
 // Start server
 const PORT = config.server.port;
 
@@ -973,6 +1013,9 @@ const PORT = config.server.port;
       if (!process.env.PUBLIC_URL) {
         console.log(`\n💡 Tip: Set PUBLIC_URL in .env to show your actual webhook URL`);
       }
+
+      // Initialize notification system (non-blocking)
+      initializeNotificationSystem();
     });
   } catch (error) {
     console.error('❌ Failed to initialize server:', error.message);

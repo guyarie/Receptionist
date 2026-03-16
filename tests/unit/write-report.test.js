@@ -8,18 +8,33 @@ describe('writeReport', () => {
   const reportsDir = path.join(process.cwd(), 'reports');
   let createdFiles = [];
 
+  // Ensure reports directory exists before each test
+  beforeEach(() => {
+    if (!fs.existsSync(reportsDir)) {
+      fs.mkdirSync(reportsDir, { recursive: true });
+    }
+  });
+
   // Clean up created files after each test
   afterEach(() => {
     createdFiles.forEach(filepath => {
-      if (fs.existsSync(filepath)) {
-        fs.unlinkSync(filepath);
+      try {
+        if (fs.existsSync(filepath)) {
+          fs.unlinkSync(filepath);
+        }
+      } catch (e) {
+        // Ignore cleanup errors
       }
     });
     createdFiles = [];
 
     // Remove reports directory if empty
-    if (fs.existsSync(reportsDir) && fs.readdirSync(reportsDir).length === 0) {
-      fs.rmdirSync(reportsDir);
+    try {
+      if (fs.existsSync(reportsDir) && fs.readdirSync(reportsDir).length === 0) {
+        fs.rmdirSync(reportsDir);
+      }
+    } catch (e) {
+      // Ignore cleanup errors — directory may not be empty due to concurrent tests
     }
   });
 
@@ -48,7 +63,8 @@ describe('writeReport', () => {
     
     if (filepath) {
       const filename = path.basename(filepath);
-      expect(filename).toMatch(/^scraping-report-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z\.md$/);
+      // Filename uses Pacific time: scraping-report-YYYY-MM-DD-HH-MM-SS.md
+      expect(filename).toMatch(/^scraping-report-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.md$/);
       createdFiles.push(filepath);
     }
   });
@@ -90,23 +106,25 @@ describe('writeReport', () => {
 
     const filepath1 = writeReport(reportContent1);
     
-    // Small delay to ensure different timestamps
-    const start = Date.now();
-    while (Date.now() - start < 10) {
-      // Wait a bit
-    }
-    
-    const filepath2 = writeReport(reportContent2);
-
+    // Verify first file exists immediately after write
     expect(filepath1).toBeTruthy();
-    expect(filepath2).toBeTruthy();
-    expect(filepath1).not.toBe(filepath2);
-
     if (filepath1) {
       expect(fs.existsSync(filepath1)).toBe(true);
       createdFiles.push(filepath1);
     }
+
+    // Wait at least 1 second to ensure different Pacific-time timestamps (second granularity)
+    const start = Date.now();
+    while (Date.now() - start < 1100) {
+      // Wait for timestamp to change
+    }
     
+    const filepath2 = writeReport(reportContent2);
+
+    // Verify second file exists and paths differ
+    expect(filepath2).toBeTruthy();
+    expect(filepath1).not.toBe(filepath2);
+
     if (filepath2) {
       expect(fs.existsSync(filepath2)).toBe(true);
       createdFiles.push(filepath2);

@@ -5,6 +5,15 @@ export default defineConfig({
     // Test files pattern
     include: ['tests/**/*.test.js', 'tests/**/*.property.test.js'],
     
+    // Exclude slow integration tests that hit real external APIs
+    // and long-running WebSocket tests (run manually with: npx vitest run tests/property/websocket-*)
+    exclude: [
+      'tests/unit/mainMultiPage.test.js',
+      'tests/property/websocket-timeout.property.test.js',
+      'tests/property/websocket-preservation.property.test.js',
+      'tests/integration/post-call-agent.test.js',
+    ],
+    
     // Environment
     environment: 'node',
     

@@ -171,10 +171,9 @@ describe('Report Writing', () => {
     const filepath = writeReport(mockReport);
     
     if (filepath) {
-      // Verify filename format
+      // Verify filename format (Pacific time: scraping-report-YYYY-MM-DD-HH-MM-SS.md)
       const filename = path.basename(filepath);
-      expect(filename).toMatch(/^scraping-report-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/);
-      expect(filename).toContain('.md');
+      expect(filename).toMatch(/^scraping-report-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.md$/);
       
       // Clean up test file
       if (fs.existsSync(filepath)) {

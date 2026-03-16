@@ -8,13 +8,15 @@ describe('Insurance Statistics in Scraping Report', () => {
   const testReportPath = path.join(reportsDir, 'scraping-report-2024-01-01T00-00-00-000Z.md');
 
   beforeEach(() => {
+    // Ensure reports directory exists for tests that write files
+    if (!fs.existsSync(reportsDir)) {
+      fs.mkdirSync(reportsDir, { recursive: true });
+    }
     // Clean up ALL existing reports to ensure clean test environment
-    if (fs.existsSync(reportsDir)) {
-      const files = fs.readdirSync(reportsDir);
-      for (const file of files) {
-        if (file.startsWith('scraping-report-') && file.endsWith('.md')) {
-          fs.unlinkSync(path.join(reportsDir, file));
-        }
+    const files = fs.readdirSync(reportsDir);
+    for (const file of files) {
+      if (file.startsWith('scraping-report-') && file.endsWith('.md')) {
+        fs.unlinkSync(path.join(reportsDir, file));
       }
     }
   });

@@ -1,0 +1,77 @@
+{
+  "callSid": "CAc26ac15d264ef8ddb9006b2e6864105d",
+  "from": "+15853979019",
+  "to": "",
+  "startTime": "2026-03-15T12:48:25",
+  "endTime": "2026-03-15T12:50:21",
+  "conversationHistory": [
+    {
+      "role": "assistant",
+      "content": "Hello! Thank you for calling the Relational Therapy Collective. If this is an emergency, please hang up and dial 911. I'm your AI receptionist. This call will be transcribed for quality assurance purposes. How can I help you today?"
+    },
+    {
+      "role": "user",
+      "content": "Can you tell me about therapy options for my dog?"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm sorry, but we don't offer therapy services for pets. Our focus is on individual, couple, and family therapy for humans. If you need help finding resources for your dog, I'd be happy to provide some suggestions. Is there anything else I can assist you with today?"
+    },
+    {
+      "role": "assistant",
+      "content": "If you have any questions"
+    },
+    {
+      "role": "user",
+      "content": "Okay."
+    },
+    {
+      "role": "user",
+      "content": "So, for my son."
+    },
+    {
+      "role": "assistant",
+      "content": "I'd be glad to help with finding support for your son. May I ask a few questions to better assist you? First, could you tell me his age? Also, what are the main concerns or reasons for reaching out?"
+    },
+    {
+      "role": "user",
+      "content": "Sure"
+    },
+    {
+      "role": "assistant",
+      "content": "Great! Could you please share his age and the main concerns or reasons you're seeking therapy for him? This will help me find the best options for his needs."
+    },
+    {
+      "role": "user",
+      "content": "He's three years old and he's not talking yet."
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Since your son is 3 years old and experiencing speech delays, we have providers who specialize in working with young children with similar challenges. I recommend considering Miri Arie, who has specialized training in working with young children, or Claire de Leon, who specializes in child mental health and selective mutism. Would you prefer in-person or telehealth sessions, and do you have any insurance preferences?"
+    },
+    {
+      "role": "user",
+      "content": "Does any of them accept insurance?"
+    },
+    {
+      "role": "assistant",
+      "content": "Miri Arie and Claire de Leon both work as out-of-network providers, which means they accept payment at the time of each session. They can provide a superbill for you to submit to your insurance company for possible reimbursement. Please check with your insurance provider to confirm your mental health coverage and reimbursement options. Would you like their contact information?"
+    },
+    {
+      "role": "user",
+      "content": "Are you sure Claire de Leon doesn't accept insurance?"
+    },
+    {
+      "role": "assistant",
+      "content": "You are correct; Claire de Leon does accept some insurance providers. She accepts Premera, Aetna, United Health Care (including Apple Health), and Lyra. If your insurance provider is not listed, she can work as an out-of-network provider. Would you like her contact information for further details?"
+    },
+    {
+      "role": "user",
+      "content": "And what about Dr. Rowley?"
+    },
+    {
+      "role": "assistant",
+      "content": "Dr. Miri Arie works as an out-of-network provider. This means she doesn't directly bill insurance but can provide a superbill for you to submit to your insurance company for possible reimbursement. Would you like her contact information for more details on her services?"
+    }
+  ]
+}

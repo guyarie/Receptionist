@@ -537,8 +537,12 @@ IMPORTANT:
 - The "fileName" field should contain only first and last name without credentials (e.g., "Miri Arie" not "Miri Arie, PhD, CGP")
 - The "insurance" field should be an array of insurance provider names
 - If no insurance information is found, return an empty array []
-- Do not use placeholder text like "Not provided" or "Not available"
+- Do not use placeholder text like "Not provided" or "Not available" in the insurance JSON array
 - Extract ALL insurance providers mentioned on the page
+- CRITICAL: In the markdown "content" field, under the ## Insurance heading:
+  - If insurance providers were found, list them
+  - If NO insurance providers were found (empty array), write: "Contact provider directly for insurance information — no insurance details available on their profile."
+  - NEVER write "[]" or leave the Insurance section empty in the markdown content
 
 Website content:
 ${text}`;
@@ -742,6 +746,16 @@ async function callLLMForProvider(providerName, text) {
     // If missing or invalid, it will be set to null and fallback logic will be used
     if (!providerData.fileName || typeof providerData.fileName !== 'string' || providerData.fileName.trim() === '') {
       providerData.fileName = null;
+    }
+
+    // Post-process: if insurance is empty, ensure the markdown content doesn't have a bare "[]"
+    if (Array.isArray(providerData.insurance) && providerData.insurance.length === 0) {
+      // Replace common patterns where the LLM writes "[]" or leaves insurance empty in markdown
+      providerData.content = providerData.content
+        .replace(/## Insurance\s*\n\s*\[\]\s*/g, '## Insurance\n\nContact provider directly for insurance information — no insurance details available on their profile.\n\n')
+        .replace(/## Insurance\s*\n\s*None\s*/gi, '## Insurance\n\nContact provider directly for insurance information — no insurance details available on their profile.\n\n')
+        .replace(/## Insurance\s*\n\s*Not provided\s*/gi, '## Insurance\n\nContact provider directly for insurance information — no insurance details available on their profile.\n\n')
+        .replace(/## Insurance\s*\n\s*Not available\s*/gi, '## Insurance\n\nContact provider directly for insurance information — no insurance details available on their profile.\n\n');
     }
 
     console.log(`✅ Successfully extracted data for ${providerName}`);
