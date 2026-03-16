@@ -1,53 +1,29 @@
-// Email transport module — thin wrapper around nodemailer SMTP
-// Uses lazy initialization to avoid creating TLS connections at startup,
-// which can interfere with OpenAI Realtime WebSocket audio streaming.
-const nodemailer = require('nodemailer');
+// Email transport module — uses Resend HTTP API
+// Falls back gracefully if not configured
 
-let transporter = null;
 let configured = false;
 let configChecked = false;
+let apiKey = null;
 let fromAddress = null;
 
-// Check if SMTP env vars are present (no connection created)
+// Check if email env vars are present
 function initialize() {
-  const host = process.env.SMTP_HOST;
-  const port = process.env.SMTP_PORT;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  // Support both RESEND_API_KEY and SMTP_PASS (for backward compat with existing .env)
+  const key = process.env.RESEND_API_KEY || process.env.SMTP_PASS;
   const from = process.env.SMTP_FROM;
 
-  if (!host || !port || !user || !pass || !from) {
-    console.warn('⚠️ SMTP not fully configured — email notifications disabled');
+  if (!key || !from) {
+    console.warn('⚠️ Email not fully configured — email notifications disabled');
     configured = false;
     configChecked = true;
     return;
   }
 
-  // Mark as configured but don't create the transport yet
+  apiKey = key;
   fromAddress = from;
   configured = true;
   configChecked = true;
-  console.log('📧 SMTP email transport configured (lazy — connects on first send)');
-}
-
-// Create the actual nodemailer transport on demand
-function ensureTransport() {
-  if (transporter) return true;
-  if (!configured) return false;
-
-  try {
-    transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT, 10),
-      secure: true,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-    });
-    console.log('📧 SMTP transport created (first use)');
-    return true;
-  } catch (err) {
-    console.error('❌ SMTP transport creation failed:', err.message);
-    return false;
-  }
+  console.log('📧 Resend email transport configured (HTTP API)');
 }
 
 function isConfigured() {
@@ -58,15 +34,29 @@ async function sendMail({ to, subject, body }) {
   if (!configured) {
     throw new Error('Email transport is not configured');
   }
-  if (!ensureTransport()) {
-    throw new Error('Failed to create email transport');
-  }
-  return transporter.sendMail({
-    from: fromAddress,
-    to,
-    subject,
-    text: body
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: fromAddress,
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      text: body
+    })
   });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Resend API error (${res.status}): ${err}`);
+  }
+
+  const data = await res.json();
+  console.log(`📧 Email sent via Resend: ${data.id}`);
+  return data;
 }
 
 module.exports = { initialize, isConfigured, sendMail };
