@@ -28,7 +28,7 @@ async function main() {
   try {
     const result = await emailTransport.sendMail({
       to,
-      subject: 'RTC Receptionist — SMTP Test',
+      subject: 'Receptionist — SMTP Test',
       body: 'If you received this, SMTP is working correctly.'
     });
     console.log('✅ Email sent successfully!');

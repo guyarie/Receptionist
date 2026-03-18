@@ -724,7 +724,7 @@ app.get('/call-summaries', (req, res) => {
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Call Summaries - RTC</title>
+  <title>Call Summaries</title>
   <style>
     body { font-family: Arial, sans-serif; max-width: 1200px; margin: 20px auto; padding: 20px; }
     h1 { color: #667eea; }

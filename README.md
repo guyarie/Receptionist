@@ -1,6 +1,6 @@
 # AI Phone Receptionist
 
-AI-powered phone receptionist for Relational Therapy Collective (RTC).
+AI-powered phone receptionist for any business. Configure via environment variables and prompt files.
 
 ## Quick Start Guide
 
@@ -240,7 +240,7 @@ For production deployment with SSL, see [DIGITALOCEAN-DEPLOYMENT.md](docs/DIGITA
 Call your Twilio phone number!
 
 You should hear:
-> "Hello! Thank you for calling the Relational Therapy Collective. I'm your AI receptionist. How can I help you today?"
+> "Hello! Thank you for calling [Your Business]. I'm your AI receptionist. How can I help you today?"
 
 Try saying:
 - "I need help finding a therapist"
