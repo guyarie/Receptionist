@@ -47,16 +47,31 @@
 
 **Decision:** Claude Sonnet. Contact info collection is non-negotiable — a lead without a phone number is worthless.
 
-### Issues Created
-- [#16](https://github.com/guyarie/Receptionist/issues/16) — Prompt externalization via `data/` folder override
-- [#17](https://github.com/guyarie/Receptionist/issues/17) — Regression test framework for pre-deployment validation
+### Issues & PRs
+
+| Issue | PR | Status | Description |
+|-------|-----|--------|-------------|
+| [#16](https://github.com/guyarie/Receptionist/issues/16) | [#18](https://github.com/guyarie/Receptionist/pull/18) | Awaiting review | Prompt externalization — `data/prompts/` overrides repo defaults |
+| [#17](https://github.com/guyarie/Receptionist/issues/17) | [#19](https://github.com/guyarie/Receptionist/pull/19) | Awaiting review | Regression test framework for pre-deployment validation |
+
+**PR #18 — Prompt Externalization:**
+- `resolvePromptPath()` checks `data/prompts/` first, falls back to `prompts/`
+- `savePrompt()` writes to `data/prompts/` (gitignored), never modifies repo files
+- Tested: override → fallback → save → admin UI source field — all pass
+
+**PR #19 — Regression Test Framework:**
+- Standalone runner: `node tests/regression/runner.js --url <your-server>`
+- 5 default scenarios (medical/office themed, generic for all users)
+- Configurable fields, keywords, thresholds via `data/tests/config.json` override
+- Markdown report with per-scenario and per-field breakdowns
+- CI-friendly: exit code 1 if below threshold
+- Live test against ChargeWizards production: **92% average, PASSED**
 
 ### Pending
 - Embed chat widget on chargewizards.com (Wix Custom Code)
 - Lead notification system (Telegram/email on qualified leads)
 - Voice channel activation (OpenAI Realtime)
 - Replace placeholder reviews on website with real Yelp/Google reviews
-- PR generic improvements to main (Issues #16, #17)
 
 ---
 
