@@ -62,27 +62,31 @@ npm install
 
 ### Step 2.5: Setup Data Folder
 
-The `data/` folder contains practice-specific information and is not included in git. You need to set it up:
+The `data/` folder contains all deployment-specific files. It is **gitignored** — your customizations stay on your server and are never overwritten by repo updates.
 
-```bash
-# Create data folder structure
-mkdir data\practice data\providers data\availability
+#### Files you can provide in `data/`
 
-# Copy and customize practice info template
-copy examples\data\custom-info.json data\practice\custom-info.json
-```
+| File / Folder | Purpose | Required? |
+|---|---|---|
+| `data/prompts/system-prompt.txt` | Main AI system prompt (replaces repo default) | Recommended |
+| `data/prompts/greeting.txt` | Voice call opening greeting | Optional |
+| `data/prompts/webchat-greeting.txt` | Web chat opening greeting | Optional |
+| `data/prompts/post-call-agent.txt` | Post-call processing instructions | Optional |
+| `data/prompts/daily-digest-agent.txt` | Daily email digest instructions | Optional |
+| `data/providers/*.md` | Provider/staff profiles (AI-generated via `npm run scrape-providers`) | Recommended |
+| `data/practice/custom-info.json` | Business address, hours, parking, and other details | Recommended |
+| `data/public/embed-chat.html` | Custom-branded full-page chat UI (replaces repo default) | Optional |
+| `data/public/` *(any file)* | Any file here is served instead of the matching file in `public/` | Optional |
 
-Edit `data/practice/custom-info.json` with your practice's actual address, hours, and parking information.
+**Override priority:** `data/` always wins over the repo defaults. You only need to provide the files you want to customize.
 
-Then generate provider profiles by scraping your website:
+To generate provider profiles by scraping your website:
 
 ```bash
 npm run scrape-providers
 ```
 
-This will create markdown files in `data/providers/` with AI-generated summaries of your practice and providers.
-
-See `examples/data/README.md` for more details on the data folder structure.
+This will create markdown files in `data/providers/` with AI-generated summaries of your business and staff.
 
 #### Puppeteer Setup for Website Scraping
 

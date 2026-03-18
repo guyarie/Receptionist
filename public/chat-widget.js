@@ -5,11 +5,11 @@
 
   // ─── Configuration ────────────────────────────────────────────────────────
   const config = {
-    apiUrl: (window.RTCChatConfig && window.RTCChatConfig.apiUrl) || 'http://localhost:3000',
-    position: (window.RTCChatConfig && window.RTCChatConfig.position) || 'bottom-right',
-    primaryColor: (window.RTCChatConfig && window.RTCChatConfig.primaryColor) || '#667eea',
-    title: (window.RTCChatConfig && window.RTCChatConfig.title) || 'Chat with us',
-    subtitle: (window.RTCChatConfig && window.RTCChatConfig.subtitle) || 'Relational Therapy Collective'
+    apiUrl: (window.ReceptionistChatConfig && window.ReceptionistChatConfig.apiUrl) || 'http://localhost:3000',
+    position: (window.ReceptionistChatConfig && window.ReceptionistChatConfig.position) || 'bottom-right',
+    primaryColor: (window.ReceptionistChatConfig && window.ReceptionistChatConfig.primaryColor) || '#667eea',
+    title: (window.ReceptionistChatConfig && window.ReceptionistChatConfig.title) || 'Chat with us',
+    subtitle: (window.ReceptionistChatConfig && window.ReceptionistChatConfig.subtitle) || 'AI Receptionist'
   };
 
   // ─── Storage Keys ─────────────────────────────────────────────────────────

@@ -65,7 +65,8 @@ if (realtimeAvailable) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Required for CSRF token validation
-app.use(express.static('public'));
+app.use(express.static('data/public')); // user overrides (gitignored)
+app.use(express.static('public'));      // repo defaults
 
 // ============================================================================
 // CORS Configuration for Web Chat Widget
