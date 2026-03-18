@@ -17,3 +17,5 @@ runtime/
 .aider*
 temp/
 reports/
+# legacy runtime
+call-summaries/
