@@ -86,6 +86,7 @@ const config = {
   digestEnabled: (process.env.DIGEST_ENABLED || 'false').toLowerCase() === 'true',
   digestScheduleHour: parseInt(process.env.DIGEST_SCHEDULE_HOUR || '18', 10),
   postCallAgentMode: (process.env.POST_CALL_AGENT_MODE || 'active').toLowerCase(),
+  timezone: process.env.TIMEZONE || 'America/Los_Angeles',
 };
 
 // Validate on load

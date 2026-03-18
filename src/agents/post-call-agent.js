@@ -11,7 +11,7 @@ const { createTools } = require('./tools');
 const { getFilenameSafeTimestamp } = require('../time-utils');
 
 const PROMPT_PATH = path.join(__dirname, '..', '..', 'prompts', 'post-call-agent.txt');
-const LOGS_DIR = path.join(__dirname, '..', '..', 'data', 'agent_logs');
+const LOGS_DIR = path.join(__dirname, '..', '..', 'runtime', 'agent-logs');
 const MAX_ITERATIONS = 10;
 
 function ensureLogsDir() {

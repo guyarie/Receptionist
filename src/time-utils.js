@@ -1,5 +1,7 @@
-// Time Utilities - Pacific Time Formatting
-// Converts timestamps to US Pacific Time (PT) for logging and display
+// Time Utilities - Timezone-aware formatting
+// Defaults to Pacific Time; override with TIMEZONE env var (e.g. America/New_York)
+
+const TIMEZONE = process.env.TIMEZONE || 'America/Los_Angeles';
 
 /**
  * Get current time in Pacific timezone as ISO-like string
@@ -9,7 +11,7 @@
 function getPacificTimeISO() {
   const date = new Date();
   const pt = date.toLocaleString('en-US', {
-    timeZone: 'America/Los_Angeles',
+    timeZone: TIMEZONE,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -33,7 +35,7 @@ function getPacificTimeISO() {
 function formatPacificTime(timestamp) {
   const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
   return date.toLocaleString('en-US', {
-    timeZone: 'America/Los_Angeles',
+    timeZone: TIMEZONE,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -51,7 +53,7 @@ function formatPacificTime(timestamp) {
 function getFilenameSafeTimestamp() {
   const date = new Date();
   const pt = date.toLocaleString('en-US', {
-    timeZone: 'America/Los_Angeles',
+    timeZone: TIMEZONE,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -73,7 +75,7 @@ function getFilenameSafeTimestamp() {
  */
 function setupConsoleTimestamps() {
   const ptFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Los_Angeles',
+    timeZone: TIMEZONE,
     hour12: false,
     year: 'numeric',
     month: '2-digit',

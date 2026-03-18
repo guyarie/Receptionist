@@ -123,13 +123,15 @@
 
     // Refresh website data
     async function refreshWebsite() {
+      if (!confirm('This will re-scrape your website and reload all provider data.\n\nA backup of your data/ folder will be saved to runtime/backups/ first.\n\nThis may take a minute. Continue?')) return;
+
       const btn = document.getElementById('refreshBtn');
       btn.disabled = true;
       btn.textContent = '⏳ Refreshing...';
 
       try {
-        await UI.apiFetch('/admin/api/refresh-website', { method: 'POST' });
-        UI.Toast.success('Website data refreshed successfully');
+        const result = await UI.apiFetch('/admin/api/refresh-website', { method: 'POST' });
+        UI.Toast.success(`Website data refreshed. Backup: ${result.backupFile}`);
       } catch (error) {
         UI.Toast.error('Refresh failed: ' + error.message);
       } finally {

@@ -80,6 +80,16 @@ The `data/` folder contains all deployment-specific files. It is **gitignored** 
 
 **Override priority:** `data/` always wins over the repo defaults. You only need to provide the files you want to customize.
 
+#### Runtime folder (`runtime/`)
+
+The `runtime/` folder is created automatically and holds everything the software generates. It is gitignored — never committed.
+
+| Folder | Contents |
+|---|---|
+| `runtime/call-summaries/` | JSON file per call — transcript, summary, metadata |
+| `runtime/agent-logs/` | Debug logs from the post-call agent |
+| `runtime/backups/` | `tar.gz` snapshots of `data/` created before each "Refresh Website Data" |
+
 To generate provider profiles by scraping your website:
 
 ```bash
