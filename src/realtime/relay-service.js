@@ -1,8 +1,10 @@
 'use strict';
 
 const callSummary = require('../call-summary');
+const config = require('../config');
 const errorBuffer = require('../error-buffer');
 const { getPacificTimeISO } = require('../time-utils');
+const { runPostCallAgent } = require('../agents/post-call-agent');
 
 /**
  * Relay Service - Bridges a Twilio Media Stream WebSocket and a Provider Adapter
@@ -176,14 +178,30 @@ class RelayService {
         content: entry.text
       }));
 
-      await callSummary.saveCallSummary({
+      const callData = {
         callSid: this.callSid,
         from: this.callerInfo.from,
         to: this.callerInfo.to,
         startTime: this.startTime,
         endTime: getPacificTimeISO(),
         conversationHistory: formattedHistory
-      });
+      };
+
+      const mode = config.postCallAgentMode;
+
+      if (mode === 'active') {
+        // Agent replaces existing flow, with fallback
+        try {
+          await runPostCallAgent(callData);
+          console.log(`📞 [${this.callSid}] Agent summary saved`);
+        } catch (agentErr) {
+          console.error(`❌ [${this.callSid}] Post-call agent failed, falling back:`, agentErr.message);
+          await callSummary.saveCallSummary(callData);
+        }
+      } else {
+        // 'disabled' — existing flow only
+        await callSummary.saveCallSummary(callData);
+      }
     } catch (err) {
       console.error(`❌ [${this.callSid}] Error saving call summary:`, err.message);
     }

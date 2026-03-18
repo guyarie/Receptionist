@@ -44,10 +44,11 @@ describe('createAuthMiddleware', () => {
   describe('when adminPassword is set', () => {
     const adminPassword = 'test-password-123';
     
-    it('should skip authentication for /admin/login', () => {
+    it('should skip authentication for /login (mount-relative path)', () => {
       const middleware = createAuthMiddleware(adminPassword);
       
-      const req = { path: '/admin/login', cookies: {} };
+      // Note: req.path is relative to the mount point (/admin)
+      const req = { path: '/login', cookies: {} };
       const res = {};
       let nextCalled = false;
       const next = () => { nextCalled = true; };
@@ -109,8 +110,9 @@ describe('createAuthMiddleware', () => {
     it('should return 401 JSON for API requests without valid session', () => {
       const middleware = createAuthMiddleware(adminPassword);
       
+      // Note: req.path is relative to the mount point (/admin)
       const req = { 
-        path: '/admin/api/calls',
+        path: '/api/calls',
         cookies: {}
       };
       let statusCode = null;

@@ -8,15 +8,18 @@ const __dirname = path.dirname(__filename);
 
 describe('Prompts Module', () => {
   let prompts;
-  const testPromptsDir = path.join(__dirname, '..', '..', 'prompts');
   const testFilename = 'greeting.txt';
-  const testFilePath = path.join(testPromptsDir, testFilename);
-  let originalContent;
+  // savePrompt() now writes to data/prompts/ (override dir), not prompts/ (repo defaults)
+  const dataPromptsDir = path.join(__dirname, '..', '..', 'data', 'prompts');
+  const overrideFilePath = path.join(dataPromptsDir, testFilename);
+  let originalOverrideContent;
+  let overrideExisted;
 
   beforeEach(async () => {
-    // Store original content
-    if (fs.existsSync(testFilePath)) {
-      originalContent = fs.readFileSync(testFilePath, 'utf-8');
+    // Store original override content if it exists
+    overrideExisted = fs.existsSync(overrideFilePath);
+    if (overrideExisted) {
+      originalOverrideContent = fs.readFileSync(overrideFilePath, 'utf-8');
     }
     
     // Dynamic import to get fresh instance
@@ -25,9 +28,11 @@ describe('Prompts Module', () => {
   });
 
   afterEach(() => {
-    // Restore original content
-    if (originalContent !== undefined) {
-      fs.writeFileSync(testFilePath, originalContent, 'utf-8');
+    // Restore or remove the override file
+    if (overrideExisted) {
+      fs.writeFileSync(overrideFilePath, originalOverrideContent, 'utf-8');
+    } else if (fs.existsSync(overrideFilePath)) {
+      fs.unlinkSync(overrideFilePath);
     }
   });
 
@@ -67,7 +72,8 @@ describe('Prompts Module', () => {
       
       prompts.savePrompt(testFilename, newContent);
       
-      const savedContent = fs.readFileSync(testFilePath, 'utf-8');
+      // savePrompt writes to data/prompts/ (override dir)
+      const savedContent = fs.readFileSync(overrideFilePath, 'utf-8');
       expect(savedContent).toBe(newContent);
       
       // Verify it's in the cache

@@ -67,7 +67,18 @@ const config = {
   admin: {
     password: process.env.ADMIN_PASSWORD || null,
     sessionSecret: process.env.SESSION_SECRET || process.env.ADMIN_PASSWORD || null
-  }
+  },
+  smtp: {
+    host: process.env.SMTP_HOST || null,
+    port: process.env.SMTP_PORT || null,
+    user: process.env.SMTP_USER || null,
+    pass: process.env.SMTP_PASS || null,
+    from: process.env.SMTP_FROM || null,
+  },
+  adminEmail: process.env.ADMIN_EMAIL || null,
+  digestEnabled: (process.env.DIGEST_ENABLED || 'false').toLowerCase() === 'true',
+  digestScheduleHour: parseInt(process.env.DIGEST_SCHEDULE_HOUR || '18', 10),
+  postCallAgentMode: (process.env.POST_CALL_AGENT_MODE || 'active').toLowerCase(),
 };
 
 // Validate on load

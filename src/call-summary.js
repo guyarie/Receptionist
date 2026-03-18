@@ -100,7 +100,7 @@ ${messages.map(m => `${m.role === 'user' ? 'Caller' : 'Receptionist'}: ${m.conte
       
       // Create filename with timestamp (Pacific time)
       const timestamp = getFilenameSafeTimestamp();
-      const filename = `call-${timestamp}-${callSid.substring(0, 8)}.json`;
+      const filename = `call-${timestamp}-${callSid ? callSid.substring(0, 8) : 'unknown'}.json`;
       const filepath = path.join(this.summariesDir, filename);
       
       // Save to file
@@ -116,6 +116,45 @@ ${messages.map(m => `${m.role === 'user' ? 'Caller' : 'Receptionist'}: ${m.conte
     }
   }
   
+  /**
+   * Save a pre-built summary object directly to disk.
+   * Used by the post-call agent's save_call_summary tool.
+   * Handles both flat and accidentally-nested summary structures.
+   * @param {Object} summaryData - Pre-built summary with callSid, callerPhone, twilioNumber, startTime, endTime, duration, summary, fullTranscript
+   * @returns {string} filepath of the saved summary
+   */
+  saveSummaryDirect(summaryData) {
+    this.ensureDirectoryExists();
+
+    // Defensive: if the agent nested fields inside a 'summary' object, flatten them
+    let data = summaryData;
+    if (data.summary && typeof data.summary === 'object' && !Array.isArray(data.summary) && data.summary.callerPhone) {
+      const nested = data.summary;
+      data = { ...data, ...nested };
+      // The nested object had a 'summary' string inside it — preserve that as the actual summary text
+      if (typeof nested.summary === 'string') {
+        data.summary = nested.summary;
+      }
+    }
+
+    const { callSid, callerPhone, twilioNumber, startTime, endTime, duration, summary, fullTranscript, notificationDecision } = data;
+
+    const summaryObj = { callSid, callerPhone, twilioNumber, startTime, endTime, duration, summary, fullTranscript };
+    if (notificationDecision) {
+      summaryObj.notificationDecision = notificationDecision;
+    }
+
+    const timestamp = getFilenameSafeTimestamp();
+    const shortSid = callSid ? callSid.substring(0, 8) : 'unknown';
+    const filename = `call-${timestamp}-${shortSid}.json`;
+    const filepath = path.join(this.summariesDir, filename);
+
+    fs.writeFileSync(filepath, JSON.stringify(summaryObj, null, 2));
+    console.log(`📝 Call summary saved (direct): ${filename}`);
+
+    return filepath;
+  }
+
   /**
    * Get all call summaries
    */

@@ -1,7 +1,9 @@
 // Call Handler - Manages individual call sessions
 const aiClient = require('./ai-client');
 const callSummary = require('./call-summary');
+const config = require('./config');
 const { getPacificTimeISO } = require('./time-utils');
+const { runPostCallAgent } = require('./agents/post-call-agent');
 
 class CallHandler {
   constructor() {
@@ -71,25 +73,42 @@ class CallHandler {
   async endCall(callSid) {
     const session = this.activeCalls.get(callSid);
     if (session) {
-      try {
-        // Get conversation history
-        const conversationHistory = aiClient.getHistory(callSid);
-        
-        // Save call summary
-        await callSummary.saveCallSummary({
-          callSid: session.callSid,
-          from: session.from,
-          to: session.to,
-          startTime: session.startTime,
-          endTime: getPacificTimeISO(),
-          conversationHistory: conversationHistory
-        });
-        
-        console.log(`📞 Call ended: ${callSid} - Summary saved`);
-      } catch (error) {
-        console.error('❌ Error saving call summary:', error);
+      const conversationHistory = aiClient.getHistory(callSid);
+      const callData = {
+        callSid: session.callSid,
+        from: session.from,
+        to: session.to,
+        startTime: session.startTime,
+        endTime: getPacificTimeISO(),
+        conversationHistory: conversationHistory
+      };
+
+      const mode = config.postCallAgentMode;
+
+      if (mode === 'active') {
+        // Agent replaces existing flow, with fallback
+        try {
+          await runPostCallAgent(callData);
+          console.log(`📞 Call ended: ${callSid} - Agent summary saved`);
+        } catch (error) {
+          console.error(`❌ [${callSid}] Post-call agent failed, falling back to existing flow:`, error.message);
+          try {
+            await callSummary.saveCallSummary(callData);
+            console.log(`📞 Call ended: ${callSid} - Fallback summary saved`);
+          } catch (fallbackErr) {
+            console.error('❌ Fallback summary also failed:', fallbackErr.message);
+          }
+        }
+      } else {
+        // 'disabled' — existing flow only
+        try {
+          await callSummary.saveCallSummary(callData);
+          console.log(`📞 Call ended: ${callSid} - Summary saved`);
+        } catch (error) {
+          console.error('❌ Error saving call summary:', error);
+        }
       }
-      
+
       // Clean up
       aiClient.endSession(callSid);
       this.activeCalls.delete(callSid);
