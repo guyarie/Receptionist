@@ -47,32 +47,97 @@
 
 **Decision:** Claude Sonnet. Contact info collection is non-negotiable — a lead without a phone number is worthless.
 
-### Issues & PRs
-
-| Issue | PR | Status | Description |
-|-------|-----|--------|-------------|
-| [#16](https://github.com/guyarie/Receptionist/issues/16) | [#18](https://github.com/guyarie/Receptionist/pull/18) | Awaiting review | Prompt externalization — `data/prompts/` overrides repo defaults |
-| [#17](https://github.com/guyarie/Receptionist/issues/17) | [#19](https://github.com/guyarie/Receptionist/pull/19) | Awaiting review | Regression test framework for pre-deployment validation |
-
-**PR #18 — Prompt Externalization:**
-- `resolvePromptPath()` checks `data/prompts/` first, falls back to `prompts/`
-- `savePrompt()` writes to `data/prompts/` (gitignored), never modifies repo files
-- Tested: override → fallback → save → admin UI source field — all pass
-
-**PR #19 — Regression Test Framework:**
-- Standalone runner: `node tests/regression/runner.js --url <your-server>`
-- 5 default scenarios (medical/office themed, generic for all users)
-- Configurable fields, keywords, thresholds via `data/tests/config.json` override
-- Markdown report with per-scenario and per-field breakdowns
-- CI-friendly: exit code 1 if below threshold
-- Live test against ChargeWizards production: **92% average, PASSED**
+### Issues Created
+- [#16](https://github.com/guyarie/Receptionist/issues/16) — Prompt externalization via `data/` folder override
+- [#17](https://github.com/guyarie/Receptionist/issues/17) — Regression test framework for pre-deployment validation
 
 ### Pending
 - Embed chat widget on chargewizards.com (Wix Custom Code)
 - Lead notification system (Telegram/email on qualified leads)
 - Voice channel activation (OpenAI Realtime)
 - Replace placeholder reviews on website with real Yelp/Google reviews
+- PR generic improvements to main (Issues #16, #17)
 
 ---
 
-*Last updated: 2026-03-10*
+
+---
+
+## 2026-03-16 — Codebase Un-Fork + Major Feature Updates
+
+### Codebase Genericized (Issue #24)
+All business-specific references removed from `src/` and `public/`. The codebase is now fully generic — any business can deploy by setting `.env` variables:
+
+| Variable | Purpose |
+|---|---|
+| `BUSINESS_NAME` | Company name (greetings, admin UI) |
+| `OWNER_NAME` | Owner name (transfers, logs) |
+| `RECEPTIONIST_NAME` | AI receptionist name |
+| `OWNER_PHONE` | Transfer target phone number |
+| `PUBLIC_URL` | Production domain (lead alert links) |
+
+New template files added:
+- `.env.example` — all env vars documented
+- `prompts/system-prompt.example.txt` — generic prompt template
+- `prompts/greeting.example.txt` — generic greeting
+- `prompts/webchat-greeting.example.txt` — generic webchat greeting
+
+### Voice Calls — Lead Detection Fixed
+- Voice calls now trigger lead detection and Telegram alerts
+- Root cause: voice calls use OpenAI Realtime API via `relay-service.js`, which bypassed `call-handler.js` lead tracking
+- Fix: lead tracking + DB save added to `relay-service.js cleanup()`
+
+### SQLite Database
+- Customer records: name, email, city, address, vehicle, notes
+- Interactions table supports types: `call`, `chat`, `sms`, `email`
+- Returning caller lookup checks DB first, falls back to JSON file scanning
+- API: `GET /api/customers`, `GET /api/customers/:phone`
+
+### Email Sync Endpoint
+- `POST /api/email-sync` — receives email interaction data from external sources
+- Enables returning caller recognition for customers who also emailed
+- Protected by `LEADS_API_KEY`
+
+### Prompt Improvements
+- **Vendor/supplier handling** — 3 caller paths: customer (qualify), vendor/partner (take message), off-topic (2-strike exit)
+- **Language switching** — detects non-English callers and responds in their language
+- **Pacing rule** — pauses after initial qualifying to ask "do you have any questions?"
+- **Contact-before-photos** — ensures name + phone collected before requesting photo uploads
+
+### Returning Caller Recognition (Issue #21)
+- Looks up caller phone in SQLite DB
+- Injects customer context into system prompt (name, email, city, vehicle, previous interactions)
+- Personalizes greeting: "Hi [Name], good to hear from you again"
+- Skips re-asking for known info
+
+### Telegram Lead Alerts
+- Configurable via `TELEGRAM_THREAD_ID` for forum topic routing
+- Links use `PUBLIC_URL` env var (no longer hardcoded)
+- Alerts include admin link + full transcript link
+
+### Bug Fixes
+- Telegram link interpolation — template literal broken during genericization, fixed
+- Widget auto-focus guard on touch devices (Issue #20)
+- Transfer detection regex genericized
+- Call hangup detection working via Twilio API
+
+### Warm Transfer (Issue #23 — deployed, testing in progress)
+- Conference-based transfer with recording
+- Endpoints: `/transfer-to-owner`, `/transfer-fallback`, `/transfer-status`, `/recording-complete`
+- Transfer triggers defined in system prompt (7 categories)
+- Recordings saved to `/call-recordings/`
+
+### SMS Handler
+- `/incoming-sms` endpoint
+- Conversation history per phone number
+- Integrated with lead detection
+
+### Issues Filed
+- [#20](https://github.com/guyarie/Receptionist/issues/20) — Mobile widget fixes
+- [#21](https://github.com/guyarie/Receptionist/issues/21) — Returning caller recognition
+- [#23](https://github.com/guyarie/Receptionist/issues/23) — Post-interaction review pipeline
+- [#24](https://github.com/guyarie/Receptionist/issues/24) — Codebase un-forked, fully generic
+
+---
+
+*Last updated: 2026-03-16*
