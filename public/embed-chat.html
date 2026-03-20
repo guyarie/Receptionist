@@ -263,7 +263,10 @@
       return typingDiv;
     }
 
-    messageInput.focus();
+    // Focus input only when user clicks into the chat area (not on page load)
+    document.querySelector('.chat-container').addEventListener('click', () => {
+      if (!messageInput.disabled) messageInput.focus();
+    });
   </script>
 </body>
 </html>
