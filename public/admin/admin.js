@@ -65,6 +65,7 @@ function renderNav(activePage) {
     { name: 'Dashboard', path: 'index.html' },
     { name: 'Prompts', path: 'prompts.html' },
     { name: 'Call Logs', path: 'calls.html' },
+    { name: 'Chat Logs', path: 'chats.html' },
     { name: 'Availability', path: 'availability.html' },
     { name: 'Provider Profiles', path: 'providers.html' }
   ];

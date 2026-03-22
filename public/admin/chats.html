@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Logs - AI Phone Receptionist</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>💬 Chat Logs</h1>
+    </div>
+  </header>
+
+  <nav>
+    <div class="container">
+      <ul></ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>Web Chat History</h2>
+      <div id="chatsContainer">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+  <script>
+    const UI = window.AdminUI;
+    UI.renderNav('chats.html');
+
+    async function loadChats() {
+      const container = document.getElementById('chatsContainer');
+      container.innerHTML = '<div class="spinner"></div>';
+
+      try {
+        const data = await UI.apiFetch('/admin/api/chats');
+
+        if (!data.chats || data.chats.length === 0) {
+          UI.showError(container, 'No chat logs found');
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Source</th>
+                <th>Messages</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.chats.map((chat, i) => `
+                <tr>
+                  <td>${UI.formatTimestamp(chat.startTime)}</td>
+                  <td>${UI.escapeHtml(chat.source || 'webchat')}</td>
+                  <td>${chat.messages ? Math.floor(chat.messages.length / 2) : 0} exchange(s)</td>
+                  <td>
+                    <span class="expand-toggle" onclick="toggleChat(${i})">View Conversation</span>
+                  </td>
+                </tr>
+                <tr id="chat-${i}" class="hidden">
+                  <td colspan="4">
+                    <div class="expandable" id="content-${i}">
+                      <div style="background: white; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto;">
+                        ${chat.messages && chat.messages.length > 0
+                          ? chat.messages.map(msg => `
+                              <p style="margin-bottom: 0.5rem;">
+                                <strong>${msg.role === 'user' ? '👤 Visitor' : '🤖 AI'}:</strong>
+                                ${UI.escapeHtml(msg.content)}
+                                <span style="color: #999; font-size: 0.8em; margin-left: 0.5rem;">${msg.time ? UI.formatTimestamp(msg.time) : ''}</span>
+                              </p>
+                            `).join('')
+                          : '<p class="text-muted">No messages</p>'
+                        }
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        UI.showError(container, 'Failed to load chat logs: ' + error.message);
+      }
+    }
+
+    function toggleChat(index) {
+      const row = document.getElementById(`chat-${index}`);
+      const content = document.getElementById(`content-${index}`);
+      if (row.classList.contains('hidden')) {
+        row.classList.remove('hidden');
+        content.classList.add('open');
+      } else {
+        row.classList.add('hidden');
+        content.classList.remove('open');
+      }
+    }
+
+    window.toggleChat = toggleChat;
+    loadChats();
+  </script>
+</body>
+</html>

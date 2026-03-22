@@ -24,6 +24,7 @@ const emailTransport = require('./email-transport');
 const cron = require('node-cron');
 const { runDailyDigestAgent } = require('./agents/daily-digest-agent');
 const path = require('path');
+const chatLogger = require('./chat-logger');
 
 // Setup console logging with Pacific time timestamps
 setupConsoleTimestamps();
@@ -175,6 +176,7 @@ app.post('/api/chat', async (req, res) => {
     // Process message directly with aiClient (not callHandler)
     const response = await aiClient.sendMessage(sessionId, message);
     
+    chatLogger.logExchange(sessionId, message, response, 'chat');
     res.json({ response });
     
   } catch (error) {
@@ -272,6 +274,9 @@ app.post('/api/webchat', cors(webchatCorsOptions), async (req, res) => {
 
     // --- Call stateless AI method ---
     const reply = await aiClient.sendMessageWithHistory(messages);
+
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+    if (lastUserMsg) chatLogger.logExchange(sessionId, lastUserMsg.content, reply, 'webchat');
 
     res.json({ response: reply, sessionId: sessionId.trim() });
 
@@ -511,6 +516,17 @@ app.delete('/admin/api/calls/:id', (req, res) => {
     console.error('❌ Error deleting call log:', error);
     errorBuffer.add(error, 'admin-call-delete-api');
     res.status(500).json({ error: 'Failed to delete call log', details: error.message });
+  }
+});
+
+// Admin chat logs endpoint
+app.get('/admin/api/chats', (req, res) => {
+  try {
+    const logs = chatLogger.getAllLogs();
+    res.json({ chats: logs });
+  } catch (error) {
+    errorBuffer.add(error, 'admin-chats-api');
+    res.status(500).json({ error: 'Failed to retrieve chat logs', details: error.message });
   }
 });
 
