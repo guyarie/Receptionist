@@ -6,7 +6,7 @@ const { getPacificTimeISO, getFilenameSafeTimestamp } = require('./time-utils');
 
 class CallSummaryManager {
   constructor() {
-    this.summariesDir = path.join(__dirname, '..', 'call-summaries');
+    this.summariesDir = path.join(__dirname, '..', 'runtime', 'call-summaries');
     this.ensureDirectoryExists();
   }
   

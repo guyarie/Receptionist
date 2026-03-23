@@ -75,10 +75,18 @@ const config = {
     pass: process.env.SMTP_PASS || null,
     from: process.env.SMTP_FROM || null,
   },
+  business: {
+    name: process.env.BUSINESS_NAME || 'Your Business',
+    ownerName: process.env.OWNER_NAME || 'the owner',
+    receptionistName: process.env.RECEPTIONIST_NAME || 'the AI receptionist',
+    ownerPhone: process.env.OWNER_PHONE || null,
+    publicUrl: process.env.PUBLIC_URL || null,
+  },
   adminEmail: process.env.ADMIN_EMAIL || null,
   digestEnabled: (process.env.DIGEST_ENABLED || 'false').toLowerCase() === 'true',
   digestScheduleHour: parseInt(process.env.DIGEST_SCHEDULE_HOUR || '18', 10),
   postCallAgentMode: (process.env.POST_CALL_AGENT_MODE || 'active').toLowerCase(),
+  timezone: process.env.TIMEZONE || 'America/Los_Angeles',
 };
 
 // Validate on load

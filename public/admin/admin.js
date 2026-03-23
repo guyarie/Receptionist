@@ -1,5 +1,24 @@
 // Admin UI Shared JavaScript
 
+// Runtime config fetched from server (timezone, business name)
+let _adminConfig = { businessName: 'AI Receptionist', timezone: 'America/Los_Angeles' };
+
+async function loadAdminConfig() {
+  try {
+    const cfg = await fetch('/admin/api/config').then(r => r.json());
+    _adminConfig = cfg;
+
+    // Update header h1 and page title with business name
+    const h1 = document.querySelector('header h1');
+    if (h1) h1.textContent = `🤖 ${cfg.businessName} — Admin`;
+    document.title = document.title.replace('AI Phone Receptionist', cfg.businessName);
+  } catch (e) {
+    // Non-fatal — fall back to defaults
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadAdminConfig);
+
 // API fetch wrapper with error handling
 async function apiFetch(url, options = {}) {
   try {
@@ -96,11 +115,11 @@ function renderNav(activePage) {
   }
 }
 
-// Format timestamp in Pacific time
+// Format timestamp using server-configured timezone
 function formatTimestamp(isoString) {
   const date = new Date(isoString);
   return date.toLocaleString('en-US', {
-    timeZone: 'America/Los_Angeles',
+    timeZone: _adminConfig.timezone,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

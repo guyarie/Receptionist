@@ -9,10 +9,13 @@ coverage/
 # Vitest cache
 .vitest/
 
-call-summaries/
-
-# Ignore all data files (managed via admin dashboard or generated)
+# User customizations (prompts, providers, public overrides, etc.)
 data/
+
+# Runtime-generated files (call logs, agent logs, backups)
+runtime/
 .aider*
 temp/
 reports/
+# legacy runtime
+call-summaries/

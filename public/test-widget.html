@@ -191,7 +191,7 @@
 
 <!-- Widget configuration override for this test page -->
 <script>
-  window.RTCChatConfig = {
+  window.ReceptionistChatConfig = {
     apiUrl: window.location.origin,
     title: 'Test Chat',
     subtitle: 'Widget Test Page',
@@ -207,7 +207,7 @@
 <script>
   // ── Config table ──────────────────────────────────────────────────────────
   (function renderConfigTable() {
-    const cfg = window.RTCChatConfig || {};
+    const cfg = window.ReceptionistChatConfig || {};
     const tbody = document.getElementById('config-table-body');
     const descriptions = {
       apiUrl: 'Backend base URL',
@@ -227,7 +227,7 @@
   (function renderEmbedSnippet() {
     const snippet = [
       '<script>',
-      '  window.RTCChatConfig = {',
+      '  window.ReceptionistChatConfig = {',
       '    apiUrl: \'https://yourdomain.com\',',
       '    title: \'Chat with us\',',
       '    primaryColor: \'#667eea\'',
@@ -249,7 +249,7 @@
     out.style.display = 'none';
 
     try {
-      const apiUrl = (window.RTCChatConfig && window.RTCChatConfig.apiUrl) || window.location.origin;
+      const apiUrl = (window.ReceptionistChatConfig && window.ReceptionistChatConfig.apiUrl) || window.location.origin;
       const res = await fetch(apiUrl + '/api/greeting');
       const data = await res.json();
 

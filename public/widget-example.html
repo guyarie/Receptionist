@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RTC Website - Chat Widget Example</title>
+  <title>Chat Widget Example</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -43,7 +43,7 @@
     const currentHost = window.location.hostname;
     const currentProtocol = window.location.protocol;
     
-    window.RTCChatConfig = {
+    window.ReceptionistChatConfig = {
       apiUrl: `${currentProtocol}//${currentHost}:${currentPort}`,  // Auto-detect from current page
       position: 'bottom-right',          // or 'bottom-left'
       primaryColor: '#667eea',           // Your brand color
@@ -56,7 +56,7 @@
 </head>
 <body>
   <div class="hero">
-    <h1>Relational Therapy Collective</h1>
+    <h1>Your Business</h1>
     <p>Welcome to our practice. We're here to help you on your journey.</p>
   </div>
   
@@ -70,7 +70,7 @@
     <div class="code-block">
       <code>&lt;!-- Configure the widget (optional) --&gt;<br>
 &lt;script&gt;<br>
-&nbsp;&nbsp;window.RTCChatConfig = {<br>
+&nbsp;&nbsp;window.ReceptionistChatConfig = {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;apiUrl: 'https://your-server-url.com',<br>
 &nbsp;&nbsp;&nbsp;&nbsp;position: 'bottom-right',<br>
 &nbsp;&nbsp;&nbsp;&nbsp;primaryColor: '#667eea',<br>

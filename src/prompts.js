@@ -1,6 +1,7 @@
 // Prompt loader - reads prompts from text files
 const fs = require('fs');
 const path = require('path');
+const config = require('./config');
 
 class PromptLoader {
   constructor() {
@@ -45,7 +46,7 @@ class PromptLoader {
     for (const [key, filename] of Object.entries(files)) {
       try {
         const { filePath, source } = this.resolvePromptPath(filename);
-        this.cache[key] = fs.readFileSync(filePath, 'utf-8').trim();
+        this.cache[key] = this.substituteVars(fs.readFileSync(filePath, 'utf-8').trim());
         this.sources[key] = source;
         const label = source === 'data' ? '✅ Loaded prompt (override)' : '✅ Loaded prompt (default)';
         console.log(`${label}: ${filename}`);
@@ -58,6 +59,19 @@ class PromptLoader {
     }
   }
   
+  /**
+   * Replace {{VAR}} placeholders with values from config/env.
+   */
+  substituteVars(text) {
+    return text
+      .replace(/\{\{BUSINESS_NAME\}\}/g, config.business.name)
+      .replace(/\{\{RECEPTIONIST_NAME\}\}/g, config.business.receptionistName)
+      .replace(/\{\{OWNER_NAME\}\}/g, config.business.ownerName)
+      .replace(/\{\{OWNER_PHONE\}\}/g, config.business.ownerPhone || '[owner phone]')
+      .replace(/\{\{PUBLIC_URL\}\}/g, config.business.publicUrl || '[your domain]')
+      .replace(/\{\{ADMIN_EMAIL\}\}/g, config.adminEmail || '[admin email]');
+  }
+
   /**
    * Get default prompts if files are missing
    */

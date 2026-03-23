@@ -66,7 +66,8 @@ if (realtimeAvailable) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Required for CSRF token validation
-app.use(express.static('public'));
+app.use(express.static('data/public')); // user overrides (gitignored)
+app.use(express.static('public'));      // repo defaults
 
 // ============================================================================
 // CORS Configuration for Web Chat Widget
@@ -664,7 +665,55 @@ app.post('/admin/api/reload', (req, res) => {
   }
 });
 
-// ============================================================================
+// Admin config endpoint — returns non-sensitive settings for the frontend UI
+app.get('/admin/api/config', (req, res) => {
+  res.json({
+    businessName: config.business.name,
+    timezone: config.timezone
+  });
+});
+
+// Admin refresh-website endpoint — backs up data/ then re-runs the scraper
+app.post('/admin/api/refresh-website', async (req, res) => {
+  const path = require('path');
+  const { exec } = require('child_process');
+  const rootDir = path.join(__dirname, '..');
+  const backupsDir = path.join(rootDir, 'runtime', 'backups');
+
+  try {
+    // Ensure backups dir exists
+    fs.mkdirSync(backupsDir, { recursive: true });
+
+    // Create timestamped tar.gz backup of data/
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const backupFile = path.join(backupsDir, `data-backup-${timestamp}.tar.gz`);
+    await new Promise((resolve, reject) => {
+      exec(`tar -czf "${backupFile}" -C "${rootDir}" data`, (err) => {
+        if (err) reject(err); else resolve();
+      });
+    });
+    console.log(`📦 Data backup created: ${path.basename(backupFile)}`);
+
+    // Re-run the scraper
+    await new Promise((resolve, reject) => {
+      exec(`node "${path.join(rootDir, 'src', 'scrape-providers.js')}"`, { cwd: rootDir }, (err, _stdout, stderr) => {
+        if (err) { console.error('Scraper stderr:', stderr); reject(err); } else resolve();
+      });
+    });
+
+    // Reload everything into memory
+    providerLoader.reload();
+    aiClient.setWebsiteContext(providerLoader.getAIContext());
+    prompts.reload();
+
+    res.json({ success: true, message: 'Website data refreshed and backed up', backupFile: path.basename(backupFile) });
+  } catch (error) {
+    errorBuffer.add(error, 'admin-refresh-website');
+    res.status(500).json({ error: 'Refresh failed', details: error.message });
+  }
+});
+
+
 // Twilio Webhook Endpoints
 // ============================================================================
 
@@ -740,7 +789,7 @@ app.get('/call-summaries', (req, res) => {
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Call Summaries - RTC</title>
+  <title>Call Summaries</title>
   <style>
     body { font-family: Arial, sans-serif; max-width: 1200px; margin: 20px auto; padding: 20px; }
     h1 { color: #667eea; }
@@ -774,7 +823,7 @@ app.get('/call-summaries', (req, res) => {
         </div>
         <div class="info-item">
           <div class="info-label">Start Time</div>
-          <div>${new Date(call.startTime).toLocaleString('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}</div>
+          <div>${new Date(call.startTime).toLocaleString('en-US', { timeZone: config.timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}</div>
         </div>
         <div class="info-item">
           <div class="info-label">Duration</div>
@@ -965,8 +1014,8 @@ function initializeNotificationSystem() {
         console.error('❌ Daily digest failed:', err.message);
         errorBuffer.add(err, 'daily-digest-cron');
       }
-    }, { timezone: 'America/Los_Angeles' });
-    console.log(`📅 Daily digest scheduled (${hour}:00 Pacific, Mon-Fri) → ${config.adminEmail}`);
+    }, { timezone: config.timezone });
+    console.log(`📅 Daily digest scheduled (${hour}:00, Mon-Fri) → ${config.adminEmail}`);
   } else if (!config.digestEnabled) {
     console.log('ℹ️ Daily digest disabled (DIGEST_ENABLED is not true)');
   } else {
