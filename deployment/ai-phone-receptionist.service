@@ -21,8 +21,7 @@ AmbientCapabilities=CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
-ProtectHome=tmpfs
-ReadOnlyPaths=/home/guyarie/receptionist_prod/Receptionist
+ProtectHome=false
 ReadWritePaths=/home/guyarie/receptionist_prod/Receptionist/runtime /home/guyarie/receptionist_prod/Receptionist/data
 
 [Install]
