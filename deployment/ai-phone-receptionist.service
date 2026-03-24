@@ -22,7 +22,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/home/guyarie/receptionist_prod/Receptionist/call-summaries /home/guyarie/receptionist_prod/Receptionist/data
+ReadWritePaths=/home/guyarie/receptionist_prod/Receptionist/runtime /home/guyarie/receptionist_prod/Receptionist/data
 
 [Install]
 WantedBy=multi-user.target
