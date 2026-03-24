@@ -88,6 +88,8 @@ The `runtime/` folder is created automatically and holds everything the software
 |---|---|
 | `runtime/call-summaries/` | JSON file per call — transcript, summary, metadata |
 | `runtime/agent-logs/` | Debug logs from the post-call agent |
+| `runtime/chat-logs/` | Web chat conversation logs |
+| `runtime/scrape-cache/` | Raw HTML/text cache from website scraping |
 | `runtime/backups/` | `tar.gz` snapshots of `data/` created before each "Refresh Website Data" |
 
 To generate provider profiles by scraping your website:
@@ -304,7 +306,20 @@ The AI will respond naturally to your questions!
 │   ├── admin-auth.js          # Admin authentication (login, sessions, CSRF)
 │   ├── ai-client.js           # OpenRouter AI integration
 │   ├── call-handler.js        # Call session management (Gather mode)
-│   ├── call-summary.js        # Call summary generation
+│   ├── call-summary.js        # Call summary generation → runtime/call-summaries/
+│   ├── chat-logger.js         # Web chat logger → runtime/chat-logs/
+│   ├── prompts.js             # Prompt loader (data/prompts/ override → prompts/ default)
+│   ├── provider-loader.js     # Provider profile loader (reads data/providers/)
+│   ├── scrape-providers.js    # Website scraper for provider profiles
+│   ├── browser-manager.js     # Puppeteer browser lifecycle
+│   ├── availability-loader.js # Availability loader (reads data/availability/)
+│   ├── email-transport.js     # SMTP email sending
+│   ├── error-buffer.js        # In-memory error ring buffer
+│   ├── time-utils.js          # Timezone and timestamp helpers
+│   ├── agents/                # AI agent modules
+│   │   ├── post-call-agent.js     # Post-call processing agent
+│   │   ├── daily-digest-agent.js  # Daily email digest agent
+│   │   └── tools.js               # Shared tool definitions for agents
 │   ├── realtime/              # Real-time voice streaming components
 │   │   ├── provider-adapter.js    # Base class for AI providers
 │   │   ├── provider-factory.js    # Provider adapter factory
@@ -312,15 +327,26 @@ The AI will respond naturally to your questions!
 │   │   ├── relay-service.js       # Audio relay between Twilio and provider
 │   │   └── session-manager.js     # Active session tracking
 │   └── test-ai.js             # AI testing script
-├── prompts/                   # Editable AI prompts
+├── prompts/                   # Repo-default AI prompts (checked into git)
+├── data/                      # User/deployment-specific data (gitignored)
+│   ├── prompts/               # Prompt overrides (priority over prompts/)
+│   ├── providers/             # Scraped provider profiles (*.md)
+│   ├── practice/              # Scraped practice overview
+│   └── availability/          # Provider availability schedules
+├── runtime/                   # Generated output (gitignored, safe to wipe)
+│   ├── call-summaries/        # Call summary JSON files
+│   ├── agent-logs/            # Post-call agent debug logs
+│   ├── chat-logs/             # Web chat conversation logs
+│   ├── scrape-cache/          # Raw HTML/text scrape cache
+│   └── backups/               # data/ snapshots before website refresh
 ├── public/                    # Web chat interface and admin UI
 │   └── admin/                 # Admin dashboard (password-protected)
-│       ├── login.html         # Login page
 │       ├── index.html         # Dashboard home
 │       ├── calls.html         # Call logs
+│       ├── chats.html         # Web chat logs
 │       ├── prompts.html       # Prompt editor
-│       ├── availability.html  # Availability editor
 │       ├── providers.html     # Provider profiles
+│       ├── availability.html  # Availability editor
 │       ├── admin.js           # Admin UI JavaScript
 │       └── admin.css          # Admin UI styles
 ├── .env                       # Environment variables (not in git)

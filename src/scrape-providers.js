@@ -1510,15 +1510,15 @@ async function processSingleProvider(providerLink, browser, index, total) {
  * @example
  * // Homepage cache
  * saveScrapeCache(html, text, "https://example.com")
- * // returns "data/scrape-cache/scrape-2024-01-15T10-30-45-123Z.json"
+ * // returns "runtime/scrape-cache/scrape-2024-01-15T10-30-45-123Z.json"
  *
  * // Provider cache
  * saveScrapeCache(html, text, "https://example.com/john", "John Doe")
- * // returns "data/scrape-cache/scrape-john-doe-2024-01-15T10-30-45-123Z.json"
+ * // returns "runtime/scrape-cache/scrape-john-doe-2024-01-15T10-30-45-123Z.json"
  */
 function saveScrapeCache(html, text, url, providerName = null) {
   try {
-    const cacheDir = path.join(__dirname, '..', 'data', 'scrape-cache');
+    const cacheDir = path.join(__dirname, '..', 'runtime', 'scrape-cache');
     if (!fs.existsSync(cacheDir)) {
       fs.mkdirSync(cacheDir, { recursive: true });
     }

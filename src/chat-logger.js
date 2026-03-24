@@ -1,9 +1,9 @@
-// Chat Logger — saves web chat conversations to data/chat-logs/
+// Chat Logger — saves web chat conversations to runtime/chat-logs/
 const fs = require('fs');
 const path = require('path');
 const { getFilenameSafeTimestamp, getPacificTimeISO } = require('./time-utils');
 
-const LOGS_DIR = path.join(__dirname, '..', 'data', 'chat-logs');
+const LOGS_DIR = path.join(__dirname, '..', 'runtime', 'chat-logs');
 
 // Ensure directory exists
 if (!fs.existsSync(LOGS_DIR)) {
