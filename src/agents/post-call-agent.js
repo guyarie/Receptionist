@@ -10,7 +10,12 @@ const config = require('../config');
 const { createTools } = require('./tools');
 const { getFilenameSafeTimestamp } = require('../time-utils');
 
-const PROMPT_PATH = path.join(__dirname, '..', '..', 'prompts', 'post-call-agent.txt');
+// Resolve prompt path at call time: data/prompts/ (user override) takes priority over prompts/ (repo default)
+const DATA_PROMPT_PATH = path.join(__dirname, '..', '..', 'data', 'prompts', 'post-call-agent.txt');
+const DEFAULT_PROMPT_PATH = path.join(__dirname, '..', '..', 'prompts', 'post-call-agent.txt');
+function resolvePromptPath() {
+  return fs.existsSync(DATA_PROMPT_PATH) ? DATA_PROMPT_PATH : DEFAULT_PROMPT_PATH;
+}
 const LOGS_DIR = path.join(__dirname, '..', '..', 'runtime', 'agent-logs');
 const MAX_ITERATIONS = 10;
 
@@ -37,7 +42,7 @@ function saveAgentLog(callSid, logData) {
 async function runPostCallAgent(callData) {
   let promptInstructions;
   try {
-    promptInstructions = fs.readFileSync(PROMPT_PATH, 'utf-8').trim();
+    promptInstructions = fs.readFileSync(resolvePromptPath(), 'utf-8').trim();
   } catch (err) {
     console.error('❌ Failed to read post-call agent prompt:', err.message);
     throw err;

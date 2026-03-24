@@ -133,6 +133,11 @@
               <h3 style="margin-top: 1rem;">Summary</h3>
               <p>${UI.escapeHtml(call.summary || 'No summary available')}</p>
               
+              ${call.notificationDecision ? `
+              <h3 style="margin-top: 1rem;">Notification Decision</h3>
+              <p>${UI.escapeHtml(call.notificationDecision)}</p>
+              ` : ''}
+              
               <h3 style="margin-top: 1rem;">Full Transcript</h3>
               <div style="background: white; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto;">
                 ${call.fullTranscript && call.fullTranscript.length > 0 

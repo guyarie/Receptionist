@@ -7,13 +7,18 @@ const { createOpenAI } = require('@ai-sdk/openai');
 const config = require('../config');
 const { createTools } = require('./tools');
 
-const PROMPT_PATH = path.join(__dirname, '..', '..', 'prompts', 'daily-digest-agent.txt');
+// Resolve prompt path at call time: data/prompts/ (user override) takes priority over prompts/ (repo default)
+const DATA_PROMPT_PATH = path.join(__dirname, '..', '..', 'data', 'prompts', 'daily-digest-agent.txt');
+const DEFAULT_PROMPT_PATH = path.join(__dirname, '..', '..', 'prompts', 'daily-digest-agent.txt');
+function resolvePromptPath() {
+  return fs.existsSync(DATA_PROMPT_PATH) ? DATA_PROMPT_PATH : DEFAULT_PROMPT_PATH;
+}
 
 async function runDailyDigestAgent(adminEmail) {
   // Read prompt from disk on each invocation (no caching)
   let promptInstructions;
   try {
-    promptInstructions = fs.readFileSync(PROMPT_PATH, 'utf-8').trim();
+    promptInstructions = fs.readFileSync(resolvePromptPath(), 'utf-8').trim();
   } catch (err) {
     console.error('❌ Failed to read daily digest agent prompt:', err.message);
     throw err;

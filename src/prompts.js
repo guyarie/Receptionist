@@ -40,7 +40,9 @@ class PromptLoader {
       closing: 'closing.txt',
       noSpeechDetected: 'no-speech-detected.txt',
       error: 'error.txt',
-      scrapingInstructions: 'scraping-instructions.txt'
+      scrapingInstructions: 'scraping-instructions.txt',
+      postCallAgent: 'post-call-agent.txt',
+      dailyDigestAgent: 'daily-digest-agent.txt'
     };
     
     for (const [key, filename] of Object.entries(files)) {
@@ -84,7 +86,9 @@ class PromptLoader {
       closing: 'Thank you for calling!',
       noSpeechDetected: 'I didn\'t catch that. Could you repeat?',
       error: 'I apologize for the technical difficulty.',
-      scrapingInstructions: 'Extract practice and provider information from the website content.'
+      scrapingInstructions: 'Extract practice and provider information from the website content.',
+      postCallAgent: 'You are a post-call processing agent. Generate a summary of the call.',
+      dailyDigestAgent: 'You are a daily digest agent. Compose a summary of today\'s calls.'
     };
     return defaults[key] || '';
   }
@@ -110,7 +114,9 @@ class PromptLoader {
       closing: { name: 'Closing', filename: 'closing.txt' },
       noSpeechDetected: { name: 'No Speech Detected', filename: 'no-speech-detected.txt' },
       error: { name: 'Error', filename: 'error.txt' },
-      scrapingInstructions: { name: 'Scraping Instructions', filename: 'scraping-instructions.txt' }
+      scrapingInstructions: { name: 'Scraping Instructions', filename: 'scraping-instructions.txt' },
+      postCallAgent: { name: 'Post-Call Agent', filename: 'post-call-agent.txt' },
+      dailyDigestAgent: { name: 'Daily Digest Agent', filename: 'daily-digest-agent.txt' }
     };
     
     return Object.entries(promptMap).map(([key, meta]) => ({
@@ -159,6 +165,8 @@ class PromptLoader {
   get noSpeechDetected() { return this.cache.noSpeechDetected; }
   get error() { return this.cache.error; }
   get scrapingInstructions() { return this.cache.scrapingInstructions; }
+  get postCallAgent() { return this.cache.postCallAgent; }
+  get dailyDigestAgent() { return this.cache.dailyDigestAgent; }
 }
 
 module.exports = new PromptLoader();
