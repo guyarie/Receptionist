@@ -159,6 +159,89 @@ app.get('/', (req, res) => {
   res.send('AI Phone Receptionist is running!');
 });
 
+// ============================================================================
+// Setup Assistant
+// ============================================================================
+
+// GET /setup — serve the setup UI
+app.get('/setup', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'setup', 'index.html'));
+});
+
+// GET /api/setup/status — tells the frontend whether the API key is set
+// and whether setup appears complete, so it knows which screen to show.
+app.get('/api/setup/status', (req, res) => {
+  const hasApiKey = !!(process.env.OPENROUTER_API_KEY);
+  const setupComplete = process.env.SETUP_MODE !== 'true'
+    && !!(process.env.TWILIO_ACCOUNT_SID)
+    && !!(process.env.OPENROUTER_API_KEY);
+  res.json({ hasApiKey, setupComplete });
+});
+
+// POST /api/setup/chat — run one turn of the setup agent, streamed as SSE events.
+// Events: tool_start, tool_end, secret_request, message, error, done
+app.post('/api/setup/chat', async (req, res) => {
+  const { message, sessionId } = req.body;
+
+  if (!message || !sessionId) {
+    return res.status(400).json({ error: 'Missing message or sessionId' });
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+
+  const sendEvent = (type, data = {}) => {
+    res.write(`data: ${JSON.stringify({ type, ...data })}\n\n`);
+  };
+
+  try {
+    const { runSetupTurn } = require('./agents/setup-agent');
+    const agentResponse = await runSetupTurn(sessionId, message, sendEvent);
+    if (agentResponse) {
+      sendEvent('message', { content: agentResponse });
+    }
+  } catch (err) {
+    console.error('❌ Setup agent error:', err);
+    sendEvent('error', { message: err.message || 'An error occurred' });
+  }
+
+  sendEvent('done');
+  res.end();
+});
+
+// POST /api/setup/secret — write a sensitive value to .env without it passing
+// through the LLM. Called by the frontend when the user submits a secret form.
+app.post('/api/setup/secret', (req, res) => {
+  const { key, value } = req.body;
+
+  if (!key || !value) {
+    return res.status(400).json({ error: 'Missing key or value' });
+  }
+
+  // Allowlist of keys that can be written via this endpoint
+  const allowedSecretKeys = [
+    'OPENROUTER_API_KEY', 'OPENAI_API_KEY',
+    'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER',
+    'ADMIN_PASSWORD', 'SESSION_SECRET',
+    'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM',
+  ];
+
+  if (!allowedSecretKeys.includes(key)) {
+    return res.status(400).json({ error: `Key '${key}' is not allowed via this endpoint` });
+  }
+
+  try {
+    const { writeSecret } = require('./agents/setup-tools');
+    writeSecret(key, value);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Error writing secret:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Chat API endpoint for web interface
 app.post('/api/chat', async (req, res) => {
   try {

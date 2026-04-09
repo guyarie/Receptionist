@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Receptionist Setup</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --border: #e2e5ea;
+      --text: #1a1d23;
+      --text-muted: #6b7280;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-light: #eef2ff;
+      --user-bubble: #4f46e5;
+      --assistant-bubble: #f1f3f5;
+      --success: #16a34a;
+      --warning: #ca8a04;
+      --error: #dc2626;
+      --activity-bg: #f9fafb;
+      --activity-border: #e5e7eb;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+    header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .header-badge {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── Layout ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 16px;
+      min-height: 0;
+    }
+
+    /* ── Messages ── */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .messages::-webkit-scrollbar { width: 6px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* Welcome state */
+    .welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      gap: 16px;
+    }
+    .welcome-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--accent-light);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    .welcome h2 { font-size: 22px; font-weight: 700; }
+    .welcome p { font-size: 15px; color: var(--text-muted); max-width: 480px; line-height: 1.6; }
+
+    /* Message bubbles */
+    .message {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    .message.user { flex-direction: row-reverse; }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .avatar.assistant { background: var(--accent-light); color: var(--accent); }
+    .avatar.user { background: var(--user-bubble); color: white; }
+
+    .bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .message.assistant .bubble {
+      background: var(--assistant-bubble);
+      border-bottom-left-radius: 4px;
+    }
+    .message.user .bubble {
+      background: var(--user-bubble);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .bubble p { margin-bottom: 8px; }
+    .bubble p:last-child { margin-bottom: 0; }
+    .bubble ul, .bubble ol { margin: 8px 0 8px 20px; }
+    .bubble li { margin-bottom: 4px; }
+    .bubble strong { font-weight: 600; }
+    .bubble code {
+      background: rgba(0,0,0,0.08);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .message.user .bubble code { background: rgba(255,255,255,0.2); }
+
+    /* Activity indicator (tool calls) */
+    .activity {
+      margin: 0 44px;
+      background: var(--activity-bg);
+      border: 1px solid var(--activity-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      animation: fadeIn 0.15s ease;
+    }
+    .activity-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .activity-header:hover { background: var(--border); }
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .activity-dot.done { background: var(--success); }
+    .activity-dot.spinning {
+      background: transparent;
+      border: 2px solid var(--accent);
+      border-top-color: transparent;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .activity-items {
+      padding: 0 12px 8px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .activity.expanded .activity-items { display: flex; }
+    .activity-item {
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 2px 0;
+    }
+    .activity-chevron {
+      margin-left: auto;
+      transition: transform 0.2s;
+      font-style: normal;
+    }
+    .activity.expanded .activity-chevron { transform: rotate(180deg); }
+
+    /* Typing indicator */
+    .typing {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      animation: fadeIn 0.2s ease;
+    }
+    .typing-dots {
+      background: var(--assistant-bubble);
+      border-radius: var(--radius);
+      border-bottom-left-radius: 4px;
+      padding: 12px 16px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: bounce 1.2s ease infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 60%, 100% { transform: none; } 30% { transform: translateY(-5px); } }
+
+    /* Secret request card */
+    .secret-card {
+      margin: 0 44px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      animation: fadeIn 0.2s ease;
+    }
+    .secret-card-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .secret-card-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .secret-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .secret-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: monospace;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .secret-input:focus { border-color: var(--accent); }
+    .secret-submit {
+      padding: 8px 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .secret-submit:hover { background: var(--accent-hover); }
+    .secret-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .secret-saved {
+      font-size: 12px;
+      color: var(--success);
+      font-weight: 500;
+      padding: 6px 0 0;
+    }
+
+    /* API key gate (shown before chat is available) */
+    #api-gate {
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+    #api-gate h2 { font-size: 20px; font-weight: 700; }
+    #api-gate p { font-size: 14px; color: var(--text-muted); max-width: 440px; line-height: 1.6; }
+    .gate-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .gate-card label { font-size: 13px; font-weight: 600; }
+    .gate-card .hint { font-size: 12px; color: var(--text-muted); margin-top: -8px; }
+    .gate-card input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: monospace;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+    .gate-card input:focus { border-color: var(--accent); }
+    .gate-submit {
+      padding: 10px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .gate-submit:hover { background: var(--accent-hover); }
+    .gate-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .gate-error { font-size: 12px; color: var(--error); display: none; }
+
+    /* Input area */
+    .input-area {
+      padding: 16px 0 20px;
+      flex-shrink: 0;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px;
+      transition: border-color 0.15s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .input-row:focus-within { border-color: var(--accent); }
+    #userInput {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: transparent;
+      line-height: 1.5;
+      max-height: 120px;
+      min-height: 24px;
+      padding: 4px 4px 4px 8px;
+    }
+    #userInput::placeholder { color: var(--text-muted); }
+    #sendBtn {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, opacity 0.15s;
+      color: white;
+    }
+    #sendBtn:hover { background: var(--accent-hover); }
+    #sendBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .input-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* Error toast */
+    .error-banner {
+      margin: 0 44px;
+      padding: 10px 14px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--error);
+      animation: fadeIn 0.2s ease;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 12px 16px; }
+      .main { padding: 0 12px; }
+      .bubble { max-width: 92%; }
+      .activity, .secret-card { margin: 0 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">📞</div>
+  <div>
+    <h1>AI Receptionist Setup</h1>
+    <p>Configure your AI phone receptionist</p>
+  </div>
+  <div class="header-badge" id="headerBadge">Checking...</div>
+</header>
+
+<div class="main">
+  <!-- API key gate — shown when OPENROUTER_API_KEY is not yet set -->
+  <div id="api-gate" style="display:none;">
+    <div class="welcome-icon">🔑</div>
+    <h2>First, let's get your AI key</h2>
+    <p>
+      The setup assistant runs on OpenRouter — a service that gives your receptionist its AI intelligence.
+      You'll need an account and API key to continue.
+    </p>
+    <div class="gate-card">
+      <label for="gateApiKey">OpenRouter API Key</label>
+      <p class="hint">Get one free at <strong>openrouter.ai/keys</strong> — add $5–10 to start</p>
+      <input type="password" id="gateApiKey" placeholder="sk-or-..." autocomplete="off" />
+      <div class="gate-error" id="gateError">Failed to save key. Please try again.</div>
+      <button class="gate-submit" id="gateSubmit">Save & Start Setup →</button>
+    </div>
+  </div>
+
+  <!-- Chat interface — shown after API key is available -->
+  <div id="chat-area" style="display:none; flex:1; flex-direction:column; min-height:0;">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">✨</div>
+        <h2>Welcome to Receptionist Setup</h2>
+        <p>
+          I'll guide you through configuring your AI phone receptionist.
+          Type anything below to get started — I'll check your current setup and walk you through each step.
+        </p>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <textarea
+          id="userInput"
+          placeholder="Type a message or just press Send to begin..."
+          rows="1"
+          autocomplete="off"
+        ></textarea>
+        <button id="sendBtn" title="Send (Enter)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="input-hint">Press <strong>Enter</strong> to send · <strong>Shift+Enter</strong> for new line</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ── Session ──────────────────────────────────────────────────────────────
+  let sessionId = sessionStorage.getItem('setup_session_id');
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    sessionStorage.setItem('setup_session_id', sessionId);
+  }
+
+  let isSending = false;
+  let pendingActivity = null; // The current activity DOM element
+  let pendingActivityItems = null;
+
+  // ── DOM refs ──────────────────────────────────────────────────────────────
+  const apiGate    = document.getElementById('api-gate');
+  const chatArea   = document.getElementById('chat-area');
+  const messages   = document.getElementById('messages');
+  const welcome    = document.getElementById('welcome');
+  const userInput  = document.getElementById('userInput');
+  const sendBtn    = document.getElementById('sendBtn');
+  const headerBadge = document.getElementById('headerBadge');
+
+  // ── Init: check if API key is already set ─────────────────────────────────
+  fetch('/api/setup/status')
+    .then(r => r.json())
+    .then(data => {
+      if (data.hasApiKey) {
+        showChat();
+      } else {
+        showGate();
+      }
+      headerBadge.textContent = data.setupComplete ? 'Setup complete' : 'Setup in progress';
+    })
+    .catch(() => {
+      showGate();
+      headerBadge.textContent = 'Ready';
+    });
+
+  function showGate() {
+    apiGate.style.display = 'flex';
+    chatArea.style.display = 'none';
+    document.getElementById('gateApiKey').focus();
+  }
+
+  function showChat() {
+    apiGate.style.display = 'none';
+    chatArea.style.display = 'flex';
+    userInput.focus();
+  }
+
+  // ── API gate submission ───────────────────────────────────────────────────
+  document.getElementById('gateSubmit').addEventListener('click', submitGateKey);
+  document.getElementById('gateApiKey').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitGateKey();
+  });
+
+  async function submitGateKey() {
+    const key = document.getElementById('gateApiKey').value.trim();
+    if (!key) return;
+
+    const btn = document.getElementById('gateSubmit');
+    const err = document.getElementById('gateError');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    err.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/setup/secret', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'OPENROUTER_API_KEY', value: key }),
+      });
+      if (!res.ok) throw new Error('Server error');
+      showChat();
+    } catch (e) {
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Save & Start Setup →';
+    }
+  }
+
+  // ── Auto-resize textarea ──────────────────────────────────────────────────
+  userInput.addEventListener('input', () => {
+    userInput.style.height = 'auto';
+    userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
+  });
+
+  // ── Send on Enter, newline on Shift+Enter ─────────────────────────────────
+  userInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  sendBtn.addEventListener('click', sendMessage);
+
+  // ── Send a message ────────────────────────────────────────────────────────
+  async function sendMessage() {
+    const text = userInput.value.trim();
+    const messageToSend = text || 'Hi, I\'m ready to start setting up my AI receptionist.';
+
+    if (isSending) return;
+
+    // Hide welcome and clear input
+    if (welcome) welcome.remove();
+    userInput.value = '';
+    userInput.style.height = 'auto';
+
+    // Append user bubble
+    if (text) appendBubble('user', text);
+
+    setSending(true);
+
+    // Show typing indicator
+    const typingEl = appendTyping();
+
+    try {
+      await streamAgentTurn(messageToSend, typingEl);
+    } catch (err) {
+      typingEl.remove();
+      appendError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setSending(false);
+      pendingActivity = null;
+      pendingActivityItems = null;
+    }
+  }
+
+  // ── Stream one agent turn via SSE-style fetch ─────────────────────────────
+  async function streamAgentTurn(message, typingEl) {
+    const response = await fetch('/api/setup/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, message }),
+    });
+
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.error || `Server error ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let typingRemoved = false;
+
+    const removeTyping = () => {
+      if (!typingRemoved) { typingEl.remove(); typingRemoved = true; }
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop(); // keep incomplete chunk
+
+      for (const part of parts) {
+        if (!part.startsWith('data: ')) continue;
+        let event;
+        try { event = JSON.parse(part.slice(6)); } catch { continue; }
+        handleEvent(event, removeTyping);
+      }
+    }
+    removeTyping();
+  }
+
+  // ── Handle a single SSE event ─────────────────────────────────────────────
+  function handleEvent(event, removeTyping) {
+    switch (event.type) {
+      case 'tool_start':
+        removeTyping();
+        ensureActivity();
+        addActivityItem(event.label || event.name, false);
+        break;
+
+      case 'tool_end':
+        if (event.summary) updateLastActivityItem(event.summary);
+        finishActivity();
+        break;
+
+      case 'secret_request':
+        removeTyping();
+        finishActivity();
+        appendSecretCard(event.key, event.label, event.description);
+        break;
+
+      case 'message':
+        removeTyping();
+        finishActivity();
+        if (event.content) appendBubble('assistant', event.content);
+        break;
+
+      case 'error':
+        removeTyping();
+        appendError(event.message);
+        break;
+
+      case 'done':
+        break;
+    }
+  }
+
+  // ── Activity log (collapsible tool call display) ──────────────────────────
+  function ensureActivity() {
+    if (pendingActivity) return;
+    pendingActivity = document.createElement('div');
+    pendingActivity.className = 'activity';
+    const header = document.createElement('div');
+    header.className = 'activity-header';
+    header.innerHTML = '<span class="activity-dot spinning"></span><span class="activity-label">Working...</span><i class="activity-chevron">▾</i>';
+    header.addEventListener('click', () => pendingActivity.classList.toggle('expanded'));
+    pendingActivityItems = document.createElement('div');
+    pendingActivityItems.className = 'activity-items';
+    pendingActivity.appendChild(header);
+    pendingActivity.appendChild(pendingActivityItems);
+    messages.appendChild(pendingActivity);
+    scrollBottom();
+  }
+
+  function addActivityItem(label, done) {
+    if (!pendingActivityItems) return;
+    const item = document.createElement('div');
+    item.className = 'activity-item';
+    item.textContent = label;
+    pendingActivityItems.appendChild(item);
+    scrollBottom();
+  }
+
+  function updateLastActivityItem(text) {
+    if (!pendingActivityItems) return;
+    const items = pendingActivityItems.querySelectorAll('.activity-item');
+    if (items.length > 0) items[items.length - 1].textContent = text;
+  }
+
+  function finishActivity() {
+    if (!pendingActivity) return;
+    const dot = pendingActivity.querySelector('.activity-dot');
+    if (dot) { dot.classList.remove('spinning'); dot.classList.add('done'); }
+    const label = pendingActivity.querySelector('.activity-label');
+    if (label) label.textContent = 'Done';
+    pendingActivity = null;
+    pendingActivityItems = null;
+  }
+
+  // ── Bubble helpers ────────────────────────────────────────────────────────
+  function appendBubble(role, text) {
+    const el = document.createElement('div');
+    el.className = `message ${role}`;
+    const avatar = document.createElement('div');
+    avatar.className = `avatar ${role}`;
+    avatar.textContent = role === 'assistant' ? '🤖' : '👤';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = markdownToHtml(text);
+    el.appendChild(avatar);
+    el.appendChild(bubble);
+    messages.appendChild(el);
+    scrollBottom();
+    return el;
+  }
+
+  function appendTyping() {
+    const el = document.createElement('div');
+    el.className = 'typing';
+    el.innerHTML = `
+      <div class="avatar assistant">🤖</div>
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+    messages.appendChild(el);
+    scrollBottom();
+    return el;
+  }
+
+  function appendError(msg) {
+    const el = document.createElement('div');
+    el.className = 'error-banner';
+    el.textContent = '⚠️ ' + msg;
+    messages.appendChild(el);
+    scrollBottom();
+  }
+
+  // ── Secret input card ─────────────────────────────────────────────────────
+  function appendSecretCard(key, label, description) {
+    const card = document.createElement('div');
+    card.className = 'secret-card';
+    card.dataset.key = key;
+
+    card.innerHTML = `
+      <div class="secret-card-label">🔐 ${label}</div>
+      <div class="secret-card-desc">${description}</div>
+      <div class="secret-input-row">
+        <input type="password" class="secret-input" placeholder="Paste your key here..." autocomplete="off" />
+        <button class="secret-submit">Save</button>
+      </div>
+      <div class="secret-saved" style="display:none;">✓ Saved securely</div>`;
+
+    messages.appendChild(card);
+    scrollBottom();
+
+    const input = card.querySelector('.secret-input');
+    const btn   = card.querySelector('.secret-submit');
+    const saved = card.querySelector('.secret-saved');
+
+    const submit = async () => {
+      const value = input.value.trim();
+      if (!value) { input.focus(); return; }
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      try {
+        const res = await fetch('/api/setup/secret', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key, value }),
+        });
+        if (!res.ok) throw new Error();
+        input.style.display = 'none';
+        btn.style.display = 'none';
+        saved.style.display = 'block';
+        // Auto-continue the conversation
+        setTimeout(() => {
+          userInput.value = `I've provided the ${label}. Please continue.`;
+          sendMessage();
+        }, 600);
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Save';
+        input.style.borderColor = 'var(--error)';
+      }
+    };
+
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    input.focus();
+  }
+
+  // ── Utilities ─────────────────────────────────────────────────────────────
+  function setSending(val) {
+    isSending = val;
+    sendBtn.disabled = val;
+    userInput.disabled = val;
+  }
+
+  function scrollBottom() {
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // Very minimal markdown → HTML (bold, code, lists, newlines)
+  function markdownToHtml(text) {
+    // Escape HTML first
+    text = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Code blocks
+    text = text.replace(/```[\s\S]*?```/g, m => {
+      const inner = m.replace(/^```[^\n]*\n?/, '').replace(/```$/, '');
+      return `<pre style="background:rgba(0,0,0,0.06);padding:10px;border-radius:6px;font-size:12px;overflow-x:auto;margin:8px 0;"><code>${inner}</code></pre>`;
+    });
+
+    // Inline code
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Bold
+    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // Headers
+    text = text.replace(/^### (.+)$/gm, '<strong>$1</strong>');
+    text = text.replace(/^## (.+)$/gm, '<strong>$1</strong>');
+    text = text.replace(/^# (.+)$/gm, '<strong>$1</strong>');
+
+    // Unordered lists
+    text = text.replace(/((?:^[-*] .+\n?)+)/gm, m => {
+      const items = m.trim().split('\n').map(l => `<li>${l.replace(/^[-*] /, '')}</li>`).join('');
+      return `<ul>${items}</ul>`;
+    });
+
+    // Numbered lists
+    text = text.replace(/((?:^\d+\. .+\n?)+)/gm, m => {
+      const items = m.trim().split('\n').map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`).join('');
+      return `<ol>${items}</ol>`;
+    });
+
+    // Paragraphs from double newlines
+    text = text.split(/\n\n+/).map(p => {
+      p = p.trim();
+      if (!p || p.startsWith('<ul') || p.startsWith('<ol') || p.startsWith('<pre')) return p;
+      return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+    }).join('\n');
+
+    return text;
+  }
+})();
+</script>
+
+</body>
+</html>
