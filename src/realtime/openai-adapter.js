@@ -79,6 +79,15 @@ class OpenAIAdapter extends ProviderAdapter {
             input_audio_transcription: {
               model: 'whisper-1'
             },
+            tools: [
+              {
+                type: 'function',
+                name: 'hangup',
+                description: 'End the call. Call this when the conversation is complete and it is time to hang up.',
+                parameters: { type: 'object', properties: {} }
+              }
+            ],
+            tool_choice: 'auto',
             instructions: instructions || ''
           }
         };
@@ -170,6 +179,13 @@ class OpenAIAdapter extends ProviderAdapter {
 
       case 'input_audio_buffer.speech_stopped':
         console.log('🔇 Speech stopped — VAD detected end of caller turn');
+        break;
+
+      case 'response.output_item.done':
+        if (event.item?.type === 'function_call' && event.item?.name === 'hangup') {
+          console.log('📵 AI requested hangup');
+          if (this.onHangup) this.onHangup();
+        }
         break;
 
       case 'response.done':
