@@ -4,7 +4,7 @@ After the setup assistant has configured your receptionist, you can fine-tune ev
 
 ## The admin panel
 
-Go to **http://localhost:3000/admin** and log in with your admin password.
+Go to **http://localhost:[PORT]/admin** and log in with your admin password. The port is whatever `PORT` is set to in your `.env` (default `443` for production HTTPS; if you're running behind a reverse proxy on port 3000, use that instead).
 
 ### Editing prompts
 
@@ -15,7 +15,7 @@ Key prompts to know:
 | Prompt | What it controls |
 |---|---|
 | `system-prompt.txt` | The receptionist's core personality, knowledge, and behavior rules |
-| `greeting.txt` | The first words callers hear |
+| `webchat-greeting.txt` | Opening message shown in the web chat widget |
 | `post-call-agent.txt` | How the AI processes each call after it ends |
 | `daily-digest-agent.txt` | What goes into the daily email summary |
 
@@ -59,7 +59,7 @@ For larger changes, you can edit files directly in `data/`:
 data/
 ├── prompts/             ← overrides prompts/ defaults
 │   ├── system-prompt.txt
-│   ├── greeting.txt
+│   ├── webchat-greeting.txt
 │   └── ...
 ├── providers/           ← one .md file per staff member
 ├── availability/        ← schedule files
@@ -68,7 +68,7 @@ data/
 
 Any file in `data/prompts/` takes priority over the matching file in `prompts/`. You only need to create files for things you want to customize.
 
-After editing files manually, use Admin → Dashboard → **Reload All** (or `curl -X POST http://localhost:3000/admin/api/reload`) to apply changes without restarting.
+After editing files manually, use Admin → Dashboard → **Reload All** (or `curl -X POST http://localhost:[PORT]/admin/api/reload`) to apply changes without restarting. Replace `[PORT]` with the value of `PORT` in your `.env`.
 
 ---
 
@@ -92,15 +92,9 @@ OPENROUTER_MODEL=openai/gpt-4o
 
 OpenRouter supports many models. See [openrouter.ai/models](https://openrouter.ai/models) for options. The model affects response quality and cost for text-based processing (summaries, post-call agent). Real-time voice always uses OpenAI's Realtime API regardless of this setting.
 
-## Switching voice modes
+## Voice
 
-**Enable real-time voice** (recommended):
-```env
-OPENAI_API_KEY=sk-xxx
-```
-
-**Use turn-by-turn mode** (no OpenAI key needed):
-Remove or leave `OPENAI_API_KEY` unset.
+The system uses OpenAI Realtime API exclusively. `OPENAI_API_KEY` is required — without it the server starts but rejects incoming calls with a message to try again later.
 
 ---
 
@@ -143,4 +137,4 @@ After editing prompts:
 2. Make a test call
 3. Review the result in Admin → Call Logs
 
-For significant prompt changes, use the web chat at http://localhost:3000/chat.html as a quick feedback loop before making a real call.
+For significant prompt changes, use the test chat at **http://localhost:[PORT]/test-widget.html** as a quick feedback loop before making a real call. Replace `[PORT]` with `SETUP_PORT` (default `3001`) if running in setup mode, or `PORT` if the server is running in production mode — both values are in your `.env`.

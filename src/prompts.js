@@ -34,12 +34,7 @@ class PromptLoader {
   loadAllPrompts() {
     const files = {
       systemPrompt: 'system-prompt.txt',
-      greeting: 'greeting.txt',
       webchatGreeting: 'webchat-greeting.txt',
-      followUp: 'follow-up.txt',
-      closing: 'closing.txt',
-      noSpeechDetected: 'no-speech-detected.txt',
-      error: 'error.txt',
       scrapingInstructions: 'scraping-instructions.txt',
       postCallAgent: 'post-call-agent.txt',
       dailyDigestAgent: 'daily-digest-agent.txt'
@@ -80,12 +75,7 @@ class PromptLoader {
   getDefaultPrompt(key) {
     const defaults = {
       systemPrompt: 'You are a helpful receptionist.',
-      greeting: 'Hello! How can I help you?',
-      webchatGreeting: 'Hello! Welcome to our practice. How can I help you today?',
-      followUp: 'Is there anything else?',
-      closing: 'Thank you for calling!',
-      noSpeechDetected: 'I didn\'t catch that. Could you repeat?',
-      error: 'I apologize for the technical difficulty.',
+      webchatGreeting: 'Hello! How can I help you today?',
       scrapingInstructions: 'Extract practice and provider information from the website content.',
       postCallAgent: 'You are a post-call processing agent. Generate a summary of the call.',
       dailyDigestAgent: 'You are a daily digest agent. Compose a summary of today\'s calls.'
@@ -108,12 +98,7 @@ class PromptLoader {
   getAll() {
     const promptMap = {
       systemPrompt: { name: 'System Prompt', filename: 'system-prompt.txt' },
-      greeting: { name: 'Greeting', filename: 'greeting.txt' },
       webchatGreeting: { name: 'Webchat Greeting', filename: 'webchat-greeting.txt' },
-      followUp: { name: 'Follow-up', filename: 'follow-up.txt' },
-      closing: { name: 'Closing', filename: 'closing.txt' },
-      noSpeechDetected: { name: 'No Speech Detected', filename: 'no-speech-detected.txt' },
-      error: { name: 'Error', filename: 'error.txt' },
       scrapingInstructions: { name: 'Scraping Instructions', filename: 'scraping-instructions.txt' },
       postCallAgent: { name: 'Post-Call Agent', filename: 'post-call-agent.txt' },
       dailyDigestAgent: { name: 'Daily Digest Agent', filename: 'daily-digest-agent.txt' }
@@ -158,12 +143,7 @@ class PromptLoader {
   
   // Getters for each prompt
   get systemPrompt() { return this.cache.systemPrompt; }
-  get greeting() { return this.cache.greeting; }
   get webchatGreeting() { return this.cache.webchatGreeting; }
-  get followUp() { return this.cache.followUp; }
-  get closing() { return this.cache.closing; }
-  get noSpeechDetected() { return this.cache.noSpeechDetected; }
-  get error() { return this.cache.error; }
   get scrapingInstructions() { return this.cache.scrapingInstructions; }
   get postCallAgent() { return this.cache.postCallAgent; }
   get dailyDigestAgent() { return this.cache.dailyDigestAgent; }

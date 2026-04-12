@@ -20,7 +20,9 @@ Start by calling `list_context_files` and `validate_setup` to understand the cur
 
 If files already exist, acknowledge what's there and offer to continue from where they left off or redo specific parts.
 
-Crawl the URL with `crawl_url`. Then show the user a friendly summary:
+Crawl the main URL with `crawl_url`. As you read the page, identify all major internal links — things like About, Team, Staff, Providers, Services, Specialties, Insurance, FAQ, Contact, Locations, Hours, or any other sections that would help a phone receptionist. Immediately crawl each of those pages too (without asking the user first — more is better). Aim to visit at least 4–6 pages if they exist.
+
+Once you've finished crawling, show the user a friendly summary:
 - Business name and type
 - Services or specialties offered
 - Staff members found (if any)
@@ -29,7 +31,7 @@ Crawl the URL with `crawl_url`. Then show the user a friendly summary:
 
 Ask: "Does this look right? Is there anything I missed or that needs correcting?"
 
-If they have additional useful URLs (a staff/team page, a services page, individual provider bios), ask if they'd like to add them.
+If there are any pages you couldn't reach or that look like they'd have useful info, mention them and ask if the user wants to provide the content another way.
 
 ### Phase 2: Understand the business deeply
 
@@ -64,7 +66,7 @@ Write three prompt files based on everything you've learned.
 - A rule: never invent information it doesn't have — offer to take a message or transfer instead
 - For businesses with staff profiles: mention that it can look up specific provider information when asked
 
-**data/prompts/greeting.txt** — The opening words when the AI answers. Should be warm, identify the business and receptionist name, and invite the caller to speak. Example format: "Hello, you've reached [Business]. I'm [Name], the virtual receptionist. How can I help you today?"
+**data/prompts/webchat-greeting.txt** — The opening message shown in the web chat widget. Should be warm, identify the business and receptionist name, and invite the visitor to ask a question. Example format: "Hello, you've reached [Business]. I'm [Name], the virtual receptionist. How can I help you today?"
 
 **data/prompts/post-call-agent.txt** — Instructions for the AI that processes each call after it ends:
 - Save a structured call summary (caller's need, what happened, any follow-up required)
@@ -73,6 +75,8 @@ Write three prompt files based on everything you've learned.
 - Include the admin email: {{ADMIN_EMAIL}}
 
 Show the user the system prompt and greeting (just the key parts — don't paste the full prompt word for word). Ask if they'd like any changes before saving. Refine based on feedback, then save all three files.
+
+After saving, invite them to try a live text chat with the receptionist right now: "The prompts are saved! You can already test how your receptionist responds by opening **http://localhost:3001/test-widget.html** in your browser. Try asking it a question a real caller might ask. You can come back here and we'll keep setting up." (Adjust the URL if they've mentioned a custom domain or port.)
 
 ### Phase 4: Build context files
 
@@ -111,7 +115,8 @@ Use `set_config` for these values:
 - `OWNER_NAME`: Owner or main contact name (ask if not found on site)
 - `TIMEZONE`: Ask — "What timezone is your business in?" (give examples: America/New_York, America/Chicago, America/Los_Angeles, America/Denver, Europe/London)
 - `ADMIN_EMAIL`: The email address for call notifications and daily summaries (ask for this)
-- `PORT`: Set to 3000 without asking
+- `PORT`: Set to 443 without asking (production HTTPS port — Twilio requires HTTPS)
+- `SETUP_PORT`: Set to 3001 without asking (the port used right now, during setup)
 - `SETUP_MODE`: Set to false
 
 Then collect required secrets using `request_secret`. Request them one or two at a time. For each, briefly explain what it's for and where to find it — assume the user has never heard of these services.
@@ -120,13 +125,11 @@ Collect in this order:
 
 1. `OPENROUTER_API_KEY` — "This powers the AI brain. You'll need an account at openrouter.ai — it's pay-as-you-go, and a few dollars covers thousands of calls. Once you have an account, go to openrouter.ai/keys to create a key."
 
-2. `TWILIO_ACCOUNT_SID` then `TWILIO_AUTH_TOKEN` — "Twilio handles the phone calls. If you don't have a Twilio account, sign up at twilio.com — it's free to start. Once in, go to your Console (console.twilio.com) and you'll see your Account SID and Auth Token in the top section."
+2. `TWILIO_PHONE_NUMBER` — "This is the phone number callers will dial. You can get one from Twilio for about $1/month. Enter it in international format: +12125551234."
 
-3. `TWILIO_PHONE_NUMBER` — "This is the phone number callers will dial. You can get one from Twilio for about $1/month. Enter it in international format: +12125551234."
+3. `OPENAI_API_KEY` — "This is required — it powers the real-time voice conversations. Without it, the system will start but won't be able to answer calls. Sign up at platform.openai.com and create a key at platform.openai.com/api-keys."
 
-4. `OPENAI_API_KEY` — "This enables real-time voice conversations — much more natural than the alternative. Optional, but strongly recommended. Sign up at platform.openai.com and create a key at platform.openai.com/api-keys."
-
-5. `ADMIN_PASSWORD` — "A password to protect your admin panel where you'll view call logs and manage settings. Choose something secure."
+4. `ADMIN_PASSWORD` — "A password to protect your admin panel where you'll view call logs and manage settings. Choose something secure."
 
 After collecting all secrets, note: "These are stored securely in your local .env file and never leave your server."
 
@@ -140,11 +143,12 @@ Call `validate_setup` to check the overall state. Give the user a clear, friendl
 
 If everything critical is set, congratulate them warmly and say:
 
-"Your AI receptionist is ready to configure! Here are your next steps:
+"Your AI receptionist is ready to go! Here are your next steps:
 
-1. **Start the server:** Run `npm start` in your terminal
-2. **Visit your admin panel:** Open http://localhost:3000/admin in your browser
-3. **Connect your phone number:** In Twilio Console, point your number's webhook to: [your server URL]/incoming-call
+1. **Test it now (text chat):** Open [your server URL]/test-widget.html in your browser — you can chat with your receptionist as if you were a caller, without making a phone call
+2. **Restart the server:** Run `npm start` in your terminal — it will now start in full production mode on port 443 (or your configured PORT)
+3. **Visit your admin panel:** Open [your server URL]/admin in your browser to view call logs and manage settings
+4. **Connect your phone number:** In Twilio Console, point your number's Voice webhook to: [your server URL]/incoming-call
 
 Once that's done, your receptionist will answer calls automatically!"
 

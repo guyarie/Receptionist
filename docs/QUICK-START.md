@@ -10,7 +10,7 @@ npm start
 
 The server will start in setup mode. You'll see:
 ```
-⚠️  Missing required environment variables (setup mode): TWILIO_ACCOUNT_SID, ...
+⚠️  Missing required environment variables (setup mode): OPENROUTER_API_KEY
    Visit /setup to configure your receptionist.
 🚀 Server running on port 3000
 ```
@@ -45,13 +45,10 @@ npm start
 Look for the confirmation lines in startup output:
 ```
 🚀 Server running on port 3000
-🎙️ Realtime voice streaming is available   ← if OPENAI_API_KEY is set
+🎙️ Realtime voice streaming is available
 ```
 
-Or if you skipped the OpenAI key (that's fine):
-```
-⚠️ OPENAI_API_KEY not set — using Gather fallback
-```
+If you see a warning that `OPENAI_API_KEY` is not set, incoming calls will be rejected until it's configured. Go back to `/setup` to add it.
 
 ## Step 4: Expose your server for testing
 
@@ -102,19 +99,9 @@ You can re-run setup at any time by visiting `/setup` again. The assistant will 
 
 ---
 
-## Voice modes
+## Voice mode
 
-**Real-time streaming** (with `OPENAI_API_KEY`):
-- Bidirectional audio via OpenAI Realtime API
-- Low latency, supports natural interruptions
-- Feels like a real phone conversation
-
-**Turn-by-turn** (without `OPENAI_API_KEY`):
-- Twilio speech recognition + OpenRouter AI
-- Slightly higher latency per turn
-- Still fully functional — a good starting point
-
-Both modes produce transcripts and summaries. You can switch by adding or removing `OPENAI_API_KEY` from `.env` and restarting.
+Real-time streaming via the OpenAI Realtime API. `OPENAI_API_KEY` is required — without it the server starts but rejects incoming calls. All calls produce transcripts and summaries.
 
 ---
 

@@ -74,8 +74,6 @@ Make sure your `.env` includes:
 PORT=443
 SSL_CERT_PATH=/path/to/your/cert.pem
 SSL_KEY_PATH=/path/to/your/key.pem
-TWILIO_ACCOUNT_SID=your_account_sid
-TWILIO_AUTH_TOKEN=your_auth_token
 TWILIO_PHONE_NUMBER=your_phone_number
 OPENROUTER_API_KEY=your_openrouter_key
 OPENAI_API_KEY=your_openai_key

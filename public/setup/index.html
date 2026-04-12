@@ -330,12 +330,13 @@
       align-items: center;
       gap: 20px;
       text-align: center;
+      overflow-y: auto;
     }
     #api-gate h2 { font-size: 20px; font-weight: 700; }
-    #api-gate p { font-size: 14px; color: var(--text-muted); max-width: 440px; line-height: 1.6; }
+    #api-gate > p { font-size: 14px; color: var(--text-muted); max-width: 480px; line-height: 1.6; }
     .gate-card {
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -346,7 +347,7 @@
       gap: 12px;
     }
     .gate-card label { font-size: 13px; font-weight: 600; }
-    .gate-card .hint { font-size: 12px; color: var(--text-muted); margin-top: -8px; }
+    .gate-card .hint { font-size: 12px; color: var(--text-muted); margin-top: -8px; line-height: 1.5; }
     .gate-card input {
       width: 100%;
       padding: 10px 12px;
@@ -373,6 +374,91 @@
     .gate-submit:hover { background: var(--accent-hover); }
     .gate-submit:disabled { opacity: 0.5; cursor: not-allowed; }
     .gate-error { font-size: 12px; color: var(--error); display: none; }
+
+    /* .env editor panel */
+    .env-toggle-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      align-self: flex-start;
+    }
+    .env-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .env-editor-panel {
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+    .env-editor-panel.open { display: flex; }
+    .env-editor-panel h3 { font-size: 14px; font-weight: 600; margin: 0; }
+    .env-editor-panel p { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+    .env-editor-panel textarea {
+      width: 100%;
+      min-height: 220px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-family: monospace;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .env-editor-panel textarea:focus { border-color: var(--accent); }
+    .env-editor-actions { display: flex; gap: 8px; align-items: center; }
+    .env-save-btn {
+      padding: 8px 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .env-save-btn:hover { background: var(--accent-hover); }
+    .env-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .env-save-status { font-size: 12px; color: var(--success); display: none; }
+    .env-save-error { font-size: 12px; color: var(--error); display: none; }
+    .restart-notice {
+      width: 100%;
+      max-width: 480px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #92400e;
+      display: none;
+      text-align: left;
+      line-height: 1.5;
+    }
+    .restart-btn {
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #d97706;
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .restart-btn:hover { background: #b45309; }
 
     /* Input area */
     .input-area {
@@ -464,17 +550,47 @@
   <!-- API key gate — shown when OPENROUTER_API_KEY is not yet set -->
   <div id="api-gate" style="display:none;">
     <div class="welcome-icon">🔑</div>
-    <h2>First, let's get your AI key</h2>
+    <h2>OpenRouter API key required</h2>
     <p>
-      The setup assistant runs on OpenRouter — a service that gives your receptionist its AI intelligence.
-      You'll need an account and API key to continue.
+      The setup assistant needs an OpenRouter API key to run. Get one at
+      <strong>openrouter.ai/keys</strong> (add $5–10 credit to start), then add it to your
+      <code style="font-size:13px;background:rgba(0,0,0,0.06);padding:2px 5px;border-radius:4px;">.env</code> file:
     </p>
+
+    <!-- Quick-paste option -->
     <div class="gate-card">
-      <label for="gateApiKey">OpenRouter API Key</label>
-      <p class="hint">Get one free at <strong>openrouter.ai/keys</strong> — add $5–10 to start</p>
+      <label for="gateApiKey">Paste your key here — we'll save it to .env automatically</label>
+      <p class="hint">Your key stays on this machine and is written directly to your <code>.env</code> file.</p>
       <input type="password" id="gateApiKey" placeholder="sk-or-..." autocomplete="off" />
       <div class="gate-error" id="gateError">Failed to save key. Please try again.</div>
       <button class="gate-submit" id="gateSubmit">Save & Start Setup →</button>
+    </div>
+
+    <!-- Divider -->
+    <p style="font-size:12px;color:var(--text-muted);">— or —</p>
+
+    <!-- Open .env editor toggle -->
+    <button class="env-toggle-btn" id="envToggleBtn">✏️ Edit .env file directly</button>
+
+    <!-- Inline .env editor -->
+    <div class="env-editor-panel" id="envEditorPanel">
+      <h3>Edit .env</h3>
+      <p>Find the line <code>OPENROUTER_API_KEY=</code> and paste your key after the <code>=</code>. Save, then restart the server.</p>
+      <textarea id="envTextarea" spellcheck="false" placeholder="Loading .env..."></textarea>
+      <div class="env-editor-actions">
+        <button class="env-save-btn" id="envSaveBtn">Save .env</button>
+        <span class="env-save-status" id="envSaveStatus">✓ Saved</span>
+        <span class="env-save-error" id="envSaveError">Failed to save</span>
+      </div>
+    </div>
+
+    <!-- Restart notice (shown after saving the full .env) -->
+    <div class="restart-notice" id="restartNotice">
+      <strong>.env saved.</strong> Restart the server for all changes to take effect.<br>
+      Press <kbd>Ctrl+C</kbd> in your terminal, then run <code>npm start</code> again.
+      <br><br>
+      <button class="restart-btn" id="restartBtn">Restart server now</button>
+      <span id="restartStatus" style="font-size:12px;margin-left:8px;display:none;"></span>
     </div>
   </div>
 
@@ -592,6 +708,70 @@
     }
   }
 
+  // ── .env editor ──────────────────────────────────────────────────────────
+  const envToggleBtn   = document.getElementById('envToggleBtn');
+  const envEditorPanel = document.getElementById('envEditorPanel');
+  const envTextarea    = document.getElementById('envTextarea');
+  const envSaveBtn     = document.getElementById('envSaveBtn');
+  const envSaveStatus  = document.getElementById('envSaveStatus');
+  const envSaveError   = document.getElementById('envSaveError');
+  const restartNotice  = document.getElementById('restartNotice');
+  const restartBtn     = document.getElementById('restartBtn');
+  const restartStatus  = document.getElementById('restartStatus');
+
+  envToggleBtn.addEventListener('click', async () => {
+    const isOpen = envEditorPanel.classList.toggle('open');
+    envToggleBtn.textContent = isOpen ? '✕ Close editor' : '✏️ Edit .env file directly';
+    if (isOpen && !envTextarea.value) {
+      envTextarea.value = 'Loading...';
+      try {
+        const res = await fetch('/api/setup/env-file');
+        envTextarea.value = await res.text();
+      } catch {
+        envTextarea.value = '# Could not load .env — paste your content here\n';
+      }
+    }
+  });
+
+  envSaveBtn.addEventListener('click', async () => {
+    envSaveStatus.style.display = 'none';
+    envSaveError.style.display = 'none';
+    envSaveBtn.disabled = true;
+    envSaveBtn.textContent = 'Saving...';
+    try {
+      const res = await fetch('/api/setup/env-file', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: envTextarea.value }),
+      });
+      if (!res.ok) throw new Error();
+      envSaveStatus.style.display = 'inline';
+      restartNotice.style.display = 'block';
+      // Check if the key is now set — if so allow proceeding without restart
+      const status = await fetch('/api/setup/status').then(r => r.json()).catch(() => ({}));
+      if (status.hasApiKey) {
+        restartNotice.innerHTML = '<strong>.env saved.</strong> API key detected — you can <button class="gate-submit" id="continueBtn" style="display:inline;padding:6px 12px;font-size:13px;">Continue to Setup →</button> or restart the server first if you changed other settings.';
+        document.getElementById('continueBtn').addEventListener('click', showChat);
+      }
+    } catch {
+      envSaveError.style.display = 'inline';
+    } finally {
+      envSaveBtn.disabled = false;
+      envSaveBtn.textContent = 'Save .env';
+    }
+  });
+
+  restartBtn.addEventListener('click', async () => {
+    restartBtn.disabled = true;
+    restartStatus.style.display = 'inline';
+    restartStatus.textContent = 'Restarting...';
+    try {
+      await fetch('/api/setup/restart', { method: 'POST' });
+    } catch { /* expected — server is going down */ }
+    restartStatus.textContent = 'Server restarting — refresh this page in a moment.';
+    setTimeout(() => location.reload(), 3000);
+  });
+
   // ── Auto-resize textarea ──────────────────────────────────────────────────
   userInput.addEventListener('input', () => {
     userInput.style.height = 'auto';
@@ -691,7 +871,7 @@
 
       case 'tool_end':
         if (event.summary) updateLastActivityItem(event.summary);
-        finishActivity();
+        // Keep spinner alive — finishActivity() is called when message/secret_request arrives
         break;
 
       case 'secret_request':
@@ -708,6 +888,7 @@
 
       case 'error':
         removeTyping();
+        finishActivity();
         appendError(event.message);
         break;
 
@@ -750,10 +931,7 @@
 
   function finishActivity() {
     if (!pendingActivity) return;
-    const dot = pendingActivity.querySelector('.activity-dot');
-    if (dot) { dot.classList.remove('spinning'); dot.classList.add('done'); }
-    const label = pendingActivity.querySelector('.activity-label');
-    if (label) label.textContent = 'Done';
+    pendingActivity.remove();
     pendingActivity = null;
     pendingActivityItems = null;
   }
@@ -894,11 +1072,16 @@
       return `<ul>${items}</ul>`;
     });
 
-    // Numbered lists
-    text = text.replace(/((?:^\d+\. .+\n?)+)/gm, m => {
-      const items = m.trim().split('\n').map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`).join('');
+    // Numbered lists — collect all `N. item` lines (even across blank lines) into one <ol>
+    text = text.replace(/((?:^\d+\. .+\n?(?:\n(?!\d+\. ).*\n?)*)+)/gm, m => {
+      const items = m.trim().split('\n')
+        .filter(l => /^\d+\. /.test(l))
+        .map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`)
+        .join('');
       return `<ol>${items}</ol>`;
     });
+    // Merge adjacent </ol><ol> blocks that got split by blank lines
+    text = text.replace(/<\/ol>\s*<ol>/g, '');
 
     // Paragraphs from double newlines
     text = text.split(/\n\n+/).map(p => {

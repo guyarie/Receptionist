@@ -3,8 +3,6 @@ require('dotenv').config();
 
 function validateConfig() {
   const required = [
-    'TWILIO_ACCOUNT_SID',
-    'TWILIO_AUTH_TOKEN',
     'OPENROUTER_API_KEY'
   ];
 
@@ -39,8 +37,6 @@ function parseIntEnv(key, defaultValue) {
 
 const config = {
   twilio: {
-    accountSid: process.env.TWILIO_ACCOUNT_SID,
-    authToken: process.env.TWILIO_AUTH_TOKEN,
     phoneNumber: process.env.TWILIO_PHONE_NUMBER
   },
   openRouter: {
@@ -65,6 +61,7 @@ const config = {
   },
   server: {
     port: parseInt(process.env.PORT || '3000', 10),
+    setupPort: parseInt(process.env.SETUP_PORT || '3001', 10),
     sslCert: process.env.SSL_CERT_PATH || null,
     sslKey: process.env.SSL_KEY_PATH || null,
     adminAllowedIps: process.env.ADMIN_ALLOWED_IPS 

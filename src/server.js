@@ -9,7 +9,6 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const config = require('./config');
-const callHandler = require('./call-handler');
 const prompts = require('./prompts');
 const aiClient = require('./ai-client');
 const providerLoader = require('./provider-loader');
@@ -59,7 +58,7 @@ const realtimeAvailable = createProviderAdapter(config.realtime.provider, config
 if (realtimeAvailable) {
   console.log('🎙️ Realtime voice streaming is available');
 } else {
-  console.log('⚠️ OPENAI_API_KEY not set — real-time voice streaming unavailable, using Gather fallback');
+  console.log('⚠️ OPENAI_API_KEY not set — incoming calls will be rejected until this is configured');
 }
 
 // Middleware
@@ -173,7 +172,6 @@ app.get('/setup', (req, res) => {
 app.get('/api/setup/status', (req, res) => {
   const hasApiKey = !!(process.env.OPENROUTER_API_KEY);
   const setupComplete = process.env.SETUP_MODE !== 'true'
-    && !!(process.env.TWILIO_ACCOUNT_SID)
     && !!(process.env.OPENROUTER_API_KEY);
   res.json({ hasApiKey, setupComplete });
 });
@@ -223,7 +221,7 @@ app.post('/api/setup/secret', (req, res) => {
   // Allowlist of keys that can be written via this endpoint
   const allowedSecretKeys = [
     'OPENROUTER_API_KEY', 'OPENAI_API_KEY',
-    'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER',
+    'TWILIO_PHONE_NUMBER',
     'ADMIN_PASSWORD', 'SESSION_SECRET',
     'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM',
   ];
@@ -240,6 +238,37 @@ app.post('/api/setup/secret', (req, res) => {
     console.error('❌ Error writing secret:', err);
     res.status(500).json({ error: err.message });
   }
+});
+
+// GET /api/setup/env-file — return raw .env contents for inline editing
+app.get('/api/setup/env-file', (req, res) => {
+  const envPath = path.join(__dirname, '..', '.env');
+  try {
+    const content = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf-8') : '';
+    res.type('text/plain').send(content);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/setup/env-file — overwrite .env with edited content, reload dotenv
+app.put('/api/setup/env-file', (req, res) => {
+  const envPath = path.join(__dirname, '..', '.env');
+  const { content } = req.body;
+  if (typeof content !== 'string') return res.status(400).json({ error: 'Missing content' });
+  try {
+    fs.writeFileSync(envPath, content, 'utf-8');
+    require('dotenv').config({ path: envPath, override: true });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/setup/restart — gracefully exit so a process manager can restart
+app.post('/api/setup/restart', (req, res) => {
+  res.json({ success: true });
+  setTimeout(() => process.exit(0), 300);
 });
 
 // Chat API endpoint for web interface
@@ -376,6 +405,14 @@ app.get('/api/greeting', (req, res) => {
   res.json({ greeting: prompts.webchatGreeting });
 });
 
+// Public status endpoint — non-sensitive business info for the test widget
+app.get('/api/status', (req, res) => {
+  res.json({
+    businessName: config.business.name,
+    receptionistName: config.business.receptionistName,
+  });
+});
+
 // Get current model info endpoint
 app.get('/api/model-info', (req, res) => {
   res.json({ 
@@ -453,7 +490,7 @@ app.get('/admin', (req, res) => {
 app.get('/admin/api/status', (req, res) => {
   try {
     const uptime = process.uptime();
-    const activeCalls = callHandler.getActiveCallCount ? callHandler.getActiveCallCount() : 0;
+    const activeCalls = sessionManager.getActiveCount();
     const recentErrors = errorBuffer.getAll().slice(0, 10); // Last 10 errors
     
     // Get prompts count
@@ -808,17 +845,26 @@ app.post('/incoming-call', (req, res) => {
   
   console.log(`📞 Incoming call: ${callSid} from ${from}`);
 
-  if (realtimeAvailable) {
-    // Use real-time bidirectional audio streaming via Twilio Media Streams
-    const host = req.headers.host;
-    // Use wss:// when SSL is enabled or behind a TLS-terminating proxy
-    const isSecure = useSSL
-      || req.headers['x-forwarded-proto'] === 'https' 
-      || req.protocol === 'https'
-      || !host.includes('localhost');
-    const protocol = isSecure ? 'wss' : 'ws';
-    console.log(`🎙️ Routing call ${callSid} to realtime streaming via ${protocol}://${host}/media-stream`);
+  if (!realtimeAvailable) {
+    console.error('❌ Incoming call rejected — OPENAI_API_KEY is not set. Realtime voice is required.');
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say>We're sorry, this service is temporarily unavailable. Please try again later.</Say>
+  <Hangup/>
+</Response>`;
+    res.type('text/xml');
+    res.send(twiml);
+    return;
+  }
+
+  const host = req.headers.host;
+  const isSecure = useSSL
+    || req.headers['x-forwarded-proto'] === 'https'
+    || req.protocol === 'https'
+    || !host.includes('localhost');
+  const protocol = isSecure ? 'wss' : 'ws';
+  console.log(`🎙️ Routing call ${callSid} to realtime streaming via ${protocol}://${host}/media-stream`);
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Connect>
     <Stream url="${protocol}://${host}/media-stream">
@@ -828,167 +874,18 @@ app.post('/incoming-call', (req, res) => {
     </Stream>
   </Connect>
 </Response>`;
-    res.type('text/xml');
-    res.send(twiml);
-  } else {
-    // Fallback: Gather-based speech recognition (turn-by-turn)
-    callHandler.startCall(callSid, { from, to });
-    
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">${escapeXml(prompts.greeting)}</Say>
-  <Gather input="speech" action="/handle-speech" timeout="5" speechTimeout="auto">
-  </Gather>
-  <Say voice="Polly.Joanna">I didn't hear anything. Goodbye!</Say>
-  <Hangup/>
-</Response>`;
-    res.type('text/xml');
-    res.send(twiml);
-  }
+  res.type('text/xml');
+  res.send(twiml);
 });
 
-// Call status callback - triggered when call ends
-app.post('/call-status', async (req, res) => {
-  const callSid = req.body.CallSid;
-  const callStatus = req.body.CallStatus;
-  
-  console.log(`📊 Call status update: ${callSid} - ${callStatus}`);
-  
-  if (callStatus === 'completed') {
-    // End call and save summary
-    await callHandler.endCall(callSid);
-  }
-  
+// Call status callback — Twilio sends this when a call ends.
+// Realtime cleanup is handled by the WebSocket close event; this just acknowledges.
+app.post('/call-status', (req, res) => {
+  console.log(`📊 Call status: ${req.body.CallSid} — ${req.body.CallStatus}`);
   res.sendStatus(200);
 });
 
-// View all call summaries
-app.get('/call-summaries', (req, res) => {
-  const callSummaryManager = require('./call-summary');
-  const summaries = callSummaryManager.getAllSummaries();
-  
-  // Return as HTML for easy viewing
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Call Summaries</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 1200px; margin: 20px auto; padding: 20px; }
-    h1 { color: #667eea; }
-    .call { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-    .call-header { background: #f5f5f5; padding: 10px; margin: -15px -15px 15px -15px; border-radius: 8px 8px 0 0; }
-    .call-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; }
-    .info-item { padding: 8px; background: #f9f9f9; border-radius: 4px; }
-    .info-label { font-weight: bold; color: #666; font-size: 12px; }
-    .summary { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-    .transcript { background: #f8f9fa; padding: 10px; border-radius: 4px; }
-    .message { margin-bottom: 10px; padding: 8px; border-left: 3px solid #667eea; }
-    .caller { border-left-color: #28a745; }
-  </style>
-</head>
-<body>
-  <h1>📞 Call Summaries</h1>
-  <p>Total calls: ${summaries.length}</p>
-  ${summaries.map(call => `
-    <div class="call">
-      <div class="call-header">
-        <strong>Call ID:</strong> ${call.callSid}
-      </div>
-      <div class="call-info">
-        <div class="info-item">
-          <div class="info-label">Caller Phone</div>
-          <div>${call.callerPhone}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Twilio Number</div>
-          <div>${call.twilioNumber}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Start Time</div>
-          <div>${new Date(call.startTime).toLocaleString('en-US', { timeZone: config.timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Duration</div>
-          <div>${call.duration}</div>
-        </div>
-      </div>
-      <div class="summary">
-        <strong>📝 Summary:</strong><br>
-        ${call.summary}
-      </div>
-      <details>
-        <summary><strong>Full Transcript</strong></summary>
-        <div class="transcript">
-          ${call.fullTranscript.map(msg => `
-            <div class="message ${msg.speaker === 'Caller' ? 'caller' : ''}">
-              <strong>${msg.speaker}:</strong> ${msg.message}
-            </div>
-          `).join('')}
-        </div>
-      </details>
-    </div>
-  `).join('')}
-</body>
-</html>
-  `;
-  
-  res.send(html);
-});
-
-// Handle speech input from caller
-app.post('/handle-speech', async (req, res) => {
-  const speechResult = req.body.SpeechResult;
-  const callSid = req.body.CallSid;
-  
-  console.log(`💬 Caller said: "${speechResult}"`);
-  
-  if (!speechResult) {
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">${escapeXml(prompts.noSpeechDetected)}</Say>
-  <Gather input="speech" action="/handle-speech" timeout="5" speechTimeout="auto">
-    <Say voice="Polly.Joanna">I'm listening.</Say>
-  </Gather>
-  <Hangup/>
-</Response>`;
-    res.type('text/xml');
-    res.send(twiml);
-    return;
-  }
-  
-  try {
-    // Process with AI
-    const aiResponse = await callHandler.processText(callSid, speechResult);
-    
-    // Return AI response and continue listening
-    // Don't add follow-up prompt - let the AI's natural response flow
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">${escapeXml(aiResponse)}</Say>
-  <Gather input="speech" action="/handle-speech" timeout="5" speechTimeout="auto">
-  </Gather>
-  <Say voice="Polly.Joanna">${escapeXml(prompts.closing)}</Say>
-  <Hangup/>
-</Response>`;
-    
-    res.type('text/xml');
-    res.send(twiml);
-    
-  } catch (error) {
-    console.error('❌ Error handling speech:', error);
-    errorBuffer.add(error, 'handle-speech');
-    
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">${escapeXml(prompts.error)}</Say>
-  <Hangup/>
-</Response>`;
-    
-    res.type('text/xml');
-    res.send(twiml);
-  }
-});
+// (Gather fallback routes removed — see backup/gather-routes.js)
 
 // Helper function to escape XML special characters
 function escapeXml(text) {
@@ -1038,7 +935,6 @@ wss.on('connection', (ws) => {
             systemPrompt: prompts.systemPrompt,
             websiteContext: providerLoader.getAIContext(),
             availabilityContext: availabilityLoader.getAIContext(),
-            greeting: prompts.greeting,
             callerPhone: callerPhone
           });
           break;
@@ -1107,7 +1003,8 @@ function initializeNotificationSystem() {
 }
 
 // Start server
-const PORT = config.server.port;
+const isSetupMode = process.env.SETUP_MODE === 'true';
+const PORT = isSetupMode ? config.server.setupPort : config.server.port;
 
 // Load provider profiles and availability before starting server
 (async () => {
@@ -1125,16 +1022,29 @@ const PORT = config.server.port;
     server.listen(PORT, () => {
       const scheme = useSSL ? 'https' : 'http';
       const wsScheme = useSSL ? 'wss' : 'ws';
-      
+
       // Use PUBLIC_URL from env if set, otherwise show localhost
       const publicUrl = process.env.PUBLIC_URL || `${scheme}://localhost:${PORT}`;
       const baseUrl = publicUrl.replace(/\/$/, ''); // Remove trailing slash if present
-      
+
+      if (isSetupMode) {
+        const setupUrl = `http://localhost:${PORT}/setup`;
+        console.log(`\n┌──────────────────────────────────────────────────┐`);
+        console.log(`│                                                  │`);
+        console.log(`│   🧙  Setup Assistant                            │`);
+        console.log(`│                                                  │`);
+        console.log(`│   Open this URL to configure your receptionist:  │`);
+        console.log(`│                                                  │`);
+        console.log(`│   👉  ${setupUrl.padEnd(43)} │`);
+        console.log(`│                                                  │`);
+        console.log(`└──────────────────────────────────────────────────┘\n`);
+        return;
+      }
+
       console.log(`🚀 Server running on port ${PORT} (${useSSL ? 'HTTPS' : 'HTTP'})`);
       console.log(`📞 Webhook URL: ${baseUrl}/incoming-call`);
       console.log(`🔌 WebSocket URL: ${baseUrl.replace(/^http/, 'ws')}/media-stream`);
       console.log(`\n✅ Configuration loaded:`);
-      console.log(`   - Twilio Account: ${config.twilio.accountSid.substring(0, 10)}...`);
       console.log(`   - OpenRouter Model: ${config.openRouter.model}`);
       console.log(`   - Provider Profiles: ${Object.keys(providerLoader.getAll()).length} loaded`);
       if (allowedOrigins.length > 0) {

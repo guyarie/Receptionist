@@ -184,18 +184,34 @@ function createSetupTools(onEvent) {
         filename: z.string().describe('The filename, e.g. "system-prompt.txt" or "dr-jane-smith.md"'),
         content: z.string().describe('The full content of the file'),
       }),
-      execute: async ({ directory, filename, content }) => {
-        onEvent('tool_start', { name: 'save_context_file', label: `Saving ${directory}/${filename}` });
+      execute: async (args) => {
+        console.log(`[setup] save_context_file raw args:`, JSON.stringify(args));
+        const { directory, filename, content } = args;
+        console.log(`[setup] save_context_file called: ${directory}/${filename}`);
+        if (!directory || !filename) {
+          const msg = `save_context_file called with missing arguments (directory=${directory}, filename=${filename}) — the model did not provide required fields`;
+          console.error(`[setup] ${msg}`);
+          onEvent('tool_end', { name: 'save_context_file', summary: msg });
+          return msg;
+        }
+        // Strip any leading 'data/' prefix the model may have mistakenly included
+        const cleanDirectory = directory.replace(/^data\//, '');
+        onEvent('tool_start', { name: 'save_context_file', label: `Saving ${cleanDirectory}/${filename}` });
         try {
           // Sanitize filename — no path traversal
           const safeName = path.basename(filename);
-          const dirPath = path.join(DATA_DIR, directory);
+          const dirPath = path.join(DATA_DIR, cleanDirectory);
+          console.log(`[setup] save_context_file: directory=${dirPath} file=${safeName} contentLength=${content?.length} (raw directory arg was: ${directory})`);
           fs.mkdirSync(dirPath, { recursive: true });
-          fs.writeFileSync(path.join(dirPath, safeName), content, 'utf-8');
-          const result = `Saved data/${directory}/${safeName}`;
+          console.log(`[setup] save_context_file: directory created/confirmed`);
+          const filePath = path.join(dirPath, safeName);
+          fs.writeFileSync(filePath, content, 'utf-8');
+          console.log(`[setup] save_context_file: wrote ${filePath}`);
+          const result = `Saved data/${cleanDirectory}/${safeName}`;
           onEvent('tool_end', { name: 'save_context_file', summary: result });
           return result;
         } catch (err) {
+          console.error(`[setup] save_context_file ERROR: ${err.message}`, err);
           const msg = `Error saving file: ${err.message}`;
           onEvent('tool_end', { name: 'save_context_file', summary: msg });
           return msg;
@@ -320,14 +336,12 @@ function createSetupTools(onEvent) {
           const env = readEnvFile();
 
           const required = {
-            TWILIO_ACCOUNT_SID: 'Twilio Account SID (phone calls)',
-            TWILIO_AUTH_TOKEN: 'Twilio Auth Token (phone calls)',
             TWILIO_PHONE_NUMBER: 'Twilio Phone Number',
             OPENROUTER_API_KEY: 'OpenRouter API Key (AI brain)',
+            OPENAI_API_KEY: 'OpenAI API Key (required for real-time voice calls)',
           };
 
           const optional = {
-            OPENAI_API_KEY: 'OpenAI API Key (real-time voice — strongly recommended)',
             ADMIN_PASSWORD: 'Admin panel password',
             ADMIN_EMAIL: 'Admin email (for call notifications)',
             SMTP_HOST: 'Email server (for sending notifications)',
@@ -358,7 +372,7 @@ function createSetupTools(onEvent) {
           }
 
           const hasSystemPrompt = dataFiles.prompts.includes('system-prompt.txt');
-          const hasGreeting = dataFiles.prompts.includes('greeting.txt');
+          const hasGreeting = dataFiles.prompts.includes('webchat-greeting.txt');
 
           onEvent('tool_end', { name: 'validate_setup', summary: summarizeToolResult('validate_setup', '') });
 

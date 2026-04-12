@@ -43,7 +43,7 @@ function clearSession(sessionId) {
  */
 async function runSetupTurn(sessionId, userMessage, onEvent) {
   // Lazy-load the API key — it may have just been saved to .env during this session
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = (process.env.OPENROUTER_API_KEY || '').trim();
   if (!apiKey) {
     throw new Error(
       'OPENROUTER_API_KEY is not set. Please enter it using the form above to continue.'
@@ -54,7 +54,6 @@ async function runSetupTurn(sessionId, userMessage, onEvent) {
     baseURL: 'https://openrouter.ai/api/v1',
     apiKey,
   });
-  // Default to a capable model; gpt-4o handles tool calls reliably on OpenRouter
   const model = openai.chat(process.env.OPENROUTER_MODEL || 'openai/gpt-4o');
 
   const messages = getOrCreateSession(sessionId);

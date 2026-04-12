@@ -9,9 +9,9 @@ Works for therapist offices, EV charging companies, medical practices, law firms
 ### Prerequisites
 - Node.js v18 or higher
 - Chrome or Chromium (for website crawling during setup)
-- A Twilio account ([twilio.com](https://twilio.com))
+- A Twilio account with a phone number ([twilio.com](https://twilio.com))
 - An OpenRouter API key ([openrouter.ai/keys](https://openrouter.ai/keys))
-- Optional: OpenAI API key for real-time voice ([platform.openai.com/api-keys](https://platform.openai.com/api-keys))
+- OpenAI API key for real-time voice ([platform.openai.com/api-keys](https://platform.openai.com/api-keys))
 
 ### Install
 
@@ -40,29 +40,17 @@ After setup, the admin panel at `/admin` handles day-to-day management: viewing 
 
 ## How Calls Work
 
-### Real-Time Voice Mode (with `OPENAI_API_KEY`)
-
 ```
 Caller dials → Twilio webhook → WebSocket stream → OpenAI Realtime API
      ↑                                                        ↓
   Audio plays ←────────────────────────────── Audio response
 ```
 
-- Bidirectional audio, low latency
-- Supports natural interruptions
-- Full voice conversation
+- Bidirectional audio via OpenAI Realtime API
+- Low latency, supports natural interruptions
+- `OPENAI_API_KEY` is required — calls are rejected with a message if it's not set
 
-### Turn-by-Turn Mode (fallback, no `OPENAI_API_KEY`)
-
-```
-Caller dials → Twilio speech recognition → /handle-speech → OpenRouter AI → Twilio speaks
-```
-
-- Works without OpenAI key
-- Slightly higher latency per turn
-- Still fully conversational
-
-Both modes produce call transcripts and run the post-call agent.
+All calls produce transcripts and run the post-call agent.
 
 ---
 
@@ -98,7 +86,6 @@ Access at `http://localhost:3000/admin` (password protected once `ADMIN_PASSWORD
 │   ├── config.js                  # Environment variable loading and validation
 │   ├── prompts.js                 # Prompt loader (data/ overrides prompts/)
 │   ├── ai-client.js               # OpenRouter AI integration
-│   ├── call-handler.js            # Turn-by-turn call session management
 │   ├── call-summary.js            # Post-call summary generation
 │   ├── provider-loader.js         # Loads data/providers/*.md
 │   ├── availability-loader.js     # Loads data/availability/*.md
@@ -173,8 +160,6 @@ PUBLIC_URL=https://your-domain.com
 TIMEZONE=America/Los_Angeles
 
 # Twilio (phone calls)
-TWILIO_ACCOUNT_SID=ACxxxxx
-TWILIO_AUTH_TOKEN=your_token
 TWILIO_PHONE_NUMBER=+12125551234
 
 # AI
