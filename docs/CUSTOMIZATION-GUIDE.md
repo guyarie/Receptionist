@@ -1,175 +1,140 @@
-# AI Receptionist Customization Guide
+# Customization Guide
 
-## 🎨 Quick Customization
+After the setup assistant has configured your receptionist, you can fine-tune everything through the admin panel — no code changes needed.
 
-All the text your AI receptionist says is now in editable files in the `prompts/` folder!
+## The admin panel
 
-### Files You Can Edit
+Go to **http://localhost:[PORT]/admin** and log in with your admin password. The port is whatever `PORT` is set to in your `.env` (default `443` for production HTTPS; if you're running behind a reverse proxy on port 3000, use that instead).
 
-```
-prompts/
-├── system-prompt.txt          # AI's personality and behavior
-├── greeting.txt               # First thing callers hear
-├── follow-up.txt              # After each response
-├── closing.txt                # Before hanging up
-├── no-speech-detected.txt     # When AI can't hear
-├── error.txt                  # When there's a problem
-└── README.md                  # Detailed guide
-```
+### Editing prompts
 
-## 🚀 How to Make Changes
+Admin → **Prompts** shows all active prompts with their source (override vs. default) and an inline editor.
 
-### Method 1: Edit and Restart (Recommended)
+Key prompts to know:
 
-1. **Edit any file** in the `prompts/` folder
-2. **Restart the server:**
-   - Stop: Press `Ctrl+C` in the terminal running `npm start`
-   - Start: Run `npm start` again
-3. **Test:** Call your number to hear the changes
+| Prompt | What it controls |
+|---|---|
+| `system-prompt.txt` | The receptionist's core personality, knowledge, and behavior rules |
+| `webchat-greeting.txt` | Opening message shown in the web chat widget |
+| `post-call-agent.txt` | How the AI processes each call after it ends |
+| `daily-digest-agent.txt` | What goes into the daily email summary |
 
-### Method 2: Live Reload (Advanced)
+**Tips for effective prompts:**
+- Be specific — vague instructions produce vague behavior
+- Describe what to do, not just what not to do
+- Include examples of good responses for tricky scenarios
+- Read prompts aloud — if it sounds robotic, it'll sound robotic on the phone
 
-1. **Edit any file** in the `prompts/` folder
-2. **Reload without restarting:**
-   ```bash
-   curl -X POST http://localhost:3000/reload-prompts
-   ```
-3. **Test:** Call your number to hear the changes
+### Editing provider profiles
 
-## 📝 Common Customizations
+Admin → **Providers** shows all staff/provider profiles. Each profile is a markdown file the AI consults when a caller asks about a specific person.
 
-### Make the Greeting More Personal
+Format:
+```markdown
+# Dr. Jane Smith, Licensed Psychologist
 
-Edit `prompts/greeting.txt`:
-```
-Hi! Thanks for calling Relational Therapy Collective. This is Sarah, your AI assistant. What brings you in today?
+**Specialties:** Anxiety, depression, trauma, EMDR
+**Email:** jane@example.com
+**Phone:** +12125551234
+**Insurance Accepted:** Blue Cross, Aetna, United, out-of-pocket
+**Availability:** Monday–Thursday, 9 AM–5 PM
+**Notes for receptionist:** Accepting new patients. Has a waitlist for trauma specialization.
 ```
 
-### Add Practice Information
+### Editing availability
 
-Edit `prompts/system-prompt.txt` and add:
-```
-Additional information to share:
-- We offer individual, couples, and family therapy
-- We accept most major insurance plans
-- We have evening and weekend appointments available
-- Our office is located at [address]
-```
+Admin → **Availability** holds schedule information. The AI uses this to answer questions about hours and booking.
 
-### Change the Tone
+### Refreshing from your website
 
-**More Casual:**
-```
-Hey there! Thanks for calling RTC. I'm the AI receptionist. What's up?
-```
+Admin → Dashboard → **Refresh Website Data** re-scrapes your website and regenerates provider profiles. It takes a backup of your `data/` folder first.
 
-**More Formal:**
-```
-Good day. You have reached the Relational Therapy Collective. I am the automated receptionist. How may I direct your inquiry?
-```
+---
 
-**More Warm/Empathetic:**
+## Manual file editing
+
+For larger changes, you can edit files directly in `data/`:
+
 ```
-Hello, and thank you for reaching out to the Relational Therapy Collective. I know it takes courage to make this call. I'm here to help you find the support you need. How can I assist you today?
+data/
+├── prompts/             ← overrides prompts/ defaults
+│   ├── system-prompt.txt
+│   ├── webchat-greeting.txt
+│   └── ...
+├── providers/           ← one .md file per staff member
+├── availability/        ← schedule files
+└── practice/            ← business overview, FAQs
 ```
 
-### Add Specific Instructions
+Any file in `data/prompts/` takes priority over the matching file in `prompts/`. You only need to create files for things you want to customize.
 
-Edit `prompts/system-prompt.txt` and add:
-```
-When callers ask about:
-- Pricing: Mention that sessions are $150-200, with insurance coverage available
-- Availability: Let them know we typically have openings within 1-2 weeks
-- Crisis situations: Immediately provide 988 (Suicide & Crisis Lifeline) or 911
-```
+After editing files manually, use Admin → Dashboard → **Reload All** (or `curl -X POST http://localhost:[PORT]/admin/api/reload`) to apply changes without restarting. Replace `[PORT]` with the value of `PORT` in your `.env`.
 
-## 🎯 Testing Your Changes
+---
 
-1. **Call your number:** +1 (855) 707-2970
-2. **Listen carefully** to how it sounds
-3. **Ask different questions** to test the AI's responses
-4. **Iterate:** Keep tweaking until it sounds perfect!
+## Changing the AI voice
 
-## 💡 Pro Tips
-
-### Keep It Natural
-- Write how people actually talk on the phone
-- Avoid overly formal or robotic language
-- Read your prompts out loud before testing
-
-### Keep It Brief
-- Long messages lose callers' attention
-- Aim for 10-15 seconds per message
-- Get to the point quickly
-
-### Be Specific in System Prompt
-- The more specific you are, the better the AI performs
-- Include examples of good responses
-- Mention what NOT to do
-
-### Test Edge Cases
-- What if someone is in crisis?
-- What if they ask about something you don't offer?
-- What if they're confused or frustrated?
-
-## 🔧 Advanced: Voice Selection
-
-Currently using: **Polly.Joanna** (female, US English)
-
-To change the voice, edit `src/server.js` and replace `Polly.Joanna` with:
-
-**Female voices:**
-- `Polly.Joanna` - US English (current)
-- `Polly.Kendra` - US English
-- `Polly.Kimberly` - US English
-- `Polly.Salli` - US English
-- `Polly.Amy` - British English
-
-**Male voices:**
-- `Polly.Joey` - US English
-- `Polly.Justin` - US English (child)
-- `Polly.Matthew` - US English
-- `Polly.Brian` - British English
-
-After changing, restart the server.
-
-## 📊 Monitoring Calls
-
-Watch the server logs while testing:
-```
-📞 Incoming call received
-💬 Caller said: "I need help finding a therapist"
-🤖 AI: "I'd be happy to help you find a therapist..."
+In `.env`:
+```env
+OPENAI_REALTIME_VOICE=nova
 ```
 
-This helps you understand:
-- What callers are saying
-- How the AI is responding
-- Where improvements are needed
+Available options: `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`
 
-## 🆘 Troubleshooting
+Restart the server to apply.
 
-**Changes not taking effect?**
-- Make sure you saved the file
-- Restart the server (Ctrl+C, then `npm start`)
-- Check for typos in the prompt files
+## Changing the AI model
 
-**AI not following instructions?**
-- Be more specific in `system-prompt.txt`
-- Add examples of desired behavior
-- Test with different phrasings
+In `.env`:
+```env
+OPENROUTER_MODEL=openai/gpt-4o
+```
 
-**Voice sounds wrong?**
-- Check the voice name in `src/server.js`
-- Make sure it's spelled correctly
-- Restart after changing
+OpenRouter supports many models. See [openrouter.ai/models](https://openrouter.ai/models) for options. The model affects response quality and cost for text-based processing (summaries, post-call agent). Real-time voice always uses OpenAI's Realtime API regardless of this setting.
 
-## 📚 Next Steps
+## Voice
 
-Once you're happy with the basic customization:
-1. Add real data (Excel file, website)
-2. Implement appointment booking
-3. Add crisis detection
-4. Set up permanent Cloudflare Tunnel
+The system uses OpenAI Realtime API exclusively. `OPENAI_API_KEY` is required — without it the server starts but rejects incoming calls with a message to try again later.
 
-See `tasks.md` for the full roadmap!
+---
+
+## Post-call agent
+
+The post-call agent runs after every call ends. It:
+- Saves a structured summary to `runtime/call-summaries/`
+- Decides whether to email a staff member based on the call content
+- Logs a debug trace to `runtime/agent-logs/`
+
+Control it via `.env`:
+```env
+POST_CALL_AGENT_MODE=active    # active | shadow | disabled
+```
+
+- `active` — agent runs and drives all post-call processing
+- `shadow` — agent runs alongside the fallback flow (for testing)
+- `disabled` — simple AI summary only, no agent
+
+Customize agent behavior by editing `data/prompts/post-call-agent.txt` in the admin panel.
+
+## Daily digest
+
+When enabled, the system emails a summary of the previous day's calls each weekday afternoon.
+
+```env
+DIGEST_ENABLED=true
+DIGEST_SCHEDULE_HOUR=18       # Hour (0–23) in your configured timezone
+ADMIN_EMAIL=you@example.com
+```
+
+Requires SMTP to be configured. Customize the digest format in `data/prompts/daily-digest-agent.txt`.
+
+---
+
+## Testing changes
+
+After editing prompts:
+1. Admin panel → Prompts → Edit and save (reloads automatically)
+2. Make a test call
+3. Review the result in Admin → Call Logs
+
+For significant prompt changes, use the test chat at **http://localhost:[PORT]/test-widget.html** as a quick feedback loop before making a real call. Replace `[PORT]` with `SETUP_PORT` (default `3001`) if running in setup mode, or `PORT` if the server is running in production mode — both values are in your `.env`.
