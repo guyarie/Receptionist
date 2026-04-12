@@ -1,0 +1,63 @@
+[
+  {
+    "id": "new-client-basic",
+    "description": "New client calling to inquire about services",
+    "messages": [
+      "Hi, I'm looking for your services",
+      "I'm in downtown, my name is Sarah",
+      "555-123-4567",
+      "sarah@email.com"
+    ]
+  },
+  {
+    "id": "price-inquiry",
+    "description": "Caller focused on pricing before anything else",
+    "messages": [
+      "How much do you charge?",
+      "Just give me a ballpark",
+      "Fine, my name is Mike, I'm in the suburbs"
+    ]
+  },
+  {
+    "id": "existing-client",
+    "description": "Returning client with a follow-up question",
+    "messages": [
+      "Hey, I worked with you guys last month. I have a question about my service",
+      "Can you have someone call me back? They have my number"
+    ]
+  },
+  {
+    "id": "out-of-area",
+    "description": "Caller from outside the service area",
+    "messages": [
+      "Hi, I need your services. I'm in Portland, Oregon",
+      "Are you sure you can't help?"
+    ]
+  },
+  {
+    "id": "spam-vendor",
+    "description": "B2B vendor or marketing cold call",
+    "messages": [
+      "Hi, I'm calling from Marketing Solutions Inc. We can help you get more leads",
+      "Can I speak to the business owner?"
+    ]
+  },
+  {
+    "id": "off-topic-troll",
+    "description": "Caller asking irrelevant or inappropriate questions",
+    "messages": [
+      "What's your favorite color?",
+      "Do you like pizza?",
+      "Come on, just chat with me"
+    ]
+  },
+  {
+    "id": "spanish-speaker",
+    "description": "Spanish-speaking caller",
+    "messages": [
+      "Hola, necesito información sobre sus servicios",
+      "Estoy en el centro de la ciudad",
+      "Mi nombre es Carlos, mi número es 555-987-6543"
+    ]
+  }
+]

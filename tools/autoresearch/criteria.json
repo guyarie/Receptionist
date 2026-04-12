@@ -1,0 +1,59 @@
+{
+  "criteria": [
+    {
+      "id": "greeting",
+      "question": "Is the greeting short and natural (under 2 sentences, no listing of services)?",
+      "applies_to": ["new-client-basic", "price-inquiry", "existing-client", "spanish-speaker"]
+    },
+    {
+      "id": "qualification",
+      "question": "Did the receptionist gather at least 2 of: name, location, phone, email, service needed?",
+      "applies_to": ["new-client-basic", "price-inquiry", "spanish-speaker"]
+    },
+    {
+      "id": "contact-capture",
+      "question": "Did the receptionist collect a phone number or email for follow-up?",
+      "applies_to": ["new-client-basic", "price-inquiry", "spanish-speaker"]
+    },
+    {
+      "id": "concise-responses",
+      "question": "Were all of the receptionist's responses 3 sentences or fewer?",
+      "applies_to": ["new-client-basic", "price-inquiry", "existing-client", "out-of-area", "spam-vendor", "spanish-speaker"]
+    },
+    {
+      "id": "no-filler-praise",
+      "question": "Did the receptionist avoid filler praise words like 'Great!', 'Perfect!', 'Excellent!', 'Awesome!'?",
+      "applies_to": ["new-client-basic", "price-inquiry", "spanish-speaker"]
+    },
+    {
+      "id": "clean-ending",
+      "question": "Did the conversation end with a clear next step (e.g., 'someone will be in touch', 'we'll call you back')?",
+      "applies_to": ["new-client-basic", "price-inquiry", "existing-client", "spanish-speaker"]
+    },
+    {
+      "id": "no-premature-price",
+      "question": "Did the receptionist ask qualifying questions BEFORE sharing any price information?",
+      "applies_to": ["price-inquiry"]
+    },
+    {
+      "id": "out-of-area-polite",
+      "question": "Did the receptionist politely decline and not waste the caller's time with unnecessary questions?",
+      "applies_to": ["out-of-area"]
+    },
+    {
+      "id": "vendor-handling",
+      "question": "Did the receptionist identify this as a vendor/marketing call and handle it efficiently (take a message or decline)?",
+      "applies_to": ["spam-vendor"]
+    },
+    {
+      "id": "off-topic-2strike",
+      "question": "Did the receptionist redirect once, then disengage cleanly on the second off-topic attempt (not repeat the same script)?",
+      "applies_to": ["off-topic-troll"]
+    },
+    {
+      "id": "language-match",
+      "question": "Did the receptionist respond in the same language as the caller?",
+      "applies_to": ["spanish-speaker"]
+    }
+  ]
+}
