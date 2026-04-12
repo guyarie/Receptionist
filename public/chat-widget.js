@@ -199,7 +199,7 @@
         fetchGreeting();
       }
 
-      chatInput.focus();
+      if (!('ontouchstart' in window)) { chatInput.focus(); }
     }
 
     function closeChat() {
@@ -270,7 +270,7 @@
       } finally {
         isBusy = false;
         chatInput.disabled = false;
-        chatInput.focus();
+        if (!('ontouchstart' in window)) { chatInput.focus(); }
       }
     });
 

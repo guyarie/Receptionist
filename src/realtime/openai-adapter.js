@@ -150,6 +150,9 @@ class OpenAIAdapter extends ProviderAdapter {
         if (this.onTranscript && event.transcript) {
           this.onTranscript('assistant', event.transcript);
         }
+        if (event.transcript && this.goodbyeCallback && this._containsGoodbye(event.transcript)) {
+          this.goodbyeCallback();
+        }
         break;
 
       case 'conversation.item.input_audio_transcription.completed':
@@ -183,6 +186,19 @@ class OpenAIAdapter extends ProviderAdapter {
         }
         break;
     }
+  }
+
+  /**
+   * Returns true if the transcript contains any of the given phrases as whole words.
+   * @param {string} transcript
+   * @param {string[]} [phrases] - defaults to config.goodbyePhrases
+   * @returns {boolean}
+   */
+  _containsGoodbye(transcript, phrases) {
+    const list = phrases || config.goodbyePhrases;
+    return list.some(phrase =>
+      new RegExp(`\\b${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(transcript)
+    );
   }
 
   /**
