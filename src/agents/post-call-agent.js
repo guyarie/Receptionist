@@ -60,7 +60,9 @@ async function runPostCallAgent(callData) {
   const tools = createTools();
   // Use .chat() to force Chat Completions API — OpenRouter doesn't support the Responses API
   // which is the default in @ai-sdk/openai v3+ / AI SDK 5+
-  const model = openai.chat(config.openRouter.model);
+  // POST_CALL_AGENT_MODEL overrides OPENROUTER_MODEL — use a model that reliably passes tool arguments
+  const agentModel = process.env.POST_CALL_AGENT_MODEL || config.openRouter.model;
+  const model = openai.chat(agentModel);
 
   const userMessage = `Call has ended. Here is the call data:
 

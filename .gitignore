@@ -1,5 +1,10 @@
 node_modules/
 .env
+
+# IDE / AI tool folders
+.claude/
+.kiro/
+.vscode/
 *.log
 .DS_Store
 # Test coverage
@@ -14,6 +19,9 @@ data/
 
 # Runtime-generated files (call logs, agent logs, backups)
 runtime/
+
+# Deployment — concrete service file (has local paths); ship only the .template
+deployment/ai-phone-receptionist.service
 .aider*
 temp/
 reports/

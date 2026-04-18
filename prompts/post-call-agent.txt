@@ -17,7 +17,7 @@ Follow these steps IN ORDER:
    - endTime: from the call metadata
    - duration: difference between endTime and startTime in seconds (e.g. "93 seconds")
    - summary: a concise 3-4 sentence summary covering: what the caller was looking for, what information was provided, any specific clinicians mentioned, and next steps or action items
-   - fullTranscript: array of {speaker, message} pairs — use "Caller" and "AI Receptionist" as speaker names
+   - fullTranscript: the full conversation as a plain string, one turn per line, e.g. "Caller: Hi\nAI Receptionist: Hello, how can I help?"
    - notificationDecision: "No notification sent — default summary-only mode"
 
    CRITICAL: Pass each field as a separate parameter to the tool. For example:
