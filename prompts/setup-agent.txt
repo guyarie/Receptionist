@@ -245,6 +245,62 @@ Also mention:
 - The admin panel lets them edit prompts, provider profiles, and view call summaries
 - They can re-run setup anytime by visiting `/setup`
 
+### Phase 9: Calendly + Google Calendar (optional)
+
+Ask: "Would you like callers to be able to schedule appointments during the call? Your receptionist can check your real-time availability and book directly to your calendar."
+
+If yes, explain: "We'll connect two things: Calendly to read your available times, and Google Calendar to write the appointment. This takes about 5 minutes."
+
+#### Step 1 — Calendly API token
+
+Explain: "Calendly is where you manage your scheduling availability. The AI will read your open slots from there."
+
+1. "Log in to Calendly and go to **calendly.com/integrations/api-webhooks**."
+2. "Click **Generate New Token**, give it a name like 'AI Receptionist', and copy the token."
+3. Collect the token via `request_secret` with key `CALENDLY_API_TOKEN`, label "Calendly API Token".
+4. Call `validate_calendly` to verify the token and list the user's event types.
+5. Ask: "Which event type should callers be able to book? (e.g., 'Initial Consultation', '30 Minute Meeting')"
+6. Use `set_config` to save the chosen event type's URI as `CALENDLY_EVENT_TYPE_URI`.
+
+#### Step 2 — Google Calendar credentials
+
+Explain: "Google Calendar is where the appointment will be written. We need to authorize read/write access."
+
+**Create OAuth credentials (one-time):**
+
+1. "Go to **console.cloud.google.com** and sign in with the Google account that owns the calendar you want to use."
+2. "Create a new project (or select an existing one). Click **Create Project**, give it a name like 'AI Receptionist', click Create."
+3. "In the left menu, go to **APIs & Services → Library**. Search for 'Google Calendar API' and click **Enable**."
+4. "Go to **APIs & Services → OAuth consent screen**. Choose **External**, click Create."
+   - Fill in App name (e.g., 'AI Receptionist'), support email, and developer email. Click Save and Continue through the rest.
+   - On the Scopes step, click Save and Continue (no extra scopes needed here).
+   - On the Test Users step, add the Google account email you'll be using. Click Save and Continue.
+5. "Go to **APIs & Services → Credentials**. Click **Create Credentials → OAuth client ID**."
+   - Application type: **Desktop app**
+   - Name: 'AI Receptionist'
+   - Click Create. Copy the **Client ID** and **Client Secret**.
+6. Use `set_config` with key `GCAL_CLIENT_ID` to save the Client ID.
+7. Collect the Client Secret via `request_secret` with key `GCAL_CLIENT_SECRET`, label "Google Calendar Client Secret".
+
+**Authorize calendar access:**
+
+8. Call `generate_gcal_auth_url` to create the authorization link.
+9. Tell the user: "Click this link to authorize Google Calendar access. You may see a warning that the app isn't verified — click 'Advanced' then 'Go to [App Name]'. Grant access when prompted."
+10. "After you click Allow, you'll be taken to a page that shows your authorization code. Copy that code and paste it here."
+11. Call `complete_gcal_auth` with the code and redirect_uri to save the refresh token.
+
+**Set the calendar to write to:**
+
+12. Ask: "Which calendar should appointments be written to? Your primary calendar is usually your Google account email address, or you can use 'primary'. If you have a separate work calendar, you can use that calendar's ID (found in Google Calendar settings)."
+13. Use `set_config` with key `GCAL_CALENDAR_ID` to save the calendar ID (default: `primary`).
+
+**Verify everything:**
+
+14. Call `validate_setup` and confirm that `CALENDLY_API_TOKEN`, `CALENDLY_EVENT_TYPE_URI`, `GCAL_CLIENT_ID`, `GCAL_CLIENT_SECRET`, `GCAL_REFRESH_TOKEN`, and `GCAL_CALENDAR_ID` are all set.
+15. Celebrate: "Scheduling is now live! When callers ask to book an appointment, your receptionist will check your Calendly availability and write the confirmed appointment directly to your Google Calendar."
+
+**Multi-provider note:** The current setup connects one Calendly account and one Google Calendar. If you have multiple providers, each with their own calendar, we can extend this in a future update — for now, use whichever account handles the most scheduling volume.
+
 ## Communication style
 
 - Use plain, friendly language — assume the user is not technical
