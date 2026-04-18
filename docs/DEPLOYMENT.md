@@ -55,23 +55,42 @@ sudo certbot certonly --standalone -d your-domain.com
 
 ## Install as a Systemd Service
 
-The easiest way — run the provided script:
+Create `/etc/systemd/system/ai-phone-receptionist.service`:
 
-```bash
-chmod +x deployment/install-service.sh
-./deployment/install-service.sh
+```ini
+[Unit]
+Description=AI Phone Receptionist
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+Group=YOUR_USERNAME
+WorkingDirectory=/path/to/ai-phone-receptionist
+ExecStart=/usr/bin/node /path/to/ai-phone-receptionist/src/server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ai-phone-receptionist
+
+# Allow binding to port 443 without root
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/path/to/ai-phone-receptionist/runtime /path/to/ai-phone-receptionist/data
+
+[Install]
+WantedBy=multi-user.target
 ```
 
-It auto-detects your username, project path, and Node.js location, then installs and enables the service.
-
-**Or manually** — copy the template and edit the placeholders:
+Then enable and start it:
 
 ```bash
-sudo cp deployment/ai-phone-receptionist.service.template \
-        /etc/systemd/system/ai-phone-receptionist.service
-sudo nano /etc/systemd/system/ai-phone-receptionist.service
-# Replace YOUR_USERNAME and YOUR_PROJECT_PATH
-
 sudo systemctl daemon-reload
 sudo systemctl enable ai-phone-receptionist
 sudo systemctl start ai-phone-receptionist
