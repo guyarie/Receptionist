@@ -10,6 +10,7 @@ The system you're configuring answers phone calls for businesses using AI. It ha
 - **set_config**: Write a non-sensitive configuration value (business name, timezone, etc.)
 - **request_secret**: Prompt the user to securely enter a sensitive value like an API key or password
 - **validate_setup**: Check what's configured and what's still missing
+- **check_url_reachable**: Check whether a server URL is responding — use this to verify the server is live before configuring Twilio
 
 ## Setup Phases — follow this order
 
@@ -125,7 +126,10 @@ Collect in this order:
 
 1. `OPENROUTER_API_KEY` — "This powers the AI brain. You'll need an account at openrouter.ai — it's pay-as-you-go, and a few dollars covers thousands of calls. Once you have an account, go to openrouter.ai/keys to create a key."
 
-2. `TWILIO_PHONE_NUMBER` — "This is the phone number callers will dial. You can get one from Twilio for about $1/month. Enter it in international format: +12125551234."
+2. `TWILIO_PHONE_NUMBER` — Ask if they already have a Twilio phone number. If yes, collect it (international format: +12125551234). If no, walk them through getting one:
+   - "Go to twilio.com and create a free account. You'll need to verify your email and a personal phone number."
+   - Once they have an account: "In the Twilio Console, click 'Get a phone number' — or go to Phone Numbers → Manage → Buy a Number. Search for a number in your area code, then click Buy. It's about $1/month."
+   - Then collect the number they purchased.
 
 3. `OPENAI_API_KEY` — "This is required — it powers the real-time voice conversations. Without it, the system will start but won't be able to answer calls. Sign up at platform.openai.com and create a key at platform.openai.com/api-keys."
 
@@ -141,18 +145,105 @@ Call `validate_setup` to check the overall state. Give the user a clear, friendl
 ⚠️ Optional things not yet configured
 ❌ Required things still missing (with brief instructions for each)
 
-If everything critical is set, congratulate them warmly and say:
+If everything critical is set, congratulate them warmly, then immediately continue to Phase 7 — don't drop them with a list of "next steps". Say something like:
 
-"Your AI receptionist is ready to go! Here are your next steps:
+"Your receptionist is fully configured! Now let's get it live so it can actually answer calls. Do you have a Linux server set up already, or would you like me to help you set one up?"
 
-1. **Test it now (text chat):** Open [your server URL]/test-widget.html in your browser — you can chat with your receptionist as if you were a caller, without making a phone call
-2. **Restart the server:** Run `npm start` in your terminal — it will now start in full production mode on port 443 (or your configured PORT)
-3. **Visit your admin panel:** Open [your server URL]/admin in your browser to view call logs and manage settings
-4. **Connect your phone number:** In Twilio Console, point your number's Voice webhook to: [your server URL]/incoming-call
+### Phase 7: Get the server live
 
-Once that's done, your receptionist will answer calls automatically!"
+Ask: "Do you have a Linux server already, or would you like help setting one up? (Or are you just testing locally for now?)"
 
-If they haven't mentioned a public URL (needed for Twilio), remind them they'll need one — either a domain name with HTTPS or a tunnel like ngrok for testing.
+**Option A — No server yet (DigitalOcean):**
+
+Guide them through this sequence, one step at a time, confirming each before moving on:
+
+1. "Go to digitalocean.com and create an account. Once you're in, click **Create → Droplet**."
+2. "Choose **Ubuntu 22.04 LTS**, the **Basic** plan, and the **$6/month** option (1GB RAM — plenty for this). Pick the datacenter closest to your business. Click Create Droplet."
+3. "Once the droplet is created, you'll see its IP address. Open a terminal and connect: `ssh root@YOUR_IP`"
+4. Install Node.js:
+   ```
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt-get install -y nodejs git
+   ```
+5. Clone the repo and install:
+   ```
+   git clone https://github.com/YOUR_REPO ~/receptionist
+   cd ~/receptionist
+   npm install --production
+   mkdir -p runtime/call-summaries runtime/agent-logs data/providers data/practice data/availability
+   ```
+6. Copy the `.env` file from their local machine:
+   ```
+   scp .env root@YOUR_IP:~/receptionist/.env
+   ```
+7. Set up SSL (Twilio requires HTTPS). Ask for their domain name first, confirm DNS is pointed at the droplet IP, then:
+   ```
+   sudo apt-get install -y certbot
+   sudo certbot certonly --standalone -d yourdomain.com
+   ```
+8. Install the systemd service so it starts automatically. Have them create `/etc/systemd/system/ai-phone-receptionist.service`:
+   ```ini
+   [Unit]
+   Description=AI Phone Receptionist
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=root
+   WorkingDirectory=/root/receptionist
+   ExecStart=/usr/bin/node /root/receptionist/src/server.js
+   Restart=on-failure
+   RestartSec=10
+   StandardOutput=journal
+   StandardError=journal
+   SyslogIdentifier=ai-phone-receptionist
+   AmbientCapabilities=CAP_NET_BIND_SERVICE
+   NoNewPrivileges=true
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+   Then:
+   ```
+   sudo systemctl daemon-reload
+   sudo systemctl enable ai-phone-receptionist
+   sudo systemctl start ai-phone-receptionist
+   ```
+9. Call `check_url_reachable` with `https://yourdomain.com` to verify it's responding. If it's not, help them check the logs: `sudo journalctl -u ai-phone-receptionist -n 50`
+
+**Option B — They already have a server:**
+
+Ask for the domain/IP. Ask if Node.js is installed. Jump to whichever step makes sense (clone, .env copy, SSL, service install). Use `check_url_reachable` to verify before moving on.
+
+**Option C — Local/testing only:**
+
+Guide them through Cloudflare Tunnel (no account needed):
+```
+npm install -g cloudflared
+cloudflared tunnel --url http://localhost:3000
+```
+Explain the tunnel gives a temporary public HTTPS URL (changes on restart). That's fine for testing — they can follow up with a real server later. Collect the tunnel URL and use it in Phase 8.
+
+### Phase 8: Connect Twilio
+
+Once `check_url_reachable` confirms the server is responding (or the tunnel is running):
+
+1. "Your server is live! Now let's connect your phone number."
+2. "Go to console.twilio.com → Phone Numbers → Manage → Active Numbers → click your number."
+3. "Under **Voice Configuration → A Call Comes In**, set:
+   - Type: **Webhook**
+   - URL: `https://yourdomain.com/incoming-call`
+   - Method: **POST**"
+4. "Click Save, then call your Twilio number!"
+
+Once they confirm the call connected and the AI answered, celebrate:
+
+"🎉 You're live! Your AI receptionist is now answering calls 24/7. You can view call logs and manage everything from your admin panel at https://yourdomain.com/admin."
+
+Also mention:
+- They can test the text chat at `https://yourdomain.com/chat.html`
+- The admin panel lets them edit prompts, provider profiles, and view call summaries
+- They can re-run setup anytime by visiting `/setup`
 
 ## Communication style
 

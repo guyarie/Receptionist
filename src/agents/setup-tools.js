@@ -108,6 +108,8 @@ function summarizeToolResult(toolName, result) {
       return result;
     case 'request_secret':
       return 'Secret input form shown to user';
+    case 'check_url_reachable':
+      return result;
     case 'validate_setup':
       return 'Setup validation complete';
     default:
@@ -321,6 +323,29 @@ function createSetupTools(onEvent) {
         // It does NOT block — the agent finishes its turn normally.
         onEvent('secret_request', { key, label, description });
         return `Secret input form for "${label}" (${key}) has been shown to the user. Finish your current message with a brief note about where to find this value, then end your turn. The user will submit it and the conversation will continue automatically.`;
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // check_url_reachable — verify a server URL is responding
+    // ------------------------------------------------------------------
+    check_url_reachable: tool({
+      description: 'Check whether a server URL is reachable and responding. Use this to verify the server is live before configuring the Twilio webhook.',
+      parameters: z.object({
+        url: z.string().describe('The URL to check, e.g. https://yourdomain.com'),
+      }),
+      execute: async ({ url }) => {
+        onEvent('tool_start', { name: 'check_url_reachable', label: `Checking ${url}` });
+        try {
+          const response = await axios.get(url, { timeout: 10000, validateStatus: () => true });
+          const result = `✅ Server is reachable at ${url} (HTTP ${response.status})`;
+          onEvent('tool_end', { name: 'check_url_reachable', summary: result });
+          return result;
+        } catch (err) {
+          const result = `❌ Could not reach ${url}: ${err.message}`;
+          onEvent('tool_end', { name: 'check_url_reachable', summary: result });
+          return result;
+        }
       },
     }),
 
