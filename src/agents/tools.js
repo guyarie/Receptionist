@@ -18,13 +18,15 @@ function createTools(options = {}) {
         endTime: z.string(),
         duration: z.string(),
         summary: z.string(),
-        fullTranscript: z.array(z.object({
-          speaker: z.string(),
-          message: z.string()
-        })),
+        fullTranscript: z.string().describe('Full conversation as plain text, one line per turn, e.g. "Caller: Hi\\nAI Receptionist: Hello..."'),
         notificationDecision: z.string().optional().describe('Brief explanation of whether a notification was sent and why')
       }),
       execute: async (params) => {
+        console.log(`[post-call] save_call_summary args:`, JSON.stringify(params).substring(0, 300));
+        if (!params.callSid && !params.callerPhone) {
+          console.error('[post-call] save_call_summary called with empty args — model did not pass tool arguments');
+          return { success: false, error: 'Tool called with no arguments — model compatibility issue' };
+        }
         const filepath = callSummaryManager.saveSummaryDirect(params);
         return { success: true, filepath };
       }

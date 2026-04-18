@@ -48,6 +48,7 @@ class RelayService {
     this.provider.onSpeechStarted = () => this.handleInterruption();
     this.provider.onError = (err) => this.handleProviderError(err);
     this.provider.onClose = () => this.handleProviderClose();
+    this.provider.onHangup = () => this.handleHangup();
 
     await this.provider.connect(options);
 
@@ -151,6 +152,17 @@ class RelayService {
       this.twilioWs.close();
     }
     this.cleanup();
+  }
+
+  /**
+   * Handle AI-initiated hangup. Closes the Twilio WebSocket, which causes
+   * Twilio to end the call naturally without needing REST API credentials.
+   */
+  handleHangup() {
+    console.log(`👋 [${this.callSid}] AI ended the call`);
+    if (this.twilioWs.readyState === 1) {
+      this.twilioWs.close();
+    }
   }
 
   /**

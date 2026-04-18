@@ -1,6 +1,0 @@
-.env
-results/
-prompt-backup.txt
-prompt-current.txt
-changelog.md
-__pycache__/

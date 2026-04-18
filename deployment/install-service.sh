@@ -90,7 +90,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=$PROJECT_DIR/call-summaries $PROJECT_DIR/data
+ReadWritePaths=$PROJECT_DIR/runtime $PROJECT_DIR/data
 
 [Install]
 WantedBy=multi-user.target

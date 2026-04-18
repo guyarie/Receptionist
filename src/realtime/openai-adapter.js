@@ -79,6 +79,15 @@ class OpenAIAdapter extends ProviderAdapter {
             input_audio_transcription: {
               model: 'whisper-1'
             },
+            tools: [
+              {
+                type: 'function',
+                name: 'hangup',
+                description: 'End the call. Call this when the conversation is complete and it is time to hang up.',
+                parameters: { type: 'object', properties: {} }
+              }
+            ],
+            tool_choice: 'auto',
             instructions: instructions || ''
           }
         };
@@ -150,6 +159,9 @@ class OpenAIAdapter extends ProviderAdapter {
         if (this.onTranscript && event.transcript) {
           this.onTranscript('assistant', event.transcript);
         }
+        if (event.transcript && this.goodbyeCallback && this._containsGoodbye(event.transcript)) {
+          this.goodbyeCallback();
+        }
         break;
 
       case 'conversation.item.input_audio_transcription.completed':
@@ -169,6 +181,13 @@ class OpenAIAdapter extends ProviderAdapter {
         console.log('🔇 Speech stopped — VAD detected end of caller turn');
         break;
 
+      case 'response.output_item.done':
+        if (event.item?.type === 'function_call' && event.item?.name === 'hangup') {
+          console.log('📵 AI requested hangup');
+          if (this.onHangup) this.onHangup();
+        }
+        break;
+
       case 'response.done':
         console.log('✅ Response turn complete');
         break;
@@ -183,6 +202,19 @@ class OpenAIAdapter extends ProviderAdapter {
         }
         break;
     }
+  }
+
+  /**
+   * Returns true if the transcript contains any of the given phrases as whole words.
+   * @param {string} transcript
+   * @param {string[]} [phrases] - defaults to config.goodbyePhrases
+   * @returns {boolean}
+   */
+  _containsGoodbye(transcript, phrases) {
+    const list = phrases || config.goodbyePhrases;
+    return list.some(phrase =>
+      new RegExp(`\\b${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(transcript)
+    );
   }
 
   /**

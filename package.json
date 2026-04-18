@@ -1,8 +1,8 @@
 {
-  "name": "receptionist",
+  "name": "ai-phone-receptionist",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI-powered voice receptionist — answers calls, handles inquiries, takes messages, and notifies your staff",
+  "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
@@ -11,9 +11,9 @@
     "test": "vitest --run",
     "scrape-providers": "node src/scrape-providers.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["ai", "receptionist", "voice", "twilio", "openai"],
+  "author": "guyarie",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",

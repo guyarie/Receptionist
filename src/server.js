@@ -924,6 +924,18 @@ wss.on('connection', (ws) => {
             return;
           }
           
+          if (config.twilio.accountSid && config.twilio.authToken) {
+            const twilioClient = require('twilio')(config.twilio.accountSid, config.twilio.authToken);
+            adapter.goodbyeCallback = () => {
+              console.log(`👋 Goodbye detected — terminating call ${callSid} in 2.5s`);
+              setTimeout(() => {
+                twilioClient.calls(callSid).update({ status: 'completed' }).catch((err) => {
+                  console.error(`❌ Failed to terminate call ${callSid}:`, err.message);
+                });
+              }, 2500);
+            };
+          }
+
           relay = new RelayService(ws, adapter, callSid, streamSid, {
             from: callerPhone,
             to: twilioNumber

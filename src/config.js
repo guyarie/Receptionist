@@ -37,7 +37,9 @@ function parseIntEnv(key, defaultValue) {
 
 const config = {
   twilio: {
-    phoneNumber: process.env.TWILIO_PHONE_NUMBER
+    phoneNumber: process.env.TWILIO_PHONE_NUMBER,
+    accountSid: process.env.TWILIO_ACCOUNT_SID || null,
+    authToken: process.env.TWILIO_AUTH_TOKEN || null,
   },
   openRouter: {
     apiKey: process.env.OPENROUTER_API_KEY,
@@ -86,6 +88,8 @@ const config = {
     ownerPhone: process.env.OWNER_PHONE || null,
     publicUrl: process.env.PUBLIC_URL || null,
   },
+  goodbyePhrases: (process.env.GOODBYE_PHRASES || 'goodbye,have a great day,take care,bye')
+    .split(',').map(p => p.trim()).filter(p => p),
   adminEmail: process.env.ADMIN_EMAIL || null,
   digestEnabled: (process.env.DIGEST_ENABLED || 'false').toLowerCase() === 'true',
   digestScheduleHour: parseInt(process.env.DIGEST_SCHEDULE_HOUR || '18', 10),

@@ -326,7 +326,7 @@
       // Re-enable input
       messageInput.disabled = false;
       sendBtn.disabled = false;
-      messageInput.focus();
+      if (!('ontouchstart' in window)) { messageInput.focus(); }
     });
     
     function addMessage(type, content) {
@@ -369,8 +369,8 @@
       chatForm.dispatchEvent(new Event('submit'));
     }
     
-    // Focus input on load
-    messageInput.focus();
+    // Focus input on load (skip on touch devices to avoid keyboard popup)
+    if (!('ontouchstart' in window)) { messageInput.focus(); }
   </script>
 </body>
 </html>
