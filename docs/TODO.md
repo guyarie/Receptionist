@@ -50,6 +50,12 @@ Show a persistent banner or status indicator when `SETUP_MODE=true` is still set
 
 ## Call handling
 
+### Receptionist should not tell the caller to call the same number they just called
+
+The AI sometimes suggests the caller call back on the same Twilio number they're already on, which doesn't make sense. The system prompt should be updated (or a guardrail added) to prevent this.
+
+
+
 ### In-call tool calling (prerequisite for dynamic context)
 The OpenAI Realtime API supports function calling, but `openai-adapter.js` doesn't implement it yet. This is the foundation for dynamic context loading and other in-call behaviors (e.g., looking up appointment availability via an external API).
 
