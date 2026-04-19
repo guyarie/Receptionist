@@ -1,5 +1,7 @@
 // Configuration loader
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', 'config', 'defaults.env') });
+require('dotenv').config({ override: true }); // .env overrides defaults
 
 function validateConfig() {
   const required = [

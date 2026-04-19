@@ -8,7 +8,7 @@ Works for therapist offices, EV charging companies, medical practices, law firms
 
 ### Prerequisites
 - Node.js v18 or higher
-- Chrome or Chromium (for website crawling during setup)
+- Chrome or Chromium (for website crawling during setup) — on Ubuntu/Debian, install the required system libraries first (see [Troubleshooting](#troubleshooting))
 - A Twilio account with a phone number ([twilio.com](https://twilio.com))
 - An OpenRouter API key ([openrouter.ai/keys](https://openrouter.ai/keys))
 - OpenAI API key for real-time voice ([platform.openai.com/api-keys](https://platform.openai.com/api-keys))
@@ -210,10 +210,24 @@ Quick checklist:
 - [ ] Configure Twilio webhook: `https://your-domain.com/incoming-call`
 - [ ] Set up systemd to keep the server running (see [docs/systemd-setup.md](docs/systemd-setup.md))
 
-For local testing with a public URL, use:
+For a public HTTPS URL without port forwarding, use Cloudflare Tunnel:
 ```bash
+# Install (Linux amd64)
+curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
+sudo dpkg -i cloudflared.deb
+
+# Quick throwaway URL (changes on restart)
 cloudflared tunnel --url http://localhost:3000
-# or
+
+# Stable named tunnel (requires a domain on Cloudflare — recommended for production)
+cloudflared tunnel login
+cloudflared tunnel create receptionist
+cloudflared tunnel route dns receptionist your-subdomain.yourdomain.com
+cloudflared tunnel run --url http://localhost:3000 receptionist
+```
+
+Alternatively, for a quick throwaway URL:
+```bash
 ngrok http 3000
 ```
 
@@ -236,10 +250,23 @@ Your OpenRouter API key may be wrong. The setup page will prompt you to re-enter
 - Check server startup logs for `🎙️ Realtime voice streaming is available`
 - Twilio requires WSS (WebSocket over HTTPS) — you need SSL in production
 
+**Server crashes with `EACCES` on port 443**
+Linux requires root (or special capabilities) to bind ports below 1024. Keep `PORT=3000` and let a reverse proxy or the systemd service handle 443:
+- **Reverse proxy (recommended):** Use nginx or Caddy to terminate SSL on 443 and forward to `localhost:3000`
+- **Systemd with capabilities:** The included systemd service sets `AmbientCapabilities=CAP_NET_BIND_SERVICE`, which lets Node bind 443 directly without root — but only when run via `systemctl`, not `npm start`
+- Twilio only requires the *public* URL to be HTTPS — the internal port the server listens on can be anything
+
 **Admin panel — can't log in**
 - Verify `ADMIN_PASSWORD` in `.env`
 - Clear browser cookies and try again
 - After 5 failed attempts, wait 15 minutes for the rate limit to reset
+
+**Puppeteer fails to launch browser (Linux)**
+Install the required Chrome system dependencies:
+```bash
+sudo apt-get install -y libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64
+```
+Note: Ubuntu 24.04+ uses `libasound2t64` instead of `libasound2`.
 
 **AI gives wrong information**
 - Review and update prompts via the admin panel → Prompts

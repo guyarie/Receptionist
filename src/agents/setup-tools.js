@@ -16,6 +16,7 @@ const ENV_PATH = path.join(ROOT_DIR, '.env');
 
 const ALLOWED_DIRECTORIES = ['prompts', 'providers', 'availability', 'practice'];
 
+
 // ============================================================================
 // Env file helpers
 // ============================================================================
@@ -106,8 +107,10 @@ function summarizeToolResult(toolName, result) {
       return 'Listed existing configuration files';
     case 'set_config':
       return result;
-    case 'request_secret':
+    case 'collect_secret':
       return 'Secret input form shown to user';
+    case 'send_email':
+      return result;
     case 'check_url_reachable':
       return result;
     case 'validate_setup':
@@ -148,14 +151,17 @@ function createSetupTools(onEvent) {
           } else {
             try {
               const { launchBrowser, fetchWithBrowser, closeBrowser } = require('../browser-manager');
+              onEvent('tool_start', { name: 'crawl_url', label: 'Launching browser...' });
               const browser = await launchBrowser();
               try {
+                onEvent('tool_start', { name: 'crawl_url', label: `Loading page...` });
                 html = await fetchWithBrowser(browser, url, { timeout: 15000 });
               } finally {
                 await closeBrowser(browser);
               }
             } catch (puppeteerErr) {
               console.warn('Puppeteer failed, falling back to axios:', puppeteerErr.message);
+              onEvent('tool_start', { name: 'crawl_url', label: 'Browser unavailable, fetching with axios...' });
               const response = await axios.get(url, {
                 headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Receptionist-Setup/1.0)' },
                 timeout: 15000,
@@ -182,38 +188,32 @@ function createSetupTools(onEvent) {
     save_context_file: tool({
       description: 'Save a configuration file for the receptionist. Use this to write prompts, provider profiles, availability schedules, and practice info.',
       parameters: z.object({
-        directory: z.enum(['prompts', 'providers', 'availability', 'practice']).describe('The subdirectory within data/ to save the file in'),
-        filename: z.string().describe('The filename, e.g. "system-prompt.txt" or "dr-jane-smith.md"'),
+        path: z.string().describe('Path relative to data/, e.g. "prompts/system-prompt.txt" or "providers/dr-jane-smith.md"'),
         content: z.string().describe('The full content of the file'),
       }),
-      execute: async (args) => {
-        console.log(`[setup] save_context_file raw args:`, JSON.stringify(args));
-        const { directory, filename, content } = args;
-        console.log(`[setup] save_context_file called: ${directory}/${filename}`);
-        if (!directory || !filename) {
-          const msg = `save_context_file called with missing arguments (directory=${directory}, filename=${filename}) — the model did not provide required fields`;
-          console.error(`[setup] ${msg}`);
+      execute: async ({ path: filePath, content }) => {
+        // Strip leading data/ if the model included it
+        const cleanPath = filePath.replace(/^data\//, '');
+        const parts = cleanPath.split('/');
+        const directory = parts[0];
+        const filename = parts.slice(1).join('/');
+
+        if (!ALLOWED_DIRECTORIES.includes(directory) || !filename) {
+          const msg = `Invalid path "${filePath}" — must be <directory>/<filename> where directory is one of: ${ALLOWED_DIRECTORIES.join(', ')}`;
           onEvent('tool_end', { name: 'save_context_file', summary: msg });
           return msg;
         }
-        // Strip any leading 'data/' prefix the model may have mistakenly included
-        const cleanDirectory = directory.replace(/^data\//, '');
-        onEvent('tool_start', { name: 'save_context_file', label: `Saving ${cleanDirectory}/${filename}` });
+
+        onEvent('tool_start', { name: 'save_context_file', label: `Saving data/${cleanPath}` });
         try {
-          // Sanitize filename — no path traversal
           const safeName = path.basename(filename);
-          const dirPath = path.join(DATA_DIR, cleanDirectory);
-          console.log(`[setup] save_context_file: directory=${dirPath} file=${safeName} contentLength=${content?.length} (raw directory arg was: ${directory})`);
+          const dirPath = path.join(DATA_DIR, directory);
           fs.mkdirSync(dirPath, { recursive: true });
-          console.log(`[setup] save_context_file: directory created/confirmed`);
-          const filePath = path.join(dirPath, safeName);
-          fs.writeFileSync(filePath, content, 'utf-8');
-          console.log(`[setup] save_context_file: wrote ${filePath}`);
-          const result = `Saved data/${cleanDirectory}/${safeName}`;
+          fs.writeFileSync(path.join(dirPath, safeName), content, 'utf-8');
+          const result = `Saved data/${directory}/${safeName}`;
           onEvent('tool_end', { name: 'save_context_file', summary: result });
           return result;
         } catch (err) {
-          console.error(`[setup] save_context_file ERROR: ${err.message}`, err);
           const msg = `Error saving file: ${err.message}`;
           onEvent('tool_end', { name: 'save_context_file', summary: msg });
           return msg;
@@ -225,22 +225,21 @@ function createSetupTools(onEvent) {
     // read_context_file — read a file from data/
     // ------------------------------------------------------------------
     read_context_file: tool({
-      description: 'Read an existing configuration file from data/. Useful for reviewing what was previously saved.',
+      description: 'Read an existing configuration file from data/. Note: {{PLACEHOLDER}} strings in these files are intentional — they are substituted at runtime from .env. Do not treat them as missing configuration.',
       parameters: z.object({
-        directory: z.enum(['prompts', 'providers', 'availability', 'practice']).describe('The subdirectory within data/'),
-        filename: z.string().describe('The filename to read'),
+        path: z.string().describe('Path relative to data/, e.g. "prompts/system-prompt.txt"'),
       }),
-      execute: async ({ directory, filename }) => {
-        onEvent('tool_start', { name: 'read_context_file', label: `Reading ${directory}/${filename}` });
+      execute: async ({ path: filePath }) => {
+        const cleanPath = filePath.replace(/^data\//, '');
+        onEvent('tool_start', { name: 'read_context_file', label: `Reading data/${cleanPath}` });
         try {
-          const safeName = path.basename(filename);
-          const filePath = path.join(DATA_DIR, directory, safeName);
-          if (!fs.existsSync(filePath)) {
-            const msg = `File not found: data/${directory}/${safeName}`;
+          const absPath = path.join(DATA_DIR, cleanPath);
+          if (!fs.existsSync(absPath)) {
+            const msg = `File not found: data/${cleanPath}`;
             onEvent('tool_end', { name: 'read_context_file', summary: msg });
             return msg;
           }
-          const content = fs.readFileSync(filePath, 'utf-8');
+          const content = fs.readFileSync(absPath, 'utf-8');
           onEvent('tool_end', { name: 'read_context_file', summary: summarizeToolResult('read_context_file', content) });
           return content;
         } catch (err) {
@@ -309,22 +308,80 @@ function createSetupTools(onEvent) {
     }),
 
     // ------------------------------------------------------------------
-    // request_secret — ask the user for a sensitive value via secure form
+    // collect_secret — show a secure input form for any sensitive value.
+    // The value is written directly to the target file without passing through the LLM.
     // ------------------------------------------------------------------
-    request_secret: tool({
-      description: 'Ask the user to enter a sensitive value like an API key or password. The frontend will show a secure password input. The value will be saved to .env without passing through the AI. After calling this, end your current response — the conversation will automatically continue once the user submits the value.',
+    collect_secret: tool({
+      description: 'Show a secure input form for the user to enter a sensitive value. The value is stored directly in the specified file without passing through the AI.',
       parameters: z.object({
-        key: z.string().describe('The environment variable name, e.g. OPENAI_API_KEY'),
-        label: z.string().describe('Human-friendly label shown to the user, e.g. "OpenAI API Key"'),
-        description: z.string().describe('Brief explanation shown below the input field, e.g. where to find this value'),
+        file: z.string().describe('The file to store the secret in, e.g. ".env"'),
+        key: z.string().describe('The environment variable name, e.g. "OPENAI_API_KEY"'),
+        label: z.string().describe('A human-friendly description of what this secret is, e.g. "OpenAI key for the voice conversation agent"'),
       }),
-      execute: async ({ key, label, description }) => {
-        // This event is intercepted by the frontend to render a password form.
-        // It does NOT block — the agent finishes its turn normally.
-        onEvent('secret_request', { key, label, description });
-        return `Secret input form for "${label}" (${key}) has been shown to the user. Finish your current message with a brief note about where to find this value, then end your turn. The user will submit it and the conversation will continue automatically.`;
+      execute: async ({ file, key, label }) => {
+        onEvent('secret_request', { file, key, label });
+        return `Secure input form for ${label} is now shown. Tell the user where to find this value, then end your turn — the conversation continues automatically once they submit.`;
       },
     }),
+
+    // ------------------------------------------------------------------
+    // web_search — search the web for instructions or documentation
+    // ------------------------------------------------------------------
+    web_search: tool({
+      description: 'Search the web for documentation, setup instructions, or troubleshooting help. Use this when the user mentions a specific service or tool you need configuration details for.',
+      parameters: z.object({
+        query: z.string().describe('The search query, e.g. "Resend SMTP configuration settings"'),
+      }),
+      execute: async ({ query }) => {
+        onEvent('tool_start', { name: 'web_search', label: `Searching: ${query}` });
+        const apiKey = process.env.TAVILY_API_KEY;
+        if (!apiKey) {
+          const msg = 'Web search is not configured (TAVILY_API_KEY not set).';
+          onEvent('tool_end', { name: 'web_search', summary: msg });
+          return msg;
+        }
+        try {
+          const response = await axios.post('https://api.tavily.com/search', {
+            api_key: apiKey,
+            query,
+            search_depth: 'basic',
+            max_results: 5,
+            include_answer: true,
+          }, { timeout: 15000 });
+
+          const { answer, results } = response.data;
+          const snippets = results.map(r => `[${r.title}](${r.url})\n${r.content}`).join('\n\n');
+          const output = [answer && `Summary: ${answer}`, snippets].filter(Boolean).join('\n\n');
+          onEvent('tool_end', { name: 'web_search', summary: `Found ${results.length} results` });
+          return output;
+        } catch (err) {
+          const msg = `Search failed: ${err.message}`;
+          onEvent('tool_end', { name: 'web_search', summary: msg });
+          return msg;
+        }
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // send_email — shared with post-call agent; re-initializes transport
+    // so credentials saved earlier in the setup session are picked up.
+    // ------------------------------------------------------------------
+    send_email: (() => {
+      const emailTransport = require('../email-transport');
+      const { createTools } = require('./tools');
+      const { send_email } = createTools();
+      return tool({
+        ...send_email,
+        execute: async (args) => {
+          onEvent('tool_start', { name: 'send_email', label: `Sending email to ${args.to}` });
+          emailTransport.initialize();
+          const result = await send_email.execute(args);
+          const summary = result.success ? `✅ Email sent to ${args.to}` : `❌ ${result.error}`;
+          onEvent('tool_end', { name: 'send_email', summary });
+          return result;
+        },
+      });
+    })(),
 
     // ------------------------------------------------------------------
     // check_url_reachable — verify a server URL is responding
@@ -361,30 +418,39 @@ function createSetupTools(onEvent) {
           const env = readEnvFile();
 
           const required = {
-            TWILIO_PHONE_NUMBER: 'Twilio Phone Number',
-            OPENROUTER_API_KEY: 'OpenRouter API Key (AI brain)',
-            OPENAI_API_KEY: 'OpenAI API Key (required for real-time voice calls)',
-          };
-
-          const optional = {
+            BUSINESS_NAME: 'Business name',
+            OWNER_NAME: 'Owner name',
+            RECEPTIONIST_NAME: 'Receptionist name',
+            TIMEZONE: 'Timezone',
+            PUBLIC_URL: 'Public URL (for Twilio webhooks)',
+            TWILIO_PHONE_NUMBER: 'Twilio phone number',
+            TWILIO_ACCOUNT_SID: 'Twilio Account SID',
+            TWILIO_AUTH_TOKEN: 'Twilio Auth Token',
+            OPENROUTER_API_KEY: 'OpenRouter API key (AI brain)',
+            OPENAI_API_KEY: 'OpenAI API key (real-time voice)',
             ADMIN_PASSWORD: 'Admin panel password',
-            ADMIN_EMAIL: 'Admin email (for call notifications)',
-            SMTP_HOST: 'Email server (for sending notifications)',
           };
 
           const configured = [];
           const missing = [];
           const optionalMissing = [];
 
-          const looksReal = (v) => v && v.length > 5 && !v.includes('your_') && !v.includes('example');
+          const isSet = (v) => v && v.trim() !== '';
 
           for (const [k, desc] of Object.entries(required)) {
-            if (looksReal(env[k])) configured.push(`${k}: ${desc}`);
+            if (isSet(env[k])) configured.push(`${k}: ${desc}`);
             else missing.push(`${k}: ${desc}`);
           }
 
-          for (const [k, desc] of Object.entries(optional)) {
-            if (!looksReal(env[k])) optionalMissing.push(`${k}: ${desc}`);
+          // Optional checks — some are multi-key (email sending key)
+          const optionalChecks = [
+            { label: 'Admin email (for call notifications)', ok: isSet(env['ADMIN_EMAIL']) },
+            { label: 'Email sending key (RESEND_API_KEY or SMTP_PASS)', ok: isSet(env['RESEND_API_KEY']) || isSet(env['SMTP_PASS']) },
+            { label: 'Email from address (SMTP_FROM)', ok: isSet(env['SMTP_FROM']) },
+            { label: 'Web chat CORS origin (ALLOWED_ORIGIN)', ok: isSet(env['ALLOWED_ORIGIN']) },
+          ];
+          for (const { label, ok } of optionalChecks) {
+            if (!ok) optionalMissing.push(label);
           }
 
           // Check data files

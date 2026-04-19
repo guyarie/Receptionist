@@ -54,7 +54,7 @@ async function runSetupTurn(sessionId, userMessage, onEvent) {
     baseURL: 'https://openrouter.ai/api/v1',
     apiKey,
   });
-  const model = openai.chat(process.env.OPENROUTER_MODEL || 'openai/gpt-4o');
+  const model = openai.chat(process.env.SETUP_AGENT_MODEL || process.env.OPENROUTER_MODEL || 'openai/gpt-4o');
 
   const messages = getOrCreateSession(sessionId);
   messages.push({ role: 'user', content: userMessage });

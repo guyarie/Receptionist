@@ -7,7 +7,7 @@ class AIClient {
   constructor() {
     this.client = new OpenAI({
       baseURL: 'https://openrouter.ai/api/v1',
-      apiKey: config.openRouter.apiKey,
+      apiKey: config.openRouter.apiKey || 'not-configured',
       defaultHeaders: {
         'HTTP-Referer': 'http://localhost:3000',
         'X-Title': 'AI Phone Receptionist'

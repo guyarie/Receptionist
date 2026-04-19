@@ -94,6 +94,9 @@ function renderNav(activePage) {
     return `<li><a href="${page.path}" class="${isActive}">${page.name}</a></li>`;
   }).join('') + `
     <li style="margin-left: auto;">
+      <a href="/setup">⚙️ Setup</a>
+    </li>
+    <li>
       <a href="#" id="logout-btn" style="color: #dc3545;">Logout</a>
     </li>
   `;
