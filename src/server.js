@@ -215,18 +215,21 @@ app.post('/api/setup/secret', (req, res) => {
   const { key, value } = req.body;
 
   if (!key || !value) {
+    console.warn(`⚠️  Secret endpoint called with missing key or value (key=${key}, valueLength=${value?.length})`);
     return res.status(400).json({ error: 'Missing key or value' });
   }
 
   // Allowlist of keys that can be written via this endpoint
   const allowedSecretKeys = [
     'OPENROUTER_API_KEY', 'OPENAI_API_KEY',
-    'TWILIO_PHONE_NUMBER',
+    'TWILIO_PHONE_NUMBER', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN',
     'ADMIN_PASSWORD', 'SESSION_SECRET',
     'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM',
+    'RESEND_API_KEY',
   ];
 
   if (!allowedSecretKeys.includes(key)) {
+    console.warn(`⚠️  Secret endpoint rejected disallowed key: ${key}`);
     return res.status(400).json({ error: `Key '${key}' is not allowed via this endpoint` });
   }
 

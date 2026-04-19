@@ -6,14 +6,14 @@ let configChecked = false;
 let apiKey = null;
 let fromAddress = null;
 
-// Check if email env vars are present
+// Check if email env vars are present. Safe to call multiple times —
+// re-reads process.env so credentials saved mid-session are picked up.
 function initialize() {
-  // Support both RESEND_API_KEY and SMTP_PASS (for backward compat with existing .env)
   const key = process.env.RESEND_API_KEY || process.env.SMTP_PASS;
   const from = process.env.SMTP_FROM;
 
   if (!key || !from) {
-    console.warn('⚠️ Email not fully configured — email notifications disabled');
+    if (!configChecked) console.warn('⚠️ Email not fully configured — email notifications disabled');
     configured = false;
     configChecked = true;
     return;

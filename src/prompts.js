@@ -60,13 +60,21 @@ class PromptLoader {
    * Replace {{VAR}} placeholders with values from config/env.
    */
   substituteVars(text) {
-    return text
-      .replace(/\{\{BUSINESS_NAME\}\}/g, config.business.name)
-      .replace(/\{\{RECEPTIONIST_NAME\}\}/g, config.business.receptionistName)
-      .replace(/\{\{OWNER_NAME\}\}/g, config.business.ownerName)
-      .replace(/\{\{OWNER_PHONE\}\}/g, config.business.ownerPhone || '[owner phone]')
-      .replace(/\{\{PUBLIC_URL\}\}/g, config.business.publicUrl || '[your domain]')
-      .replace(/\{\{ADMIN_EMAIL\}\}/g, config.adminEmail || '[admin email]');
+    const vars = {
+      BUSINESS_NAME:     config.business.name,
+      RECEPTIONIST_NAME: config.business.receptionistName,
+      OWNER_NAME:        config.business.ownerName,
+      OWNER_PHONE:       config.business.ownerPhone || '[owner phone]',
+      PUBLIC_URL:        config.business.publicUrl || '[your domain]',
+      ADMIN_EMAIL:       config.adminEmail || '[admin email]',
+    };
+    for (const [key, value] of Object.entries(vars)) {
+      // Match both {{KEY}} and [KEY] formats
+      text = text
+        .replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value)
+        .replace(new RegExp(`\\[${key}\\]`, 'g'), value);
+    }
+    return text;
   }
 
   /**

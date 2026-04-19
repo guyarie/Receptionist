@@ -877,7 +877,7 @@
       case 'secret_request':
         removeTyping();
         finishActivity();
-        appendSecretCard(event.key, event.label, event.description);
+        appendSecretCard(event.key, event.label);
         break;
 
       case 'message':
@@ -977,19 +977,19 @@
   }
 
   // ── Secret input card ─────────────────────────────────────────────────────
-  function appendSecretCard(key, label, description) {
+  function appendSecretCard(key, label) {
     const card = document.createElement('div');
     card.className = 'secret-card';
     card.dataset.key = key;
 
     card.innerHTML = `
       <div class="secret-card-label">🔐 ${label}</div>
-      <div class="secret-card-desc">${description}</div>
       <div class="secret-input-row">
         <input type="password" class="secret-input" placeholder="Paste your key here..." autocomplete="off" />
         <button class="secret-submit">Save</button>
       </div>
-      <div class="secret-saved" style="display:none;">✓ Saved securely</div>`;
+      <div class="secret-error" style="display:none;font-size:12px;color:var(--error);padding-top:6px;"></div>
+      <div class="secret-saved" style="display:none;font-size:12px;color:var(--success);font-weight:500;padding-top:6px;"></div>`;
 
     messages.appendChild(card);
     scrollBottom();
@@ -997,31 +997,44 @@
     const input = card.querySelector('.secret-input');
     const btn   = card.querySelector('.secret-submit');
     const saved = card.querySelector('.secret-saved');
+    const errEl = card.querySelector('.secret-error');
 
     const submit = async () => {
       const value = input.value.trim();
       if (!value) { input.focus(); return; }
       btn.disabled = true;
       btn.textContent = 'Saving...';
+      errEl.style.display = 'none';
+      input.style.borderColor = '';
       try {
         const res = await fetch('/api/setup/secret', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key, value }),
         });
-        if (!res.ok) throw new Error();
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error || `Server error ${res.status}`);
+        }
         input.style.display = 'none';
         btn.style.display = 'none';
+        const preview = value.length <= 8
+          ? '•'.repeat(value.length)
+          : value.slice(0, 4) + '••••••••' + value.slice(-4);
+        saved.textContent = `✓ Saved — ${preview}`;
         saved.style.display = 'block';
         // Auto-continue the conversation
         setTimeout(() => {
           userInput.value = `I've provided the ${label}. Please continue.`;
           sendMessage();
         }, 600);
-      } catch {
+      } catch (err) {
         btn.disabled = false;
         btn.textContent = 'Save';
         input.style.borderColor = 'var(--error)';
+        errEl.textContent = err.message || 'Failed to save — please try again.';
+        errEl.style.display = 'block';
+        console.error('Secret save failed:', err.message, { key });
       }
     };
 
