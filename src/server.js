@@ -226,6 +226,7 @@ app.post('/api/setup/secret', (req, res) => {
     'ADMIN_PASSWORD', 'SESSION_SECRET',
     'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM',
     'RESEND_API_KEY',
+    'CALENDLY_API_TOKEN', 'GCAL_CLIENT_SECRET', 'GCAL_REFRESH_TOKEN',
   ];
 
   if (!allowedSecretKeys.includes(key)) {

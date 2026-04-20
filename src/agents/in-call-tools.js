@@ -1,7 +1,8 @@
 'use strict';
 
 const { getEventType, getAvailableTimes } = require('./tools/calendly');
-const { refreshAccessToken, createCalendarEvent } = require('./tools/google-calendar');
+const { generateIcs } = require('./tools/ics');
+const emailTransport = require('../email-transport');
 
 const DEFAULT_DURATION_MIN = 30;
 // Calendly available_times endpoint supports max 14 days per request
@@ -46,6 +47,10 @@ const SCHEDULING_TOOLS = [
           type: 'string',
           description: "Caller's phone number.",
         },
+        caller_email: {
+          type: 'string',
+          description: "Caller's email address, if provided. A calendar invite will be sent to this address.",
+        },
         notes: {
           type: 'string',
           description: 'Optional reason for the appointment or other notes.',
@@ -59,10 +64,7 @@ const SCHEDULING_TOOLS = [
 function isSchedulingEnabled() {
   return !!(
     process.env.CALENDLY_API_TOKEN &&
-    process.env.CALENDLY_EVENT_TYPE_URI &&
-    process.env.GCAL_CLIENT_ID &&
-    process.env.GCAL_CLIENT_SECRET &&
-    process.env.GCAL_REFRESH_TOKEN
+    process.env.CALENDLY_EVENT_TYPE_URI
   );
 }
 
@@ -117,43 +119,66 @@ async function executeCheckAvailability(args) {
 }
 
 async function executeBookAppointment(args, callerPhone) {
-  const { start_time, duration_minutes, caller_name, notes } = args;
+  const { start_time, duration_minutes, caller_name, caller_email, notes } = args;
   const phone = args.caller_phone || callerPhone || '';
-
-  const clientId = process.env.GCAL_CLIENT_ID;
-  const clientSecret = process.env.GCAL_CLIENT_SECRET;
-  const refreshToken = process.env.GCAL_REFRESH_TOKEN;
-  const calendarId = process.env.GCAL_CALENDAR_ID || 'primary';
   const timezone = process.env.TIMEZONE || 'America/Los_Angeles';
-
-  if (!clientId || !clientSecret || !refreshToken) {
-    return { error: 'Calendar booking is not configured for this practice.' };
-  }
-
-  const accessToken = await refreshAccessToken(clientId, clientSecret, refreshToken);
+  const businessName = process.env.BUSINESS_NAME || 'Your Practice';
+  const practiceEmail = process.env.ADMIN_EMAIL || '';
 
   const durationMs = (duration_minutes || DEFAULT_DURATION_MIN) * 60 * 1000;
   const endTime = new Date(new Date(start_time).getTime() + durationMs).toISOString();
+  const displayTime = formatSlotForSpeech(start_time, timezone);
 
-  const event = {
+  const description = [
+    `Caller: ${caller_name}`,
+    phone ? `Phone: ${phone}` : '',
+    caller_email ? `Email: ${caller_email}` : '',
+    notes ? `Notes: ${notes}` : '',
+    'Booked via AI Receptionist',
+  ].filter(Boolean).join('\n');
+
+  const icsContent = generateIcs({
+    uid: `${Date.now()}-${Math.random().toString(36).slice(2)}@receptionist`,
+    startTime: start_time,
+    endTime,
     summary: `Appointment — ${caller_name}`,
-    description: [
-      `Caller: ${caller_name}`,
-      phone ? `Phone: ${phone}` : '',
-      notes ? `Notes: ${notes}` : '',
-      'Booked via AI Receptionist',
-    ].filter(Boolean).join('\n'),
-    start: { dateTime: start_time, timeZone: timezone },
-    end: { dateTime: endTime, timeZone: timezone },
+    description,
+    organizerEmail: practiceEmail || undefined,
+    attendeeEmail: caller_email || undefined,
+  });
+
+  const attachment = {
+    filename: 'appointment.ics',
+    content: Buffer.from(icsContent).toString('base64'),
   };
 
-  const created = await createCalendarEvent(accessToken, calendarId, event);
+  const recipients = [practiceEmail, caller_email].filter(Boolean);
+
+  if (recipients.length > 0 && emailTransport.isConfigured()) {
+    const subject = `Appointment confirmed — ${caller_name} at ${displayTime}`;
+    const body = [
+      `Hi,`,
+      ``,
+      `An appointment has been booked via your AI Receptionist.`,
+      ``,
+      `Name: ${caller_name}`,
+      phone ? `Phone: ${phone}` : '',
+      caller_email ? `Email: ${caller_email}` : '',
+      `Time: ${displayTime}`,
+      notes ? `Notes: ${notes}` : '',
+      ``,
+      `A calendar invite is attached. Open it to add the appointment to your calendar.`,
+      ``,
+      `— ${businessName} AI Receptionist`,
+    ].filter(l => l !== null).join('\n');
+
+    await emailTransport.sendMail({ to: recipients, subject, body, attachments: [attachment] });
+  }
 
   return {
     success: true,
-    event_id: created.id,
-    display_time: formatSlotForSpeech(start_time, timezone),
-    calendar_link: created.htmlLink,
+    display_time: displayTime,
+    invite_sent: recipients.length > 0 && emailTransport.isConfigured(),
   };
 }
 
