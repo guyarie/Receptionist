@@ -30,9 +30,20 @@ function isConfigured() {
   return configured;
 }
 
-async function sendMail({ to, subject, body }) {
+async function sendMail({ to, subject, body, attachments }) {
   if (!configured) {
     throw new Error('Email transport is not configured');
+  }
+
+  const payload = {
+    from: fromAddress,
+    to: Array.isArray(to) ? to : [to],
+    subject,
+    text: body,
+  };
+
+  if (attachments && attachments.length > 0) {
+    payload.attachments = attachments;
   }
 
   const res = await fetch('https://api.resend.com/emails', {
@@ -41,12 +52,7 @@ async function sendMail({ to, subject, body }) {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      from: fromAddress,
-      to: Array.isArray(to) ? to : [to],
-      subject,
-      text: body
-    })
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {

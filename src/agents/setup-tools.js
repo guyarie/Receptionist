@@ -9,6 +9,8 @@ const { z } = require('zod');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const { getUser, getEventTypes } = require('./tools/calendly');
+const { generateAuthUrl, exchangeCodeForTokens } = require('./tools/google-calendar');
 
 const ROOT_DIR = path.join(__dirname, '..', '..');
 const DATA_DIR = path.join(ROOT_DIR, 'data');
@@ -115,6 +117,12 @@ function summarizeToolResult(toolName, result) {
       return result;
     case 'validate_setup':
       return 'Setup validation complete';
+    case 'validate_calendly':
+      return result.startsWith('Connected') ? result.split('\n')[0] : result.substring(0, 120);
+    case 'generate_gcal_auth_url':
+      return 'Google authorization URL generated';
+    case 'complete_gcal_auth':
+      return result;
     default:
       return result.substring(0, 120);
   }
@@ -225,11 +233,33 @@ function createSetupTools(onEvent) {
     // read_context_file — read a file from data/
     // ------------------------------------------------------------------
     read_context_file: tool({
-      description: 'Read an existing configuration file from data/. Note: {{PLACEHOLDER}} strings in these files are intentional — they are substituted at runtime from .env. Do not treat them as missing configuration.',
+      description: 'Read an existing configuration file from data/, or the special path ".env.example" to see all available configuration fields with their descriptions. Note: {{PLACEHOLDER}} strings in data/ files are intentional — they are substituted at runtime from .env. Do not treat them as missing configuration.',
       parameters: z.object({
-        path: z.string().describe('Path relative to data/, e.g. "prompts/system-prompt.txt"'),
+        path: z.string().describe('Path relative to data/, e.g. "prompts/system-prompt.txt". Use ".env.example" to read the full list of supported config fields.'),
       }),
       execute: async ({ path: filePath }) => {
+        // Block attempts to read .env directly — it contains secrets and isn't in data/
+        if (filePath === '.env' || filePath === 'data/.env') {
+          const msg = 'Cannot read .env directly — it contains secrets. Use validate_setup to check what is configured, or read_context_file(".env.example") to see the list of available fields.';
+          onEvent('tool_end', { name: 'read_context_file', summary: msg });
+          return msg;
+        }
+
+        // Special case: allow reading .env.example from the project root
+        if (filePath === '.env.example') {
+          const envExamplePath = path.join(ROOT_DIR, '.env.example');
+          onEvent('tool_start', { name: 'read_context_file', label: 'Reading .env.example' });
+          try {
+            const content = fs.readFileSync(envExamplePath, 'utf-8');
+            onEvent('tool_end', { name: 'read_context_file', summary: 'Read .env.example successfully' });
+            return content;
+          } catch (err) {
+            const msg = `Error reading .env.example: ${err.message}`;
+            onEvent('tool_end', { name: 'read_context_file', summary: msg });
+            return msg;
+          }
+        }
+
         const cleanPath = filePath.replace(/^data\//, '');
         onEvent('tool_start', { name: 'read_context_file', label: `Reading data/${cleanPath}` });
         try {
@@ -422,7 +452,6 @@ function createSetupTools(onEvent) {
             OWNER_NAME: 'Owner name',
             RECEPTIONIST_NAME: 'Receptionist name',
             TIMEZONE: 'Timezone',
-            PUBLIC_URL: 'Public URL (for Twilio webhooks)',
             TWILIO_PHONE_NUMBER: 'Twilio phone number',
             TWILIO_ACCOUNT_SID: 'Twilio Account SID',
             TWILIO_AUTH_TOKEN: 'Twilio Auth Token',
@@ -433,6 +462,7 @@ function createSetupTools(onEvent) {
 
           const configured = [];
           const missing = [];
+          const optionalConfigured = [];
           const optionalMissing = [];
 
           const isSet = (v) => v && v.trim() !== '';
@@ -448,9 +478,13 @@ function createSetupTools(onEvent) {
             { label: 'Email sending key (RESEND_API_KEY or SMTP_PASS)', ok: isSet(env['RESEND_API_KEY']) || isSet(env['SMTP_PASS']) },
             { label: 'Email from address (SMTP_FROM)', ok: isSet(env['SMTP_FROM']) },
             { label: 'Web chat CORS origin (ALLOWED_ORIGIN)', ok: isSet(env['ALLOWED_ORIGIN']) },
+            { label: 'Public URL — cosmetic only, used in logs and prompt templates (PUBLIC_URL)', ok: isSet(env['PUBLIC_URL']) },
+            { label: 'Calendly API token (scheduling)', ok: isSet(env['CALENDLY_API_TOKEN']) },
+            { label: 'Calendly event type URI (scheduling)', ok: isSet(env['CALENDLY_EVENT_TYPE_URI']) },
           ];
           for (const { label, ok } of optionalChecks) {
-            if (!ok) optionalMissing.push(label);
+            if (ok) optionalConfigured.push(label);
+            else optionalMissing.push(label);
           }
 
           // Check data files
@@ -470,6 +504,7 @@ function createSetupTools(onEvent) {
           return JSON.stringify({
             configured,
             missing,
+            optionalConfigured,
             optionalMissing,
             dataFiles,
             isReady: missing.length === 0 && hasSystemPrompt,
@@ -483,6 +518,96 @@ function createSetupTools(onEvent) {
         } catch (err) {
           const msg = `Error during validation: ${err.message}`;
           onEvent('tool_end', { name: 'validate_setup', summary: msg });
+          return msg;
+        }
+      },
+    }),
+    // ------------------------------------------------------------------
+    // validate_calendly — test API token and list event types
+    // ------------------------------------------------------------------
+    validate_calendly: tool({
+      description: 'Test a Calendly API token and list the account\'s event types. Use this after the user has entered their CALENDLY_API_TOKEN to verify it works and to help them choose which event type to use for scheduling.',
+      parameters: z.object({}),
+      execute: async () => {
+        onEvent('tool_start', { name: 'validate_calendly', label: 'Checking Calendly connection' });
+        const apiToken = process.env.CALENDLY_API_TOKEN;
+        if (!apiToken) {
+          const msg = 'CALENDLY_API_TOKEN is not set — ask the user to enter it via request_secret first.';
+          onEvent('tool_end', { name: 'validate_calendly', summary: msg });
+          return msg;
+        }
+        try {
+          const user = await getUser(apiToken);
+          const eventTypes = await getEventTypes(apiToken, user.uri);
+          const list = eventTypes.map((et, i) => `${i + 1}. ${et.name} (${et.duration} min) — URI: ${et.uri}`).join('\n');
+          const result = `Connected as: ${user.name} (${user.email})\n\nEvent types:\n${list}`;
+          onEvent('tool_end', { name: 'validate_calendly', summary: `Found ${eventTypes.length} event type(s)` });
+          return result;
+        } catch (err) {
+          const msg = `Calendly connection failed: ${err.response?.data?.message || err.message}`;
+          onEvent('tool_end', { name: 'validate_calendly', summary: msg });
+          return msg;
+        }
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // generate_gcal_auth_url — build the Google OAuth2 authorization URL
+    // ------------------------------------------------------------------
+    generate_gcal_auth_url: tool({
+      description: 'Generate a Google OAuth2 authorization URL for Google Calendar access. Call this after the user has entered GCAL_CLIENT_ID. The user will visit the URL, authorize access, and be redirected to a page showing their authorization code.',
+      parameters: z.object({
+        setup_port: z.number().optional().describe('The port the setup server is running on (default 3001)'),
+      }),
+      execute: async ({ setup_port }) => {
+        onEvent('tool_start', { name: 'generate_gcal_auth_url', label: 'Generating Google auth URL' });
+        const clientId = process.env.GCAL_CLIENT_ID;
+        if (!clientId) {
+          const msg = 'GCAL_CLIENT_ID is not set — ask the user to enter it via set_config first.';
+          onEvent('tool_end', { name: 'generate_gcal_auth_url', summary: msg });
+          return msg;
+        }
+        const port = setup_port || process.env.SETUP_PORT || 3001;
+        const redirectUri = `http://localhost:${port}/gcal-oauth.html`;
+        const url = generateAuthUrl(clientId, redirectUri);
+        onEvent('tool_end', { name: 'generate_gcal_auth_url', summary: 'Authorization URL generated' });
+        return `Authorization URL:\n${url}\n\nRedirect URI (save this — you'll need it): ${redirectUri}`;
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // complete_gcal_auth — exchange OAuth code for tokens and save them
+    // ------------------------------------------------------------------
+    complete_gcal_auth: tool({
+      description: 'Exchange a Google OAuth2 authorization code for a refresh token and save it to configuration. Call this after the user pastes the code they received from the Google authorization page.',
+      parameters: z.object({
+        code: z.string().describe('The authorization code the user copied from the Google redirect page'),
+        redirect_uri: z.string().describe('The redirect URI used when generating the auth URL (must match exactly)'),
+      }),
+      execute: async ({ code, redirect_uri }) => {
+        onEvent('tool_start', { name: 'complete_gcal_auth', label: 'Completing Google Calendar authorization' });
+        const clientId = process.env.GCAL_CLIENT_ID;
+        const clientSecret = process.env.GCAL_CLIENT_SECRET;
+        if (!clientId || !clientSecret) {
+          const msg = 'GCAL_CLIENT_ID and GCAL_CLIENT_SECRET must be set before completing authorization.';
+          onEvent('tool_end', { name: 'complete_gcal_auth', summary: msg });
+          return msg;
+        }
+        try {
+          const tokens = await exchangeCodeForTokens(clientId, clientSecret, code.trim(), redirect_uri);
+          if (!tokens.refresh_token) {
+            const msg = 'Google did not return a refresh token. Make sure the OAuth2 consent screen was shown (try revoking access at myaccount.google.com/permissions and authorizing again).';
+            onEvent('tool_end', { name: 'complete_gcal_auth', summary: msg });
+            return msg;
+          }
+          writeEnvValue('GCAL_REFRESH_TOKEN', tokens.refresh_token);
+          const result = 'Google Calendar authorized successfully. Refresh token saved to configuration.';
+          onEvent('tool_end', { name: 'complete_gcal_auth', summary: result });
+          return result;
+        } catch (err) {
+          const detail = err.response?.data?.error_description || err.response?.data?.error || err.message;
+          const msg = `Authorization failed: ${detail}`;
+          onEvent('tool_end', { name: 'complete_gcal_auth', summary: msg });
           return msg;
         }
       },

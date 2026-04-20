@@ -3,6 +3,7 @@
 const WebSocket = require('ws');
 const ProviderAdapter = require('./provider-adapter');
 const config = require('../config');
+const { SCHEDULING_TOOLS, isSchedulingEnabled, executeTool } = require('../agents/in-call-tools');
 
 const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17';
 
@@ -27,6 +28,7 @@ class OpenAIAdapter extends ProviderAdapter {
    */
   async connect(options) {
     const { systemPrompt, websiteContext, availabilityContext, callerPhone } = options || {};
+    this.callerPhone = callerPhone || null;
 
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(OPENAI_REALTIME_URL, {
@@ -85,7 +87,8 @@ class OpenAIAdapter extends ProviderAdapter {
                 name: 'hangup',
                 description: 'End the call. Call this when the conversation is complete and it is time to hang up.',
                 parameters: { type: 'object', properties: {} }
-              }
+              },
+              ...(isSchedulingEnabled() ? SCHEDULING_TOOLS : []),
             ],
             tool_choice: 'auto',
             instructions: instructions || ''
@@ -182,9 +185,13 @@ class OpenAIAdapter extends ProviderAdapter {
         break;
 
       case 'response.output_item.done':
-        if (event.item?.type === 'function_call' && event.item?.name === 'hangup') {
-          console.log('📵 AI requested hangup');
-          if (this.onHangup) this.onHangup();
+        if (event.item?.type === 'function_call') {
+          if (event.item.name === 'hangup') {
+            console.log('📵 AI requested hangup');
+            if (this.onHangup) this.onHangup();
+          } else {
+            this._handleFunctionCall(event.item);
+          }
         }
         break;
 
@@ -202,6 +209,38 @@ class OpenAIAdapter extends ProviderAdapter {
         }
         break;
     }
+  }
+
+  /**
+   * Execute a scheduling function call and return the result to OpenAI.
+   */
+  async _handleFunctionCall(item) {
+    const { name, call_id, arguments: argsStr } = item;
+    console.log(`🔧 AI called tool: ${name}`);
+
+    let args = {};
+    try { args = JSON.parse(argsStr || '{}'); } catch (_) {}
+
+    let result;
+    try {
+      result = await executeTool(name, args, this.callerPhone);
+    } catch (err) {
+      console.error(`Tool ${name} failed:`, err.message);
+      result = { error: err.message };
+    }
+
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+
+    this.ws.send(JSON.stringify({
+      type: 'conversation.item.create',
+      item: {
+        type: 'function_call_output',
+        call_id,
+        output: JSON.stringify(result),
+      },
+    }));
+
+    this.ws.send(JSON.stringify({ type: 'response.create' }));
   }
 
   /**
