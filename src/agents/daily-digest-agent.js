@@ -7,9 +7,10 @@ const { createOpenAI } = require('@ai-sdk/openai');
 const config = require('../config');
 const { createTools } = require('./tools');
 
+const { dataDir, promptsDir } = require('../paths');
 // Resolve prompt path at call time: data/prompts/ (user override) takes priority over prompts/ (repo default)
-const DATA_PROMPT_PATH = path.join(__dirname, '..', '..', 'data', 'prompts', 'daily-digest-agent.txt');
-const DEFAULT_PROMPT_PATH = path.join(__dirname, '..', '..', 'prompts', 'daily-digest-agent.txt');
+const DATA_PROMPT_PATH = path.join(dataDir, 'prompts', 'daily-digest-agent.txt');
+const DEFAULT_PROMPT_PATH = path.join(promptsDir, 'daily-digest-agent.txt');
 function resolvePromptPath() {
   return fs.existsSync(DATA_PROMPT_PATH) ? DATA_PROMPT_PATH : DEFAULT_PROMPT_PATH;
 }

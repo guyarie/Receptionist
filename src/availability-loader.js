@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { dataDir } = require('./paths');
 
 /**
  * AvailabilityLoader manages provider availability markdown files.
@@ -7,7 +8,7 @@ const path = require('path');
  */
 class AvailabilityLoader {
   constructor(availabilityDir = null) {
-    this.availabilityDir = availabilityDir || path.join(__dirname, '..', 'data', 'availability');
+    this.availabilityDir = availabilityDir || path.join(dataDir, 'availability');
     this.files = new Map(); // Map<filename, content>
   }
 

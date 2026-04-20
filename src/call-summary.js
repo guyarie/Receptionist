@@ -3,10 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const aiClient = require('./ai-client');
 const { getPacificTimeISO, getFilenameSafeTimestamp } = require('./time-utils');
+const { runtimeDir } = require('./paths');
 
 class CallSummaryManager {
   constructor() {
-    this.summariesDir = path.join(__dirname, '..', 'runtime', 'call-summaries');
+    this.summariesDir = path.join(runtimeDir, 'call-summaries');
     this.ensureDirectoryExists();
   }
   

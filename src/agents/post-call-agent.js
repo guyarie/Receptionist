@@ -10,13 +10,14 @@ const config = require('../config');
 const { createTools } = require('./tools');
 const { getFilenameSafeTimestamp } = require('../time-utils');
 
+const { dataDir, runtimeDir, promptsDir } = require('../paths');
 // Resolve prompt path at call time: data/prompts/ (user override) takes priority over prompts/ (repo default)
-const DATA_PROMPT_PATH = path.join(__dirname, '..', '..', 'data', 'prompts', 'post-call-agent.txt');
-const DEFAULT_PROMPT_PATH = path.join(__dirname, '..', '..', 'prompts', 'post-call-agent.txt');
+const DATA_PROMPT_PATH = path.join(dataDir, 'prompts', 'post-call-agent.txt');
+const DEFAULT_PROMPT_PATH = path.join(promptsDir, 'post-call-agent.txt');
 function resolvePromptPath() {
   return fs.existsSync(DATA_PROMPT_PATH) ? DATA_PROMPT_PATH : DEFAULT_PROMPT_PATH;
 }
-const LOGS_DIR = path.join(__dirname, '..', '..', 'runtime', 'agent-logs');
+const LOGS_DIR = path.join(runtimeDir, 'agent-logs');
 const MAX_ITERATIONS = 10;
 
 function ensureLogsDir() {

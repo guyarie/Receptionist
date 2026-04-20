@@ -2,8 +2,9 @@
 const fs = require('fs');
 const path = require('path');
 const { getFilenameSafeTimestamp, getPacificTimeISO } = require('./time-utils');
+const { runtimeDir } = require('./paths');
 
-const LOGS_DIR = path.join(__dirname, '..', 'runtime', 'chat-logs');
+const LOGS_DIR = path.join(runtimeDir, 'chat-logs');
 
 // Ensure directory exists
 if (!fs.existsSync(LOGS_DIR)) {
