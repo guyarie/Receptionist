@@ -70,6 +70,7 @@ class OpenAIAdapter extends ProviderAdapter {
         const sessionUpdate = {
           type: 'session.update',
           session: {
+            modalities: ['text', 'audio'],
             voice: this.voice,
             input_audio_format: 'g711_ulaw',
             output_audio_format: 'g711_ulaw',
