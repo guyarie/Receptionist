@@ -13,15 +13,25 @@ Works for therapist offices, EV charging companies, medical practices, law firms
 - An OpenRouter API key ([openrouter.ai/keys](https://openrouter.ai/keys))
 - OpenAI API key for real-time voice ([platform.openai.com/api-keys](https://platform.openai.com/api-keys))
 
-### Install
-
 ```bash
 npm install
-cp .env.example .env
-npm start
+
+# Add shared API keys (inherited by all installs)
+cp installs/_defaults.env.example installs/_defaults.env
+# edit installs/_defaults.env with your OPENROUTER_API_KEY, OPENAI_API_KEY, etc.
+
+# Create your first install — auto-assigns a port and starts setup
+node manage.js create demo1
+# → Setup running at http://localhost:3101/setup
+
+# Common management commands
+node manage.js status          # list all installs and their state
+node manage.js start all       # start all installs via PM2
+node manage.js stop demo1      # stop one install
+node manage.js nginx           # print nginx config for all installs
 ```
 
-Then open **http://localhost:3000/setup** in your browser.
+Each install lives in `installs/<name>/` with its own `.env`, `data/`, and `runtime/`. All installs share the same `src/` codebase.
 
 The setup assistant will guide you through everything — crawling your website, designing your receptionist's personality, configuring all credentials, and preparing the AI context files. No manual file editing required.
 
@@ -81,9 +91,10 @@ Access at `http://localhost:3000/admin` (password protected once `ADMIN_PASSWORD
 
 ```
 .
-├── src/
+├── src/                           # Shared codebase — all installs run from here
 │   ├── server.js                  # Express server, Twilio webhooks, admin API
 │   ├── config.js                  # Environment variable loading and validation
+│   ├── paths.js                   # Resolves data/ and runtime/ from INSTALL_DIR
 │   ├── prompts.js                 # Prompt loader (data/ overrides prompts/)
 │   ├── ai-client.js               # OpenRouter AI integration
 │   ├── call-summary.js            # Post-call summary generation
@@ -105,41 +116,53 @@ Access at `http://localhost:3000/admin` (password protected once `ADMIN_PASSWORD
 │       ├── session-manager.js     # Active call session tracking
 │       ├── provider-adapter.js    # Base class for AI provider adapters
 │       └── provider-factory.js    # Adapter factory
-├── prompts/                       # Default prompts (checked into git)
+├── prompts/                       # Default prompts (checked into git, shared)
 │   ├── system-prompt.txt          # AI personality and behavior
 │   ├── greeting.txt               # Call opening
 │   ├── setup-agent.txt            # Setup assistant instructions
 │   └── ...                        # Post-call, digest, and utility prompts
-├── data/                          # Deployment-specific files (gitignored)
-│   ├── prompts/                   # Overrides for any file in prompts/
-│   ├── providers/                 # Provider/staff profiles (*.md)
-│   ├── availability/              # Availability schedules (*.md)
-│   └── practice/                  # Business overview and FAQs
-├── runtime/                       # Generated at runtime (gitignored)
-│   ├── call-summaries/            # JSON transcript + summary per call
-│   ├── agent-logs/                # Post-call agent debug logs
-│   ├── chat-logs/                 # Web chat logs
-│   ├── scrape-cache/              # Raw HTML cache from website scraping
-│   └── backups/                   # data/ snapshots before each website refresh
+├── installs/                      # One subdirectory per install (gitignored)
+│   ├── _defaults.env.example      # Template for shared API keys (tracked)
+│   ├── _defaults.env              # Shared API keys inherited by all installs (gitignored)
+│   └── <name>/                    # Per-install directory
+│       ├── .env                   # Install config (PORT, TWILIO_*, BUSINESS_NAME, …)
+│       ├── data/
+│       │   ├── prompts/           # Overrides for any file in prompts/
+│       │   ├── providers/         # Provider/staff profiles (*.md)
+│       │   ├── availability/      # Availability schedules (*.md)
+│       │   └── practice/          # Business overview and FAQs
+│       └── runtime/
+│           ├── call-summaries/    # JSON transcript + summary per call
+│           ├── agent-logs/        # Post-call agent debug logs
+│           ├── chat-logs/         # Web chat logs
+│           ├── scrape-cache/      # Raw HTML cache from website scraping
+│           └── backups/           # data/ snapshots before each website refresh
 ├── public/
 │   ├── setup/                     # Setup assistant web UI
 │   └── admin/                     # Admin dashboard
-├── docs/                          # Additional documentation
-├── .env                           # Your configuration (not in git)
-└── .env.example                   # Configuration template
+├── manage.js                      # Multi-install CLI (create/start/stop/status/nginx)
+└── docs/                          # Additional documentation
 ```
 
-### The `data/` override system
+### Config inheritance
 
-Any file in `data/prompts/` takes priority over the matching file in `prompts/`. This means:
+Configuration is loaded in three layers, with each layer overriding the previous:
+
+1. `config/defaults.env` — repo defaults, checked in, no secrets
+2. `installs/_defaults.env` — your shared API keys, gitignored, inherited by all installs
+3. `installs/<name>/.env` — per-install overrides (PORT, TWILIO credentials, BUSINESS_NAME, etc.)
+
+### The prompt override system
+
+Any file in `installs/<name>/data/prompts/` takes priority over the matching file in `prompts/`. This means:
 
 - Repo updates never overwrite your configuration
-- Your `data/` folder is everything you need to back up or migrate
+- `installs/<name>/data/` is everything you need to back up or migrate to another host
 - Git history stays clean — only code changes are tracked
 
 ### The `runtime/` folder
 
-Created automatically. Safe to wipe (call logs will be lost, nothing else breaks).
+Located at `installs/<name>/runtime/`. Created automatically. Safe to wipe (call logs will be lost, nothing else breaks).
 
 ---
 
@@ -204,11 +227,13 @@ ALLOWED_ORIGIN=https://yoursite.com
 See [docs/DIGITALOCEAN-DEPLOYMENT.md](docs/DIGITALOCEAN-DEPLOYMENT.md) for a full guide.
 
 Quick checklist:
-- [ ] Point a domain at your server with SSL (Twilio requires HTTPS)
-- [ ] Set `PUBLIC_URL=https://your-domain.com` in `.env`
-- [ ] Set a strong `ADMIN_PASSWORD`
+- [ ] Point a domain (or subdomain) at your server with SSL — Twilio requires HTTPS
+- [ ] Set `PUBLIC_URL=https://your-domain.com` in the install's `.env`
+- [ ] Set a strong `ADMIN_PASSWORD` and `SESSION_SECRET`
 - [ ] Configure Twilio webhook: `https://your-domain.com/incoming-call`
-- [ ] Set up systemd to keep the server running (see [docs/systemd-setup.md](docs/systemd-setup.md))
+- [ ] Start all installs with PM2: `node manage.js start all`
+- [ ] Configure nginx to route each subdomain to the right port: `node manage.js nginx`
+- [ ] Persist PM2 across reboots: `pm2 save && pm2 startup`
 
 For a public HTTPS URL without port forwarding, use Cloudflare Tunnel:
 ```bash

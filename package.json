@@ -11,7 +11,13 @@
     "test": "vitest --run",
     "scrape-providers": "node src/scrape-providers.js"
   },
-  "keywords": ["ai", "receptionist", "voice", "twilio", "openai"],
+  "keywords": [
+    "ai",
+    "receptionist",
+    "voice",
+    "twilio",
+    "openai"
+  ],
   "author": "guyarie",
   "license": "MIT",
   "type": "commonjs",
@@ -27,6 +33,7 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.2",
     "openai": "^6.18.0",
+    "pm2": "^6.0.14",
     "puppeteer": "^24.37.5",
     "twilio": "^5.12.1",
     "ws": "^8.19.0",

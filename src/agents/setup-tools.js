@@ -12,9 +12,8 @@ const axios = require('axios');
 const { getUser, getEventTypes } = require('./tools/calendly');
 const { generateAuthUrl, exchangeCodeForTokens } = require('./tools/google-calendar');
 
-const ROOT_DIR = path.join(__dirname, '..', '..');
-const DATA_DIR = path.join(ROOT_DIR, 'data');
-const ENV_PATH = path.join(ROOT_DIR, '.env');
+const { installDir, dataDir: DATA_DIR, envFile: ENV_PATH } = require('../paths');
+const ROOT_DIR = installDir;
 
 const ALLOWED_DIRECTORIES = ['prompts', 'providers', 'availability', 'practice'];
 

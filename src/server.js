@@ -23,6 +23,7 @@ const emailTransport = require('./email-transport');
 const cron = require('node-cron');
 const { runDailyDigestAgent } = require('./agents/daily-digest-agent');
 const path = require('path');
+const { dataDir, runtimeDir, installDir, envFile, promptsDir } = require('./paths');
 const chatLogger = require('./chat-logger');
 
 // Setup console logging with Pacific time timestamps
@@ -65,8 +66,8 @@ if (realtimeAvailable) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Required for CSRF token validation
-app.use(express.static('data/public')); // user overrides (gitignored)
-app.use(express.static('public'));      // repo defaults
+app.use(express.static(path.join(dataDir, 'public'))); // user overrides (gitignored)
+app.use(express.static(path.join(__dirname, '..', 'public'))); // repo defaults
 
 // ============================================================================
 // CORS Configuration for Web Chat Widget
@@ -246,7 +247,7 @@ app.post('/api/setup/secret', (req, res) => {
 
 // GET /api/setup/env-file — return raw .env contents for inline editing
 app.get('/api/setup/env-file', (req, res) => {
-  const envPath = path.join(__dirname, '..', '.env');
+  const envPath = envFile;
   try {
     const content = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf-8') : '';
     res.type('text/plain').send(content);
@@ -257,7 +258,7 @@ app.get('/api/setup/env-file', (req, res) => {
 
 // PUT /api/setup/env-file — overwrite .env with edited content, reload dotenv
 app.put('/api/setup/env-file', (req, res) => {
-  const envPath = path.join(__dirname, '..', '.env');
+  const envPath = envFile;
   const { content } = req.body;
   if (typeof content !== 'string') return res.status(400).json({ error: 'Missing content' });
   try {
@@ -799,10 +800,9 @@ app.get('/admin/api/config', (req, res) => {
 
 // Admin refresh-website endpoint — backs up data/ then re-runs the scraper
 app.post('/admin/api/refresh-website', async (req, res) => {
-  const path = require('path');
   const { exec } = require('child_process');
-  const rootDir = path.join(__dirname, '..');
-  const backupsDir = path.join(rootDir, 'runtime', 'backups');
+  const rootDir = installDir;
+  const backupsDir = path.join(runtimeDir, 'backups');
 
   try {
     // Ensure backups dir exists
@@ -990,7 +990,7 @@ function initializeNotificationSystem() {
   emailTransport.initialize();
 
   // --- Verify post-call agent prompt exists ---
-  const promptPath = path.join(__dirname, '..', 'prompts', 'post-call-agent.txt');
+  const promptPath = path.join(promptsDir, 'post-call-agent.txt');
   if (fs.existsSync(promptPath)) {
     console.log('📋 Post-call agent prompt loaded');
   } else {

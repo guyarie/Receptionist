@@ -1,7 +1,14 @@
 // Configuration loader
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '..', 'config', 'defaults.env') });
-require('dotenv').config({ override: true }); // .env overrides defaults
+// paths.js must be required before dotenv so INSTALL_DIR is resolved first
+const { repoRoot, envFile } = require('./paths');
+
+// Layer 1: repo defaults (checked in, no secrets)
+require('dotenv').config({ path: path.join(repoRoot, 'config', 'defaults.env') });
+// Layer 2: shared API keys for all installs — installs/_defaults.env (gitignored)
+require('dotenv').config({ path: path.join(repoRoot, 'installs', '_defaults.env') });
+// Layer 3: per-install config — installs/<name>/.env
+require('dotenv').config({ path: envFile, override: true });
 
 function validateConfig() {
   const required = [

@@ -42,11 +42,12 @@ const path = require('path');
 const OpenAI = require('openai');
 const prompts = require('./prompts');
 const { getPacificTimeISO, getFilenameSafeTimestamp } = require('./time-utils');
+const { dataDir, runtimeDir } = require('./paths');
 require('dotenv').config();
 
 // Configuration
 const WEBSITE_URL = process.env.WEBSITE_URL || 'https://www.relationaltherapycollective.com';
-const PROVIDERS_DIR = path.join(__dirname, '..', 'data', 'providers');
+const PROVIDERS_DIR = path.join(dataDir, 'providers');
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openai/gpt-4';
 
@@ -932,7 +933,7 @@ function writePracticeOverview(practiceOverview) {
   console.log(`📝 Writing practice overview to file`);
 
   // Ensure practice directory exists (reuse existing directory creation logic)
-  const practiceDir = path.join(__dirname, '..', 'data', 'practice');
+  const practiceDir = path.join(dataDir, 'practice');
   if (!fs.existsSync(practiceDir)) {
     fs.mkdirSync(practiceDir, { recursive: true });
     console.log(`📁 Created directory: ${practiceDir}`);
@@ -1518,7 +1519,7 @@ async function processSingleProvider(providerLink, browser, index, total) {
  */
 function saveScrapeCache(html, text, url, providerName = null) {
   try {
-    const cacheDir = path.join(__dirname, '..', 'runtime', 'scrape-cache');
+    const cacheDir = path.join(runtimeDir, 'scrape-cache');
     if (!fs.existsSync(cacheDir)) {
       fs.mkdirSync(cacheDir, { recursive: true });
     }
@@ -1757,7 +1758,7 @@ async function writeProviderFiles(summaries) {
   
   try {
     // Ensure directories exist
-    const practiceDir = path.join(__dirname, '..', 'data', 'practice');
+    const practiceDir = path.join(dataDir, 'practice');
     if (!fs.existsSync(practiceDir)) {
       fs.mkdirSync(practiceDir, { recursive: true });
       console.log(`📁 Created directory: ${practiceDir}`);

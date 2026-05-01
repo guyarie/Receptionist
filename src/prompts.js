@@ -2,11 +2,12 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('./config');
+const { dataDir, promptsDir: repoPromptsDir } = require('./paths');
 
 class PromptLoader {
   constructor() {
-    this.dataPromptsDir = path.join(__dirname, '..', 'data', 'prompts');
-    this.promptsDir = path.join(__dirname, '..', 'prompts');
+    this.dataPromptsDir = path.join(dataDir, 'prompts');
+    this.promptsDir = repoPromptsDir;
     this.cache = {};
     this.sources = {};
     this.loadAllPrompts();

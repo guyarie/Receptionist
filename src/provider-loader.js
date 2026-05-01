@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { dataDir } = require('./paths');
 
 /**
  * ProviderLoader manages provider profile markdown files.
@@ -7,7 +8,7 @@ const path = require('path');
  */
 class ProviderLoader {
   constructor(providerDir = null) {
-    this.providerDir = providerDir || path.join(__dirname, '..', 'data', 'providers');
+    this.providerDir = providerDir || path.join(dataDir, 'providers');
     this.files = new Map(); // Map<filename, content>
   }
 
