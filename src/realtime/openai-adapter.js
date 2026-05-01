@@ -96,6 +96,7 @@ class OpenAIAdapter extends ProviderAdapter {
         };
 
         this.ws.send(JSON.stringify(sessionUpdate));
+        console.log(`📤 Session update sent, instructions length: ${instructions.length}`);
 
         // Trigger an immediate greeting by injecting a user turn
         // This makes the AI speak immediately when the call connects
@@ -153,6 +154,7 @@ class OpenAIAdapter extends ProviderAdapter {
 
     switch (event.type) {
       case 'response.audio.delta':
+        console.log(`🔊 Audio delta received: ${event.delta ? event.delta.length : 0} bytes`);
         if (this.onAudioOutput && event.delta) {
           this.onAudioOutput(event.delta);
         }
@@ -204,10 +206,20 @@ class OpenAIAdapter extends ProviderAdapter {
         break;
 
       case 'error':
+        console.error(`❌ OpenAI Realtime error event:`, JSON.stringify(event.error));
         if (this.onError) {
           this.onError(new Error(event.error?.message || 'OpenAI Realtime API error'));
         }
         break;
+
+      default:
+        if (!['input_audio_buffer.committed', 'input_audio_buffer.speech_started',
+              'input_audio_buffer.speech_stopped', 'conversation.item.created',
+              'response.created', 'response.output_item.added', 'response.content_part.added',
+              'response.content_part.done', 'response.output_item.done',
+              'response.audio_transcript.delta'].includes(event.type)) {
+          console.log(`[OpenAI event] ${event.type}`, JSON.stringify(event).slice(0, 200));
+        }
     }
   }
 
