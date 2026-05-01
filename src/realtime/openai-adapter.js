@@ -155,7 +155,6 @@ class OpenAIAdapter extends ProviderAdapter {
 
     switch (event.type) {
       case 'response.audio.delta':
-        console.log(`🔊 Audio delta received: ${event.delta ? event.delta.length : 0} bytes`);
         if (this.onAudioOutput && event.delta) {
           this.onAudioOutput(event.delta);
         }
