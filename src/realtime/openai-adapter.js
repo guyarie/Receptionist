@@ -3,7 +3,7 @@
 const WebSocket = require('ws');
 const ProviderAdapter = require('./provider-adapter');
 const config = require('../config');
-const { SCHEDULING_TOOLS, isSchedulingEnabled, executeTool } = require('../agents/in-call-tools');
+const { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, isSchedulingEnabled, executeTool } = require('../agents/in-call-tools');
 
 const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17';
 
@@ -91,6 +91,7 @@ class OpenAIAdapter extends ProviderAdapter {
                 description: 'End the call. Call this when the conversation is complete and it is time to hang up.',
                 parameters: { type: 'object', properties: {} }
               },
+              PROVIDER_INFO_TOOL,
               ...(isSchedulingEnabled() ? SCHEDULING_TOOLS : []),
             ],
             tool_choice: 'auto',
@@ -202,7 +203,8 @@ class OpenAIAdapter extends ProviderAdapter {
         if (event.item?.type === 'function_call') {
           if (event.item.name === 'hangup') {
             console.log('📵 AI requested hangup');
-            if (this.onHangup) this.onHangup();
+            if (this.onHangupRequested) this.onHangupRequested(event.item.call_id);
+            else if (this.onHangup) this.onHangup();
           } else {
             this._handleFunctionCall(event.item);
           }
@@ -243,6 +245,15 @@ class OpenAIAdapter extends ProviderAdapter {
   /**
    * Execute a scheduling function call and return the result to OpenAI.
    */
+  sendFunctionResult(callId, result) {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    this.ws.send(JSON.stringify({
+      type: 'conversation.item.create',
+      item: { type: 'function_call_output', call_id: callId, output: JSON.stringify(result) },
+    }));
+    this.ws.send(JSON.stringify({ type: 'response.create' }));
+  }
+
   async _handleFunctionCall(item) {
     const { name, call_id, arguments: argsStr } = item;
     console.log(`🔧 AI called tool: ${name}`);

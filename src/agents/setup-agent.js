@@ -62,6 +62,8 @@ async function runSetupTurn(sessionId, userMessage, onEvent) {
   const tools = createSetupTools(onEvent);
   let iteration = 0;
 
+  console.log(`🛠️  [setup:${sessionId.slice(0, 8)}] User: ${userMessage.slice(0, 80)}${userMessage.length > 80 ? '…' : ''}`);
+
   while (iteration < MAX_ITERATIONS) {
     iteration++;
 
@@ -75,6 +77,7 @@ async function runSetupTurn(sessionId, userMessage, onEvent) {
     const toolCalls = result.toolCalls || [];
 
     if (toolCalls.length > 0) {
+      console.log(`🛠️  [setup:${sessionId.slice(0, 8)}] Iteration ${iteration}: called ${toolCalls.map(tc => tc.toolName).join(', ')}`);
       // Append tool call + results into the message history for the next iteration.
       // Strip providerOptions/providerMetadata that OpenRouter doesn't understand.
       if (result.response && result.response.messages) {
@@ -96,10 +99,12 @@ async function runSetupTurn(sessionId, userMessage, onEvent) {
       if (text) {
         messages.push({ role: 'assistant', content: text });
       }
+      console.log(`🛠️  [setup:${sessionId.slice(0, 8)}] Done in ${iteration} iteration(s)`);
       return text;
     }
   }
 
+  console.log(`🛠️  [setup:${sessionId.slice(0, 8)}] Hit max iterations (${MAX_ITERATIONS})`);
   return 'I reached the maximum number of steps. Please send another message to continue.';
 }
 

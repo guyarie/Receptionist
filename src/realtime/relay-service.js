@@ -49,6 +49,7 @@ class RelayService {
     this.provider.onError = (err) => this.handleProviderError(err);
     this.provider.onClose = () => this.handleProviderClose();
     this.provider.onHangup = () => this.handleHangup();
+    this.provider.onHangupRequested = (callId) => this.handleHangupRequested(callId);
     this.provider.onTextOnlyRefusal = () => this.handleTextOnlyRefusal();
 
     await this.provider.connect(options);
@@ -163,6 +164,20 @@ class RelayService {
     console.log(`👋 [${this.callSid}] AI ended the call`);
     if (this.twilioWs.readyState === 1) {
       this.twilioWs.close();
+    }
+  }
+
+  handleHangupRequested(callId) {
+    if (!this.hangupConfirmed) {
+      this.hangupConfirmed = true;
+      console.log(`📵 [${this.callSid}] Hangup requested — asking AI to confirm with caller`);
+      this.provider.sendFunctionResult(callId, {
+        status: 'pending_confirmation',
+        instruction: 'Before ending the call, ask the caller if there is anything else you can help them with. Only call hangup again once they confirm they are done.',
+      });
+    } else {
+      console.log(`👋 [${this.callSid}] Hangup confirmed — ending call`);
+      this.handleHangup();
     }
   }
 

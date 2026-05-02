@@ -45,8 +45,12 @@
       <h2>Quick Actions</h2>
       <div class="btn-group">
         <button onclick="reloadAll()" id="reloadBtn">🔄 Reload All</button>
-        <button onclick="refreshWebsite()" id="refreshBtn">🌐 Refresh Website Data</button>
       </div>
+      <p class="text-muted" style="margin-top:0.75rem;font-size:0.875rem;">
+        To re-read your website or update provider profiles, open the
+        <a href="/setup" target="_blank">setup agent</a> — it will re-crawl your site,
+        let you review the results, and save changes safely.
+      </p>
     </div>
 
     <!-- Recent Errors -->
@@ -118,25 +122,6 @@
       } finally {
         btn.disabled = false;
         btn.textContent = '🔄 Reload All';
-      }
-    }
-
-    // Refresh website data
-    async function refreshWebsite() {
-      if (!confirm('This will re-scrape your website and reload all provider data.\n\nA backup of your data/ folder will be saved to runtime/backups/ first.\n\nThis may take a minute. Continue?')) return;
-
-      const btn = document.getElementById('refreshBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Refreshing...';
-
-      try {
-        const result = await UI.apiFetch('/admin/api/refresh-website', { method: 'POST' });
-        UI.Toast.success(`Website data refreshed. Backup: ${result.backupFile}`);
-      } catch (error) {
-        UI.Toast.error('Refresh failed: ' + error.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '🌐 Refresh Website Data';
       }
     }
 

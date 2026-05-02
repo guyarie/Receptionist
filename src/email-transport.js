@@ -30,7 +30,7 @@ function isConfigured() {
   return configured;
 }
 
-async function sendMail({ to, subject, body, attachments }) {
+async function sendMail({ to, subject, body, html, attachments }) {
   if (!configured) {
     throw new Error('Email transport is not configured');
   }
@@ -41,6 +41,8 @@ async function sendMail({ to, subject, body, attachments }) {
     subject,
     text: body,
   };
+
+  if (html) payload.html = html;
 
   if (attachments && attachments.length > 0) {
     payload.attachments = attachments;

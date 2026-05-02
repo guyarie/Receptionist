@@ -1,12 +1,29 @@
 'use strict';
 
-const { getEventType, getAvailableTimes } = require('./tools/calendly');
+const { getEventType, getAvailableTimes, createInvitee } = require('./tools/calendly');
 const { generateIcs } = require('./tools/ics');
 const emailTransport = require('../email-transport');
+const providerLoader = require('../provider-loader');
 
 const DEFAULT_DURATION_MIN = 30;
-// Calendly available_times endpoint supports max 14 days per request
-const MAX_DAYS_AHEAD = 14;
+// Calendly available_times endpoint supports max 7 days per request
+const MAX_DAYS_AHEAD = 7;
+
+const PROVIDER_INFO_TOOL = {
+  type: 'function',
+  name: 'get_provider_info',
+  description: 'Get the full profile for a specific provider. Call this whenever a caller asks about a specific therapist or clinician by name — their specialties, fees, insurance, credentials, approach, or scheduling process. A partial name (e.g. "Dr. Arie", "Miri") is fine.',
+  parameters: {
+    type: 'object',
+    properties: {
+      provider_name: {
+        type: 'string',
+        description: "The provider's name as the caller said it. Partial names are fine (e.g. 'Dr. Arie', 'Miri', 'Jeffrey').",
+      },
+    },
+    required: ['provider_name'],
+  },
+};
 
 // Tool definitions in OpenAI Realtime API format (not Vercel AI SDK format)
 const SCHEDULING_TOOLS = [
@@ -90,7 +107,7 @@ async function executeCheckAvailability(args) {
     return { error: 'Scheduling is not configured for this practice.' };
   }
 
-  const startTime = new Date().toISOString();
+  const startTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
   const endTime = new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000).toISOString();
 
   const slots = await getAvailableTimes(apiToken, eventTypeUri, startTime, endTime);
@@ -125,6 +142,34 @@ async function executeBookAppointment(args, callerPhone) {
   const businessName = process.env.BUSINESS_NAME || 'Your Practice';
   const practiceEmail = process.env.ADMIN_EMAIL || '';
 
+  // Try Calendly direct booking first (requires paid plan)
+  const apiToken = process.env.CALENDLY_API_TOKEN;
+  const eventTypeUri = process.env.CALENDLY_EVENT_TYPE_URI;
+  if (apiToken && eventTypeUri && caller_email) {
+    try {
+      await createInvitee(apiToken, {
+        eventTypeUri,
+        startTime: start_time,
+        name: caller_name,
+        email: caller_email,
+        timezone,
+      });
+      console.log(`📅 Calendly invitee created for ${caller_name} at ${start_time}`);
+      return {
+        success: true,
+        display_time: formatSlotForSpeech(start_time, timezone),
+        invite_sent: true,
+        method: 'calendly',
+      };
+    } catch (err) {
+      if (err.calendlyPlanRequired) {
+        console.log('📅 Calendly paid plan not available — falling back to ICS email');
+      } else {
+        console.error('📅 Calendly booking failed — falling back to ICS email:', err.message);
+      }
+    }
+  }
+
   const durationMs = (duration_minutes || DEFAULT_DURATION_MIN) * 60 * 1000;
   const endTime = new Date(new Date(start_time).getTime() + durationMs).toISOString();
   const displayTime = formatSlotForSpeech(start_time, timezone);
@@ -156,23 +201,39 @@ async function executeBookAppointment(args, callerPhone) {
 
   if (recipients.length > 0 && emailTransport.isConfigured()) {
     const subject = `Appointment confirmed — ${caller_name} at ${displayTime}`;
-    const body = [
-      `Hi,`,
-      ``,
-      `An appointment has been booked via your AI Receptionist.`,
-      ``,
-      `Name: ${caller_name}`,
-      phone ? `Phone: ${phone}` : '',
-      caller_email ? `Email: ${caller_email}` : '',
-      `Time: ${displayTime}`,
-      notes ? `Notes: ${notes}` : '',
-      ``,
-      `A calendar invite is attached. Open it to add the appointment to your calendar.`,
-      ``,
-      `— ${businessName} AI Receptionist`,
-    ].filter(l => l !== null).join('\n');
 
-    await emailTransport.sendMail({ to: recipients, subject, body, attachments: [attachment] });
+    // Build Google Calendar and Outlook links
+    const toGcalDate = iso => iso.replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+      `&text=${encodeURIComponent(`Appointment — ${caller_name}`)}` +
+      `&dates=${toGcalDate(start_time)}/${toGcalDate(endTime)}` +
+      `&details=${encodeURIComponent(description)}`;
+    const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(`Appointment — ${caller_name}`)}` +
+      `&startdt=${start_time}&enddt=${endTime}&body=${encodeURIComponent(description)}`;
+
+    const detailLines = [
+      `<b>Name:</b> ${caller_name}`,
+      phone ? `<b>Phone:</b> ${phone}` : null,
+      caller_email ? `<b>Email:</b> ${caller_email}` : null,
+      `<b>Time:</b> ${displayTime}`,
+      notes ? `<b>Notes:</b> ${notes}` : null,
+    ].filter(Boolean).join('<br>');
+
+    const html = `
+<div style="font-family:sans-serif;font-size:15px;color:#333;max-width:520px">
+  <p>An appointment has been booked via your AI Receptionist.</p>
+  <p style="line-height:1.8">${detailLines}</p>
+  <p>
+    <a href="${gcalUrl}" style="display:inline-block;margin-right:12px;padding:10px 18px;background:#4285F4;color:white;border-radius:5px;text-decoration:none;font-weight:bold">Add to Google Calendar</a>
+    <a href="${outlookUrl}" style="display:inline-block;padding:10px 18px;background:#0072C6;color:white;border-radius:5px;text-decoration:none;font-weight:bold">Add to Outlook</a>
+  </p>
+  <p style="color:#888;font-size:13px">An .ics file is also attached for Apple Calendar or other calendar apps.</p>
+  <p style="color:#aaa;font-size:12px">— ${businessName} AI Receptionist</p>
+</div>`;
+
+    const body = `An appointment has been booked via your AI Receptionist.\n\nName: ${caller_name}\n${phone ? `Phone: ${phone}\n` : ''}${caller_email ? `Email: ${caller_email}\n` : ''}Time: ${displayTime}\n${notes ? `Notes: ${notes}\n` : ''}\nAdd to Google Calendar: ${gcalUrl}\nAdd to Outlook: ${outlookUrl}\n\n— ${businessName} AI Receptionist`;
+
+    await emailTransport.sendMail({ to: recipients, subject, body, html, attachments: [attachment] });
   }
 
   return {
@@ -182,15 +243,31 @@ async function executeBookAppointment(args, callerPhone) {
   };
 }
 
+function executeGetProviderInfo(args) {
+  const { provider_name } = args;
+  if (!provider_name) return { error: 'provider_name is required' };
+
+  const match = providerLoader.findByName(provider_name);
+  if (!match) {
+    return {
+      error: `No provider found matching "${provider_name}". Check the roster in your instructions for available names.`,
+    };
+  }
+
+  return { provider: match.name, profile: match.content };
+}
+
 async function executeTool(name, args, callerPhone) {
   switch (name) {
+    case 'get_provider_info':
+      return executeGetProviderInfo(args);
     case 'check_availability':
       return executeCheckAvailability(args);
     case 'book_appointment':
       return executeBookAppointment(args, callerPhone);
     default:
-      return { error: `Unknown scheduling tool: ${name}` };
+      return { error: `Unknown tool: ${name}` };
   }
 }
 
-module.exports = { SCHEDULING_TOOLS, isSchedulingEnabled, executeTool };
+module.exports = { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, isSchedulingEnabled, executeTool };

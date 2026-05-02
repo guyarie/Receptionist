@@ -276,6 +276,31 @@
 
     // ── DOM helpers ─────────────────────────────────────────────────────────
     /**
+     * Safely convert AI message text to HTML with basic markdown support.
+     */
+    function formatMessage(text) {
+      // 1. Escape HTML to prevent XSS
+      const escaped = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+      return escaped
+        // Bold: **text** or __text__
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/__(.+?)__/g, '<strong>$1</strong>')
+        // Italic: *text* or _text_
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/_(.+?)_/g, '<em>$1</em>')
+        // Bullet lines: lines starting with "- " or "* "
+        .replace(/(^|\n)[*-] (.+)/g, '$1<li>$2</li>')
+        .replace(/(<li>.*<\/li>)/gs, '<ul style="margin:6px 0 6px 16px;padding:0">$1</ul>')
+        // Newlines → <br>
+        .replace(/\n/g, '<br>');
+    }
+
+    /**
      * Render a single chat bubble.
      * @param {'user'|'ai'} type
      * @param {string} content
@@ -301,8 +326,7 @@
           : 'background:' + config.primaryColor + ';color:white;border-bottom-right-radius:4px;'
       ].join('');
 
-      // Use textContent to prevent XSS
-      bubble.textContent = content;
+      bubble.innerHTML = formatMessage(content);
 
       row.appendChild(bubble);
       chatMessages.appendChild(row);

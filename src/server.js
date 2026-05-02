@@ -292,7 +292,7 @@ app.post('/api/chat', async (req, res) => {
     }
     
     // Process message directly with aiClient (not callHandler)
-    const response = await aiClient.sendMessage(sessionId, message);
+    const response = await aiClient.sendMessage(sessionId, message, { maxTokens: 8192 });
     
     chatLogger.logExchange(sessionId, message, response, 'chat');
     res.json({ response });
@@ -798,44 +798,6 @@ app.get('/admin/api/config', (req, res) => {
   });
 });
 
-// Admin refresh-website endpoint — backs up data/ then re-runs the scraper
-app.post('/admin/api/refresh-website', async (req, res) => {
-  const { exec } = require('child_process');
-  const rootDir = installDir;
-  const backupsDir = path.join(runtimeDir, 'backups');
-
-  try {
-    // Ensure backups dir exists
-    fs.mkdirSync(backupsDir, { recursive: true });
-
-    // Create timestamped tar.gz backup of data/
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    const backupFile = path.join(backupsDir, `data-backup-${timestamp}.tar.gz`);
-    await new Promise((resolve, reject) => {
-      exec(`tar -czf "${backupFile}" -C "${rootDir}" data`, (err) => {
-        if (err) reject(err); else resolve();
-      });
-    });
-    console.log(`📦 Data backup created: ${path.basename(backupFile)}`);
-
-    // Re-run the scraper
-    await new Promise((resolve, reject) => {
-      exec(`node "${path.join(rootDir, 'src', 'scrape-providers.js')}"`, { cwd: rootDir }, (err, _stdout, stderr) => {
-        if (err) { console.error('Scraper stderr:', stderr); reject(err); } else resolve();
-      });
-    });
-
-    // Reload everything into memory
-    providerLoader.reload();
-    aiClient.setWebsiteContext(providerLoader.getAIContext());
-    prompts.reload();
-
-    res.json({ success: true, message: 'Website data refreshed and backed up', backupFile: path.basename(backupFile) });
-  } catch (error) {
-    errorBuffer.add(error, 'admin-refresh-website');
-    res.status(500).json({ error: 'Refresh failed', details: error.message });
-  }
-});
 
 
 // Twilio Webhook Endpoints
@@ -949,7 +911,7 @@ wss.on('connection', (ws) => {
           
           await relay.initialize({
             systemPrompt: prompts.systemPrompt,
-            websiteContext: providerLoader.getAIContext(),
+            websiteContext: providerLoader.getTrimmedRoster(),
             availabilityContext: availabilityLoader.getAIContext(),
             callerPhone: callerPhone
           });

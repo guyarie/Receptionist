@@ -53,20 +53,39 @@ Guidelines:
   - "## Services" - List of services offered
 - IMPORTANT: Extract the complete physical address, phone number, office hours, and parking details if present on the website
 - For each provider: Create a markdown document with sections like:
- - Provider Name
+ - Provider Name (with credentials as heading, e.g. "# Jane Smith, LMFT")
  - Credentials
+ - Accepting New Clients (REQUIRED — see instructions below)
  - Insurance (CRITICAL - see detailed instructions below)
+ - Specialties / Areas of Focus
  - Approach
  - Contact
  - Fees
  - About
- - Specialties
 
 - Use the provider's full name with credentials for the heading (e.g., "# Miri Arie, LMFT")
 - Generate a kebab-case slug from the provider name (e.g., "miri-arie")
 - Extract all relevant information including specialties, therapeutic approaches, contact details, credentials, insurance, contact, fees
 - Format contact info as bullet points
 - If information is unclear or missing, store that in a "questions.md" file under the 'practice' folder
+
+=== REQUIRED: ACCEPTING NEW CLIENTS ===
+
+Every provider profile MUST include an "Accepting New Clients" field as a bold key-value line near the top of the profile:
+
+**Accepting New Clients:** Yes
+
+Use one of these exact values:
+- **Yes** — provider is actively accepting new clients
+- **No** — provider is not currently accepting new clients
+- **Limited** — provider has limited openings or a waitlist
+
+WHERE TO FIND THIS INFORMATION:
+- Look for phrases like "currently accepting", "not accepting new clients", "waitlist", "limited availability"
+- Check the provider's bio, hours section, or any scheduling notes
+- If the website says "call to inquire" or gives no information, use: **Accepting New Clients:** Unknown
+
+This field is used by the AI receptionist to quickly route callers to providers who can see them. It must always be present.
 
 === CRITICAL: INSURANCE INFORMATION EXTRACTION ===
 

@@ -75,7 +75,7 @@ IMPORTANT: When writing prompt files, always use these template placeholders ins
 - Tone (professional, warm, concise — never robotic)
 - Instructions to reference available context (provider profiles, schedules) when relevant
 - A rule: never invent information it doesn't have — offer to take a message or transfer instead
-- For businesses with staff profiles: mention that it can look up specific provider information when asked
+- For businesses with staff profiles: instruct it to use the get_provider_info tool when a caller asks about a specific person, and to use the roster summary in the instructions for general routing questions. The system-prompt.txt template already contains a boilerplate section for this — preserve it.
 
 **data/prompts/webchat-greeting.txt** — The opening message shown in the web chat widget. Should be warm, identify the business and receptionist name, and invite the visitor to ask a question. Example: "Hello, you've reached {{BUSINESS_NAME}}. I'm {{RECEPTIONIST_NAME}}, the virtual receptionist. How can I help you today?"
 
@@ -97,6 +97,7 @@ Create a markdown file in `providers/` for each person. Name the file after the 
 ```
 # [Full Name], [Title]
 
+**Accepting New Clients:** [Yes / No / Limited / Unknown]
 **Specialties:** [comma-separated list]
 **Email:** [email if available]
 **Phone:** [direct phone if available]
@@ -104,6 +105,8 @@ Create a markdown file in `providers/` for each person. Name the file after the 
 **Availability:** [general schedule if known]
 **Notes for receptionist:** [anything callers commonly ask about this person, or special routing instructions]
 ```
+
+The **Accepting New Clients** field is required — it lets the AI receptionist route callers to providers who can actually see them without loading the full profile on every call.
 
 **For service or product businesses:**
 Create `practice/overview.md` with:

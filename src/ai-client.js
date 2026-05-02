@@ -2,6 +2,14 @@
 const OpenAI = require('openai');
 const config = require('./config');
 const prompts = require('./prompts');
+const { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, isSchedulingEnabled, executeTool } = require('./agents/in-call-tools');
+
+// Convert realtime-API tool format to chat completions format
+function toChatTool(t) {
+  return { type: 'function', function: { name: t.name, description: t.description, parameters: t.parameters } };
+}
+
+const MAX_TOOL_ITERATIONS = 10;
 
 class AIClient {
   constructor() {
@@ -94,7 +102,7 @@ class AIClient {
   /**
    * Send a message and get AI response (session-based, used for voice/internal flows)
    */
-  async sendMessage(sessionId, userMessage) {
+  async sendMessage(sessionId, userMessage, { maxTokens = 150 } = {}) {
     if (!this.conversationHistory.has(sessionId)) {
       this.initSession(sessionId);
     }
@@ -109,31 +117,45 @@ class AIClient {
     
     try {
       console.log(`💬 User: ${userMessage}`);
-      
-      const response = await this.client.chat.completions.create({
-        model: this.model,
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 150 // Keep responses concise for phone calls
-      });
-      
-      // Log the actual model used by OpenRouter
-      if (response.model) {
-        console.log(`🔍 Actual model used: ${response.model}`);
+
+      const tools = [toChatTool(PROVIDER_INFO_TOOL), ...(isSchedulingEnabled() ? SCHEDULING_TOOLS.map(toChatTool) : [])];
+
+      let iteration = 0;
+      while (iteration < MAX_TOOL_ITERATIONS) {
+        iteration++;
+        const response = await this.client.chat.completions.create({
+          model: this.model,
+          messages,
+          temperature: 0.7,
+          max_tokens: maxTokens,
+          ...(tools.length ? { tools, tool_choice: 'auto' } : {}),
+        });
+
+        if (response.model && iteration === 1) {
+          console.log(`🔍 Actual model used: ${response.model}`);
+        }
+
+        const choice = response.choices[0];
+        const assistantMsg = choice.message;
+        messages.push(assistantMsg);
+
+        const toolCalls = assistantMsg.tool_calls || [];
+        if (toolCalls.length === 0) {
+          const text = assistantMsg.content || '';
+          console.log(`🤖 AI: ${text}`);
+          return text;
+        }
+
+        console.log(`🔧 Tool calls: ${toolCalls.map(tc => tc.function.name).join(', ')}`);
+        for (const tc of toolCalls) {
+          const args = JSON.parse(tc.function.arguments || '{}');
+          const result = await executeTool(tc.function.name, args);
+          messages.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify(result) });
+        }
       }
-      
-      const assistantMessage = response.choices[0].message.content;
-      
-      // Add assistant response to history
-      messages.push({
-        role: 'assistant',
-        content: assistantMessage
-      });
-      
-      console.log(`🤖 AI: ${assistantMessage}`);
-      
-      return assistantMessage;
-      
+
+      return 'I ran into an issue processing your request. Please try again.';
+
     } catch (error) {
       console.error('❌ OpenRouter API error:', error.message);
       throw error;
@@ -164,21 +186,43 @@ class AIClient {
 
     console.log(`💬 [webchat] Sending ${clientMessages.length} message(s) to AI`);
 
-    const response = await this.client.chat.completions.create({
-      model: this.model,
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 300 // Slightly more generous for web chat vs. phone
-    });
+    const tools = [toChatTool(PROVIDER_INFO_TOOL), ...(isSchedulingEnabled() ? SCHEDULING_TOOLS.map(toChatTool) : [])];
 
-    if (response.model) {
-      console.log(`🔍 [webchat] Actual model used: ${response.model}`);
+    let iteration = 0;
+    while (iteration < MAX_TOOL_ITERATIONS) {
+      iteration++;
+      const response = await this.client.chat.completions.create({
+        model: this.model,
+        messages,
+        temperature: 0.7,
+        max_tokens: 8192,
+        ...(tools.length ? { tools, tool_choice: 'auto' } : {}),
+      });
+
+      if (response.model && iteration === 1) {
+        console.log(`🔍 [webchat] Actual model used: ${response.model}`);
+      }
+
+      const choice = response.choices[0];
+      const assistantMsg = choice.message;
+      messages.push(assistantMsg);
+
+      const toolCalls = assistantMsg.tool_calls || [];
+      if (toolCalls.length === 0) {
+        const assistantMessage = assistantMsg.content || '';
+        console.log(`🤖 [webchat] AI: ${assistantMessage}`);
+        return assistantMessage;
+      }
+
+      console.log(`🔧 [webchat] Tool calls: ${toolCalls.map(tc => tc.function.name).join(', ')}`);
+      for (const tc of toolCalls) {
+        const args = JSON.parse(tc.function.arguments || '{}');
+        const result = await executeTool(tc.function.name, args);
+        messages.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify(result) });
+      }
     }
 
-    const assistantMessage = response.choices[0].message.content;
-    console.log(`🤖 [webchat] AI: ${assistantMessage}`);
-
-    return assistantMessage;
+    return 'I ran into an issue processing your request. Please try again.';
   }
   
   /**
