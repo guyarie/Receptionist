@@ -195,7 +195,7 @@ class AIClient {
         model: this.model,
         messages,
         temperature: 0.7,
-        max_tokens: 8192,
+        max_tokens: 800,
         ...(tools.length ? { tools, tool_choice: 'auto' } : {}),
       });
 

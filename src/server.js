@@ -292,7 +292,7 @@ app.post('/api/chat', async (req, res) => {
     }
     
     // Process message directly with aiClient (not callHandler)
-    const response = await aiClient.sendMessage(sessionId, message, { maxTokens: 8192 });
+    const response = await aiClient.sendMessage(sessionId, message, { maxTokens: 800 });
     
     chatLogger.logExchange(sessionId, message, response, 'chat');
     res.json({ response });
