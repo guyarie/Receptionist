@@ -8,9 +8,9 @@ const __dirname = path.dirname(__filename);
 
 describe('Prompts Module', () => {
   let prompts;
-  const testFilename = 'greeting.txt';
-  // savePrompt() now writes to data/prompts/ (override dir), not prompts/ (repo defaults)
-  const dataPromptsDir = path.join(__dirname, '..', '..', 'data', 'prompts');
+  const testFilename = 'webchat-greeting.txt';
+  // savePrompt() writes to the install-specific data/prompts/ override dir
+  const dataPromptsDir = path.resolve(process.env.INSTALL_DIR || 'installs/dev', 'data', 'prompts');
   const overrideFilePath = path.join(dataPromptsDir, testFilename);
   let originalOverrideContent;
   let overrideExisted;
@@ -56,13 +56,12 @@ describe('Prompts Module', () => {
     it('should include all expected prompt files', () => {
       const allPrompts = prompts.getAll();
       const filenames = allPrompts.map(p => p.filename);
-      
+
       expect(filenames).toContain('system-prompt.txt');
-      expect(filenames).toContain('greeting.txt');
-      expect(filenames).toContain('follow-up.txt');
-      expect(filenames).toContain('closing.txt');
-      expect(filenames).toContain('no-speech-detected.txt');
-      expect(filenames).toContain('error.txt');
+      expect(filenames).toContain('webchat-greeting.txt');
+      expect(filenames).toContain('scraping-instructions.txt');
+      expect(filenames).toContain('post-call-agent.txt');
+      expect(filenames).toContain('daily-digest-agent.txt');
     });
   });
 

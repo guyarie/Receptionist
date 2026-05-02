@@ -16,6 +16,9 @@ export default defineConfig({
     
     // Environment
     environment: 'node',
+    env: {
+      INSTALL_DIR: 'installs/dev',
+    },
     
     // Coverage configuration
     coverage: {

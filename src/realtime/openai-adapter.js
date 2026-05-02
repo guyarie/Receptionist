@@ -19,6 +19,8 @@ class OpenAIAdapter extends ProviderAdapter {
       this.voice = voice || 'alloy';
       this.ws = null;
       this.keepaliveInterval = null;
+      this._responseAudioCount = 0;
+      this._responseTextSeen = false;
     }
 
 
@@ -154,10 +156,20 @@ class OpenAIAdapter extends ProviderAdapter {
     }
 
     switch (event.type) {
+      case 'response.created':
+        this._responseAudioCount = 0;
+        this._responseTextSeen = false;
+        break;
+
       case 'response.audio.delta':
+        this._responseAudioCount++;
         if (this.onAudioOutput && event.delta) {
           this.onAudioOutput(event.delta);
         }
+        break;
+
+      case 'response.text.delta':
+        this._responseTextSeen = true;
         break;
 
       case 'response.audio_transcript.done':
@@ -198,7 +210,12 @@ class OpenAIAdapter extends ProviderAdapter {
         break;
 
       case 'response.done':
-        console.log('✅ Response turn complete');
+        if (this._responseTextSeen && this._responseAudioCount === 0) {
+          console.error('🚨 OpenAI returned text-only response with no audio — likely a refusal or oversized instructions');
+          if (this.onTextOnlyRefusal) this.onTextOnlyRefusal();
+        } else {
+          console.log('✅ Response turn complete');
+        }
         break;
 
       case 'response.cancelled':
@@ -215,7 +232,7 @@ class OpenAIAdapter extends ProviderAdapter {
       default:
         if (!['input_audio_buffer.committed', 'input_audio_buffer.speech_started',
               'input_audio_buffer.speech_stopped', 'conversation.item.created',
-              'response.created', 'response.output_item.added', 'response.content_part.added',
+              'response.output_item.added', 'response.content_part.added',
               'response.content_part.done', 'response.output_item.done',
               'response.audio_transcript.delta'].includes(event.type)) {
           console.log(`[OpenAI event] ${event.type}`, JSON.stringify(event).slice(0, 200));

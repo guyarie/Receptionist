@@ -8,8 +8,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Test directory for provider files
-const TEST_PROVIDERS_DIR = path.join(__dirname, '..', '..', 'data', 'providers');
+// Test directory for provider files — must match the install-specific path used by scrape-providers.js
+const TEST_PROVIDERS_DIR = path.resolve(process.env.INSTALL_DIR || 'installs/dev', 'data', 'providers');
 
 describe('Duplicate Detection Functions', () => {
   let providerFileExists, findExistingProviderFile;

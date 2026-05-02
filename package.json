@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node src/server.js",
+    "dev": "INSTALL_DIR=$(cat .install) node src/server.js",
     "test-ai": "node src/test-ai.js",
     "chat": "node src/test-chat.js",
     "test": "vitest --run",

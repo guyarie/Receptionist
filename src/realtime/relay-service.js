@@ -49,6 +49,7 @@ class RelayService {
     this.provider.onError = (err) => this.handleProviderError(err);
     this.provider.onClose = () => this.handleProviderClose();
     this.provider.onHangup = () => this.handleHangup();
+    this.provider.onTextOnlyRefusal = () => this.handleTextOnlyRefusal();
 
     await this.provider.connect(options);
 
@@ -162,6 +163,27 @@ class RelayService {
     console.log(`👋 [${this.callSid}] AI ended the call`);
     if (this.twilioWs.readyState === 1) {
       this.twilioWs.close();
+    }
+  }
+
+  /**
+   * Handle a text-only (refusal) response from the provider — play a TTS fallback
+   * message via Twilio REST API and end the call, rather than leaving the relay open.
+   */
+  handleTextOnlyRefusal() {
+    console.error(`🚨 [${this.callSid}] Provider returned text-only response — playing fallback message and ending call`);
+    this.errors.push(new Error('Provider returned text-only response (possible refusal or oversized instructions)'));
+
+    const { accountSid, authToken } = config.twilio;
+    if (accountSid && authToken) {
+      const twilioClient = require('twilio')(accountSid, authToken);
+      const twiml = `<Response><Say>I'm sorry, I'm having some trouble right now. Please try calling back in a few minutes.</Say><Hangup/></Response>`;
+      twilioClient.calls(this.callSid).update({ twiml }).catch((err) => {
+        console.error(`❌ [${this.callSid}] Failed to play fallback message:`, err.message);
+        if (this.twilioWs.readyState === 1) this.twilioWs.close();
+      });
+    } else {
+      if (this.twilioWs.readyState === 1) this.twilioWs.close();
     }
   }
 

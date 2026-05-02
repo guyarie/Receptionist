@@ -33,6 +33,24 @@ node manage.js nginx           # print nginx config for all installs
 
 Each install lives in `installs/<name>/` with its own `.env`, `data/`, and `runtime/`. All installs share the same `src/` codebase.
 
+### Running an install manually (without PM2)
+
+`INSTALL_DIR` must be set for the server to know which install to use. For quick local runs:
+
+```bash
+# Check which installs exist
+ls installs/
+
+# Option 1 — inline
+INSTALL_DIR=installs/<name> npm start
+
+# Option 2 — create a .install file (gitignored), then just use npm run dev
+echo "installs/<name>" > .install
+npm run dev
+```
+
+On production with systemd or PM2, `INSTALL_DIR` is set in the service config — see [Production Deployment](#production-deployment).
+
 The setup assistant will guide you through everything — crawling your website, designing your receptionist's personality, configuring all credentials, and preparing the AI context files. No manual file editing required.
 
 ### What setup does

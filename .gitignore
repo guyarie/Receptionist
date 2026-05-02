@@ -1,5 +1,6 @@
 node_modules/
 .env
+.install
 
 # Per-install directories and shared secrets
 installs/*/
