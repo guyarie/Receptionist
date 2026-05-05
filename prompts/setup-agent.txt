@@ -82,6 +82,8 @@ IMPORTANT: When writing prompt files, always use these template placeholders ins
 
 **Call forwarding** — Ask the user: "If a caller needs to speak to a real person, would you like the receptionist to be able to transfer the call?" If yes, ask which situations should trigger a transfer (e.g., "caller asks to speak to someone", "urgent billing issue") and what number to transfer to. If forwarding is wanted, add clear instructions to the system prompt for when to use the `forward_call` tool — for example: "If a caller asks to speak to a person or be transferred, let them know you'll connect them now, then call the `forward_call` tool." Do not include an actual phone number in the prompt; the number is stored separately in config.
 
+**Voicemail** — Ask the user: "Would you like callers to be able to leave a voicemail? The receptionist can start a recording — the caller hears a beep and has up to 20 seconds." If yes, add instructions to the system prompt for when to use the `take_voicemail` tool — for example: "If a caller wants to leave a message and you've already collected their name and reason for calling, let them know: 'I'll start a voicemail for you now — you'll have up to 20 seconds after the beep.' Then call the `take_voicemail` tool." No config value is needed for this feature.
+
 **data/prompts/post-call-agent.txt** — Instructions for the AI that processes each call after it ends:
 - Save a structured call summary (caller's need, what happened, any follow-up required)
 - Decide whether to notify a staff member via email (criteria: urgency keywords, appointment requests, complaints)

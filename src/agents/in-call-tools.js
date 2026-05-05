@@ -93,10 +93,24 @@ function isForwardingEnabled() {
   );
 }
 
+function isVoicemailEnabled() {
+  return !!(
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN
+  );
+}
+
 const FORWARD_TOOL = {
   type: 'function',
   name: 'forward_call',
   description: 'Forward the current call to the configured number. Use this when the caller asks to speak to a person, needs to be transferred, or the situation requires human assistance.',
+  parameters: { type: 'object', properties: {} },
+};
+
+const VOICEMAIL_TOOL = {
+  type: 'function',
+  name: 'take_voicemail',
+  description: 'Start a voicemail recording. The caller will hear a beep and have up to 20 seconds to leave a message. The call ends automatically when they finish or go silent.',
   parameters: { type: 'object', properties: {} },
 };
 
@@ -272,6 +286,29 @@ function executeGetProviderInfo(args) {
   return { provider: match.name, profile: match.content };
 }
 
+async function executeTakeVoicemail(callSid) {
+  if (!callSid) return { error: 'Call SID unavailable — cannot start voicemail' };
+
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  if (!accountSid || !authToken) return { error: 'Twilio credentials not configured' };
+
+  const publicUrl = process.env.PUBLIC_URL ? process.env.PUBLIC_URL.replace(/\/$/, '') : null;
+  const actionAttr = publicUrl ? ` action="${publicUrl}/voicemail-complete"` : '';
+
+  const twiml = `<Response><Say>Please leave your message after the beep. You have up to 20 seconds.</Say><Record timeout="3" maxLength="20" playBeep="true" transcribe="false"${actionAttr}/></Response>`;
+
+  const twilio = require('twilio')(accountSid, authToken);
+  try {
+    await twilio.calls(callSid).update({ twiml });
+    console.log(`📼 [${callSid}] Voicemail recording started`);
+    return { success: true };
+  } catch (err) {
+    console.error(`❌ Failed to start voicemail for ${callSid}:`, err.message);
+    return { error: `Failed to start voicemail: ${err.message}` };
+  }
+}
+
 async function executeForwardCall(callSid) {
   const forwardNumber = process.env.FORWARD_NUMBER;
   if (!forwardNumber) return { error: 'FORWARD_NUMBER is not configured' };
@@ -300,9 +337,11 @@ async function executeTool(name, args, callerPhone, callSid) {
       return executeBookAppointment(args, callerPhone);
     case 'forward_call':
       return executeForwardCall(callSid);
+    case 'take_voicemail':
+      return executeTakeVoicemail(callSid);
     default:
       return { error: `Unknown tool: ${name}` };
   }
 }
 
-module.exports = { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, FORWARD_TOOL, isSchedulingEnabled, isForwardingEnabled, executeTool };
+module.exports = { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, FORWARD_TOOL, VOICEMAIL_TOOL, isSchedulingEnabled, isForwardingEnabled, isVoicemailEnabled, executeTool };

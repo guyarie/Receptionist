@@ -851,6 +851,44 @@ app.post('/call-status', (req, res) => {
   res.sendStatus(200);
 });
 
+// POST /voicemail-complete — Twilio webhook fired when a <Record> finishes.
+// Downloads the MP3 and emails it to ADMIN_EMAIL.
+app.post('/voicemail-complete', async (req, res) => {
+  res.type('text/xml').send('<Response/>');
+
+  const { RecordingUrl, RecordingDuration, CallSid, From } = req.body;
+  const duration = parseInt(RecordingDuration) || 0;
+  const from = From || 'Unknown';
+  console.log(`📼 Voicemail received from ${from} (${duration}s) — CallSid: ${CallSid}`);
+
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail || !emailTransport.isConfigured()) {
+    console.log(`📼 No email configured — voicemail from ${from} not forwarded`);
+    return;
+  }
+
+  try {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const auth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+    const audioRes = await fetch(`${RecordingUrl}.mp3`, {
+      headers: { Authorization: `Basic ${auth}` }
+    });
+    if (!audioRes.ok) throw new Error(`Download failed: ${audioRes.status}`);
+    const audioBase64 = Buffer.from(await audioRes.arrayBuffer()).toString('base64');
+
+    await emailTransport.sendMail({
+      to: adminEmail,
+      subject: `New voicemail from ${from} (${duration}s)`,
+      body: `You received a voicemail from ${from}.\nDuration: ${duration} seconds`,
+      attachments: [{ filename: 'voicemail.mp3', content: audioBase64 }]
+    });
+    console.log(`📼 Voicemail from ${from} emailed to ${adminEmail}`);
+  } catch (err) {
+    console.error(`❌ Failed to process voicemail:`, err.message);
+  }
+});
+
 // (Gather fallback routes removed — see backup/gather-routes.js)
 
 // Helper function to escape XML special characters
