@@ -141,7 +141,7 @@ Then collect required secrets one or two at a time. For each, explain what it's 
 
 Collect in this order:
 
-1. Call `collect_secret('.env', 'OPENROUTER_API_KEY', 'OpenRouter API key (AI brain)')` — Explain first: "This powers the AI brain. You'll need an account at openrouter.ai — it's pay-as-you-go, and a few dollars covers thousands of calls. Once you have an account, go to openrouter.ai/keys to create a key."
+1. Call `collect_secret('.env', 'OPENROUTER_API_KEY', 'OpenRouter API key (AI brain)')` — Explain first: "This powers the AI brain. You'll need an account at openrouter.ai — it's pay-as-you-go, and a few dollars covers thousands of calls. Once you have an account, go to openrouter.ai/keys to create a key." Then call `validate_openrouter` to confirm the key works and show the credit balance.
 
 2. Collect the Twilio credentials. Ask if they already have a Twilio account. If not, walk them through signing up:
    - "Go to twilio.com and create a free account. You'll need to verify your email and a personal phone number."
@@ -151,9 +151,10 @@ Collect in this order:
    - For the phone number, use `set_config('TWILIO_PHONE_NUMBER', ...)` — it's not sensitive. Ask the user to type it in international format (e.g. +12125551234) and confirm it looks right before saving.
    - Explain then call `collect_secret('.env', 'TWILIO_ACCOUNT_SID', 'Twilio Account SID')` — "Found on your Twilio Console dashboard — starts with AC."
    - Explain then call `collect_secret('.env', 'TWILIO_AUTH_TOKEN', 'Twilio Auth Token')` — "Found next to the Account SID on the dashboard. Keep this private — it's like a password."
+   - Once all three Twilio values are saved, call `validate_twilio` to confirm the credentials are correct and the phone number belongs to the account.
    - Important note to give the user: "The Account SID and Auth Token are optional — everything works without them. They're only used by the receptionist to cleanly hang up a call when it detects a goodbye. You can skip these and add them later."
 
-3. Explain then call `collect_secret('.env', 'OPENAI_API_KEY', 'OpenAI API key (real-time voice)')` — "This powers the real-time voice conversations on calls. Without it, the system will start but won't be able to answer calls. Sign up at platform.openai.com and create a key at platform.openai.com/api-keys."
+3. Explain then call `collect_secret('.env', 'OPENAI_API_KEY', 'OpenAI API key (real-time voice)')` — "This powers the real-time voice conversations on calls. Without it, the system will start but won't be able to answer calls. Sign up at platform.openai.com and create a key at platform.openai.com/api-keys." Then call `validate_openai` to confirm the key works and check realtime model access.
 
 4. Explain then call `collect_secret('.env', 'ADMIN_PASSWORD', 'Admin panel password')` — Explain first: "The admin panel is where you'll view call logs, listen to recordings, and manage your setup. This password protects it from unauthorized access. Choose something secure."
 
@@ -178,7 +179,7 @@ Collect in this order:
 
    **Other providers:** collect their API key or password via `collect_secret('.env', 'RESEND_API_KEY', '...')`, suggest a display name, and save the full from string as `SMTP_FROM` via `set_config`.
 
-   c. Once email credentials are saved, call `send_email` with `to` set to `ADMIN_EMAIL`, a clear subject, and a short body to verify it works. Tell the user: "Let me send a test email to confirm everything is set up correctly." If it fails, show the error and help them fix the credentials.
+   c. Once email credentials are saved, call `validate_email` to confirm the key and from address are valid, then call `send_email` with `to` set to `ADMIN_EMAIL`, a clear subject, and a short body to verify delivery end-to-end. Tell the user: "Let me send a test email to confirm everything is set up correctly." If it fails, show the error and help them fix the credentials.
 
 6. **Call forwarding (optional)** — If the user said they want call forwarding during Phase 3, ask: "What phone number should calls be transferred to? (in international format, e.g. +12065551234)" Then save it with `set_config('FORWARD_NUMBER', ...)`. Confirm: "Got it — when a caller asks to be transferred, the receptionist will connect them to that number."
 

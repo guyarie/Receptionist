@@ -116,6 +116,9 @@ function summarizeToolResult(toolName, result) {
       return result;
     case 'validate_setup':
       return 'Setup validation complete';
+    case 'validate_openai':
+    case 'validate_openrouter':
+    case 'validate_email':
     case 'validate_twilio':
       return result.substring(0, 120);
     case 'validate_calendly':
@@ -581,6 +584,130 @@ function createSetupTools(onEvent) {
         const url = generateAuthUrl(clientId, redirectUri);
         onEvent('tool_end', { name: 'generate_gcal_auth_url', summary: 'Authorization URL generated' });
         return `Authorization URL:\n${url}\n\nRedirect URI (save this — you'll need it): ${redirectUri}`;
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // validate_openai — test OpenAI API key and check realtime model access
+    // ------------------------------------------------------------------
+    validate_openai: tool({
+      description: 'Verify the OpenAI API key is valid and that the realtime voice model is accessible. Call this after the user has entered their OPENAI_API_KEY.',
+      parameters: z.object({}),
+      execute: async () => {
+        onEvent('tool_start', { name: 'validate_openai', label: 'Checking OpenAI API key' });
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) {
+          const msg = 'OPENAI_API_KEY is not set — ask the user to enter it first.';
+          onEvent('tool_end', { name: 'validate_openai', summary: msg });
+          return msg;
+        }
+        try {
+          const res = await fetch('https://api.openai.com/v1/models', {
+            headers: { Authorization: `Bearer ${apiKey}` }
+          });
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            const msg = `❌ OpenAI API key rejected (${res.status}): ${body?.error?.message || res.statusText}`;
+            onEvent('tool_end', { name: 'validate_openai', summary: msg });
+            return msg;
+          }
+          const { data: models } = await res.json();
+          const realtimeModel = models.find(m => m.id.includes('realtime'));
+          let result = `✅ API key valid — ${models.length} models available`;
+          result += realtimeModel
+            ? `\n✅ Realtime model accessible: ${realtimeModel.id}`
+            : '\n⚠️  No realtime model found — this key may not have access to gpt-4o-realtime';
+          onEvent('tool_end', { name: 'validate_openai', summary: result.split('\n')[0] });
+          return result;
+        } catch (err) {
+          const msg = `❌ OpenAI validation failed: ${err.message}`;
+          onEvent('tool_end', { name: 'validate_openai', summary: msg });
+          return msg;
+        }
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // validate_openrouter — test OpenRouter API key and show credit balance
+    // ------------------------------------------------------------------
+    validate_openrouter: tool({
+      description: 'Verify the OpenRouter API key is valid and show the remaining credit balance. Call this after the user has entered their OPENROUTER_API_KEY.',
+      parameters: z.object({}),
+      execute: async () => {
+        onEvent('tool_start', { name: 'validate_openrouter', label: 'Checking OpenRouter API key' });
+        const apiKey = process.env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          const msg = 'OPENROUTER_API_KEY is not set — ask the user to enter it first.';
+          onEvent('tool_end', { name: 'validate_openrouter', summary: msg });
+          return msg;
+        }
+        try {
+          const res = await fetch('https://openrouter.ai/api/v1/auth/key', {
+            headers: { Authorization: `Bearer ${apiKey}` }
+          });
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            const msg = `❌ OpenRouter API key rejected (${res.status}): ${body?.error?.message || res.statusText}`;
+            onEvent('tool_end', { name: 'validate_openrouter', summary: msg });
+            return msg;
+          }
+          const { data } = await res.json();
+          const limit = data.limit != null ? `$${data.limit.toFixed(2)} limit` : 'no limit';
+          const usage = data.usage != null ? `$${data.usage.toFixed(4)} used` : 'usage unknown';
+          const result = `✅ API key valid — ${usage}, ${limit}${data.label ? ` (${data.label})` : ''}`;
+          onEvent('tool_end', { name: 'validate_openrouter', summary: result });
+          return result;
+        } catch (err) {
+          const msg = `❌ OpenRouter validation failed: ${err.message}`;
+          onEvent('tool_end', { name: 'validate_openrouter', summary: msg });
+          return msg;
+        }
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // validate_email — verify Resend API key and from address are working
+    // ------------------------------------------------------------------
+    validate_email: tool({
+      description: 'Verify the email configuration is valid (Resend API key and from address). Call this after the user has entered their email credentials.',
+      parameters: z.object({}),
+      execute: async () => {
+        onEvent('tool_start', { name: 'validate_email', label: 'Checking email configuration' });
+        const apiKey = process.env.RESEND_API_KEY;
+        const fromAddress = process.env.SMTP_FROM;
+
+        if (!apiKey) {
+          const msg = 'RESEND_API_KEY is not set — ask the user to enter it first.';
+          onEvent('tool_end', { name: 'validate_email', summary: msg });
+          return msg;
+        }
+        if (!fromAddress) {
+          const msg = 'SMTP_FROM is not set — ask the user to set it via set_config.';
+          onEvent('tool_end', { name: 'validate_email', summary: msg });
+          return msg;
+        }
+        try {
+          const res = await fetch('https://api.resend.com/api-keys', {
+            headers: { Authorization: `Bearer ${apiKey}` }
+          });
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            const errMsg = body?.message || res.statusText || '';
+            // Restricted keys (send-only) return 401 on management endpoints — that's fine
+            if (res.status !== 401 || !errMsg.toLowerCase().includes('restricted')) {
+              const msg = `❌ Resend API key rejected (${res.status}): ${errMsg}`;
+              onEvent('tool_end', { name: 'validate_email', summary: msg });
+              return msg;
+            }
+          }
+          const result = `✅ Resend API key valid\n✅ From address: ${fromAddress}`;
+          onEvent('tool_end', { name: 'validate_email', summary: result.split('\n')[0] });
+          return result;
+        } catch (err) {
+          const msg = `❌ Email validation failed: ${err.message}`;
+          onEvent('tool_end', { name: 'validate_email', summary: msg });
+          return msg;
+        }
       },
     }),
 
