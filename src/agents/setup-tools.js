@@ -116,8 +116,12 @@ function summarizeToolResult(toolName, result) {
       return result;
     case 'validate_setup':
       return 'Setup validation complete';
+    case 'validate_twilio':
+      return result.substring(0, 120);
     case 'validate_calendly':
       return result.startsWith('Connected') ? result.split('\n')[0] : result.substring(0, 120);
+    case 'configure_nginx':
+      return result.substring(0, 120);
     case 'generate_gcal_auth_url':
       return 'Google authorization URL generated';
     case 'complete_gcal_auth':
@@ -318,6 +322,12 @@ function createSetupTools(onEvent) {
         onEvent('tool_start', { name: 'set_config', label: `Setting ${key}` });
         // Block secrets from being written via this tool
         const secretKeys = ['API_KEY', 'AUTH_TOKEN', 'PASSWORD', 'SECRET', 'PASS', 'SID'];
+        const reservedKeys = ['PORT', 'SETUP_PORT', 'INSTALL_NAME'];
+        if (reservedKeys.includes(key.toUpperCase())) {
+          const msg = `${key} is managed by manage.js and cannot be changed via setup.`;
+          onEvent('tool_end', { name: 'set_config', summary: msg });
+          return msg;
+        }
         if (secretKeys.some(s => key.toUpperCase().includes(s))) {
           const msg = `${key} looks like a sensitive value — use request_secret instead.`;
           onEvent('tool_end', { name: 'set_config', summary: msg });
@@ -571,6 +581,144 @@ function createSetupTools(onEvent) {
         const url = generateAuthUrl(clientId, redirectUri);
         onEvent('tool_end', { name: 'generate_gcal_auth_url', summary: 'Authorization URL generated' });
         return `Authorization URL:\n${url}\n\nRedirect URI (save this — you'll need it): ${redirectUri}`;
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // validate_twilio — test Account SID + Auth Token and phone number
+    // ------------------------------------------------------------------
+    validate_twilio: tool({
+      description: 'Verify that the Twilio Account SID, Auth Token, and phone number are valid and working. Call this after the user has entered their Twilio credentials to confirm they are correct.',
+      parameters: z.object({}),
+      execute: async () => {
+        onEvent('tool_start', { name: 'validate_twilio', label: 'Checking Twilio credentials' });
+        const accountSid  = process.env.TWILIO_ACCOUNT_SID;
+        const authToken   = process.env.TWILIO_AUTH_TOKEN;
+        const phoneNumber = process.env.TWILIO_PHONE_NUMBER;
+
+        if (!accountSid || !authToken) {
+          const msg = 'TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must both be set — ask the user to enter them first.';
+          onEvent('tool_end', { name: 'validate_twilio', summary: msg });
+          return msg;
+        }
+
+        try {
+          const twilio = require('twilio')(accountSid, authToken);
+          const account = await twilio.api.accounts(accountSid).fetch();
+          let result = `✅ Credentials valid — account "${account.friendlyName}" (${account.status})`;
+
+          if (phoneNumber) {
+            const numbers = await twilio.incomingPhoneNumbers.list({ phoneNumber });
+            if (numbers.length === 0) {
+              result += `\n❌ Phone number ${phoneNumber} was not found on this account`;
+            } else {
+              result += `\n✅ Phone number ${phoneNumber} confirmed (${numbers[0].friendlyName})`;
+            }
+          } else {
+            result += '\n⚠️  TWILIO_PHONE_NUMBER not set — skipping number check';
+          }
+
+          onEvent('tool_end', { name: 'validate_twilio', summary: result.split('\n')[0] });
+          return result;
+        } catch (err) {
+          const msg = `❌ Twilio authentication failed: ${err.message}`;
+          onEvent('tool_end', { name: 'validate_twilio', summary: msg });
+          return msg;
+        }
+      },
+    }),
+
+    // ------------------------------------------------------------------
+    // configure_nginx — write nginx server block for this install
+    // ------------------------------------------------------------------
+    configure_nginx: tool({
+      description: 'Generate and save the nginx server block for this install. Sets PUBLIC_URL, finds the SSL cert automatically, and writes installs/<name>/nginx.conf. The admin must run `sudo node manage.js deploy-nginx` to activate it.',
+      parameters: z.object({
+        domain: z.string().describe('The full public domain for this install, e.g. dave.phone.16jets.com'),
+      }),
+      execute: async ({ domain }) => {
+        onEvent('tool_start', { name: 'configure_nginx', label: `Configuring nginx for ${domain}` });
+        try {
+          const env = readEnvFile();
+          const port = env.PORT || process.env.PORT || '3000';
+
+          // Find a wildcard or exact cert covering this domain
+          let certPath, keyPath;
+          const leDir = '/etc/letsencrypt/live';
+          if (fs.existsSync(leDir)) {
+            const certs = fs.readdirSync(leDir).filter(n => !n.startsWith('README'));
+            // Prefer longest matching parent domain (most specific wildcard wins)
+            const match = certs
+              .filter(c => domain === c || domain.endsWith('.' + c))
+              .sort((a, b) => b.length - a.length)[0];
+            if (match) {
+              certPath = `${leDir}/${match}/fullchain.pem`;
+              keyPath = `${leDir}/${match}/privkey.pem`;
+            }
+          }
+
+          const proxy = [
+            `        proxy_pass http://127.0.0.1:${port};`,
+            `        proxy_http_version 1.1;`,
+            `        proxy_set_header Upgrade $http_upgrade;`,
+            `        proxy_set_header Connection "upgrade";`,
+            `        proxy_set_header Host $host;`,
+            `        proxy_set_header X-Forwarded-Proto $scheme;`,
+            `        proxy_set_header X-Real-IP $remote_addr;`,
+            `        proxy_read_timeout 3600s;`,
+            `        proxy_send_timeout 3600s;`,
+          ].join('\n');
+
+          let nginxConf;
+          if (certPath) {
+            nginxConf = [
+              `server {`,
+              `    listen 80;`,
+              `    server_name ${domain};`,
+              `    return 301 https://$host$request_uri;`,
+              `}`,
+              ``,
+              `server {`,
+              `    listen 443 ssl;`,
+              `    server_name ${domain};`,
+              ``,
+              `    ssl_certificate ${certPath};`,
+              `    ssl_certificate_key ${keyPath};`,
+              ``,
+              `    location / {`,
+              proxy,
+              `    }`,
+              `}`,
+            ].join('\n');
+          } else {
+            nginxConf = [
+              `server {`,
+              `    listen 80;`,
+              `    server_name ${domain};`,
+              ``,
+              `    location / {`,
+              proxy,
+              `    }`,
+              `}`,
+            ].join('\n');
+          }
+
+          const nginxConfPath = path.join(ROOT_DIR, 'nginx.conf');
+          fs.writeFileSync(nginxConfPath, nginxConf + '\n', 'utf-8');
+
+          writeEnvValue('PUBLIC_URL', `https://${domain}`);
+
+          const result = certPath
+            ? `nginx config saved with SSL (cert: ${certPath}). Run \`sudo node manage.js deploy-nginx\` to activate.`
+            : `nginx config saved (no matching SSL cert found — HTTP only). Ensure certbot has run for ${domain} first.`;
+
+          onEvent('tool_end', { name: 'configure_nginx', summary: result });
+          return result;
+        } catch (err) {
+          const msg = `Error configuring nginx: ${err.message}`;
+          onEvent('tool_end', { name: 'configure_nginx', summary: msg });
+          return msg;
+        }
       },
     }),
 
