@@ -544,6 +544,7 @@
     <p>Configure your AI phone receptionist</p>
   </div>
   <div class="header-badge" id="headerBadge">Checking...</div>
+  <a href="/admin" id="adminLink" style="display:none;margin-left:12px;padding:6px 14px;background:#2563eb;color:white;border-radius:6px;text-decoration:none;font-size:13px;font-weight:500;">Admin Panel →</a>
 </header>
 
 <div class="main">
@@ -659,6 +660,7 @@
         showGate();
       }
       headerBadge.textContent = data.setupComplete ? 'Setup complete' : 'Setup in progress';
+      if (data.setupComplete) document.getElementById('adminLink').style.display = 'inline-block';
     })
     .catch(() => {
       showGate();
