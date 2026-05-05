@@ -140,10 +140,10 @@
               
               <h3 style="margin-top: 1rem;">Full Transcript</h3>
               <div style="background: white; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto;">
-                ${call.fullTranscript && call.fullTranscript.length > 0 
+                ${call.fullTranscript && call.fullTranscript.length > 0
                   ? call.fullTranscript.map(msg => `
                       <p style="margin-bottom: 0.5rem;">
-                        <strong>${UI.escapeHtml(msg.speaker)}:</strong> 
+                        <strong>${UI.escapeHtml(msg.speaker)}:</strong>
                         ${UI.escapeHtml(msg.message)}
                       </p>
                     `).join('')

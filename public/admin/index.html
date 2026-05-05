@@ -45,6 +45,7 @@
       <h2>Quick Actions</h2>
       <div class="btn-group">
         <button onclick="reloadAll()" id="reloadBtn">🔄 Reload All</button>
+        <button onclick="restartServer()" id="restartBtn" style="background:#b45309;">⚡ Restart Server</button>
       </div>
       <p class="text-muted" style="margin-top:0.75rem;font-size:0.875rem;">
         To re-read your website or update provider profiles, open the
@@ -123,6 +124,17 @@
         btn.disabled = false;
         btn.textContent = '🔄 Reload All';
       }
+    }
+
+    async function restartServer() {
+      if (!confirm('Restart the server? Active calls will be dropped.')) return;
+      const btn = document.getElementById('restartBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Restarting...';
+      try {
+        await UI.apiFetch('/api/setup/restart', { method: 'POST' });
+      } catch (_) {}
+      btn.textContent = '✅ Restarting — refresh in a moment';
     }
 
     // Auto-refresh every 30 seconds

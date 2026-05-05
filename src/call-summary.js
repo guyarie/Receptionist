@@ -126,7 +126,20 @@ ${messages.map(m => `${m.role === 'user' ? 'Caller' : 'Receptionist'}: ${m.conte
   saveSummaryDirect(summaryData) {
     this.ensureDirectoryExists();
 
-    const { callSid, callerPhone, twilioNumber, startTime, endTime, duration, summary, notificationDecision, fullTranscript } = summaryData;
+    const { callSid, callerPhone, twilioNumber, startTime, endTime, duration, summary, notificationDecision } = summaryData;
+
+    // Normalize fullTranscript: agent saves it as a plain string; convert to array so
+    // the admin panel (which always expects [{ speaker, message }]) can render it.
+    let fullTranscript = summaryData.fullTranscript;
+    if (typeof fullTranscript === 'string') {
+      fullTranscript = fullTranscript.split('\n').filter(l => l.trim()).map(line => {
+        const colonIdx = line.indexOf(':');
+        if (colonIdx > 0) {
+          return { speaker: line.substring(0, colonIdx).trim(), message: line.substring(colonIdx + 1).trim() };
+        }
+        return { speaker: 'Unknown', message: line.trim() };
+      });
+    }
 
     const summaryObj = { callSid, callerPhone, twilioNumber, startTime, endTime, duration, summary, fullTranscript };
     if (notificationDecision) {
