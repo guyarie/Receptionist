@@ -3,7 +3,7 @@
 const WebSocket = require('ws');
 const ProviderAdapter = require('./provider-adapter');
 const config = require('../config');
-const { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, isSchedulingEnabled, executeTool } = require('../agents/in-call-tools');
+const { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, FORWARD_TOOL, isSchedulingEnabled, isForwardingEnabled, executeTool } = require('../agents/in-call-tools');
 
 const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17';
 
@@ -93,6 +93,7 @@ class OpenAIAdapter extends ProviderAdapter {
               },
               PROVIDER_INFO_TOOL,
               ...(isSchedulingEnabled() ? SCHEDULING_TOOLS : []),
+              ...(isForwardingEnabled() ? [FORWARD_TOOL] : []),
             ],
             tool_choice: 'auto',
             instructions: instructions || ''
@@ -263,7 +264,7 @@ class OpenAIAdapter extends ProviderAdapter {
 
     let result;
     try {
-      result = await executeTool(name, args, this.callerPhone);
+      result = await executeTool(name, args, this.callerPhone, this.callSid);
     } catch (err) {
       console.error(`Tool ${name} failed:`, err.message);
       result = { error: err.message };

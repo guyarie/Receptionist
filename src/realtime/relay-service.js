@@ -26,6 +26,7 @@ class RelayService {
     this.provider = providerAdapter;
     this.callSid = callSid;
     this.streamSid = streamSid;
+    providerAdapter.callSid = callSid;
     this.callerInfo = callerInfo || {};
     this.conversationHistory = [];
     this.closed = false;

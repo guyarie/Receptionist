@@ -105,6 +105,7 @@ function buildConfig(env) {
     goodbyePhrases: (env.GOODBYE_PHRASES || 'goodbye,have a great day,take care,bye')
       .split(',').map(p => p.trim()).filter(p => p),
     adminEmail: env.ADMIN_EMAIL || null,
+    forwardNumber: env.FORWARD_NUMBER || null,
     digestEnabled: (env.DIGEST_ENABLED || 'false').toLowerCase() === 'true',
     digestScheduleHour: parseInt(env.DIGEST_SCHEDULE_HOUR || '18', 10),
     postCallAgentMode: (env.POST_CALL_AGENT_MODE || 'active').toLowerCase(),

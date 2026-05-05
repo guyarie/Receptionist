@@ -85,6 +85,21 @@ function isSchedulingEnabled() {
   );
 }
 
+function isForwardingEnabled() {
+  return !!(
+    process.env.FORWARD_NUMBER &&
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN
+  );
+}
+
+const FORWARD_TOOL = {
+  type: 'function',
+  name: 'forward_call',
+  description: 'Forward the current call to the configured number. Use this when the caller asks to speak to a person, needs to be transferred, or the situation requires human assistance.',
+  parameters: { type: 'object', properties: {} },
+};
+
 function formatSlotForSpeech(isoTime, timezone) {
   return new Date(isoTime).toLocaleString('en-US', {
     timeZone: timezone,
@@ -257,7 +272,25 @@ function executeGetProviderInfo(args) {
   return { provider: match.name, profile: match.content };
 }
 
-async function executeTool(name, args, callerPhone) {
+async function executeForwardCall(callSid) {
+  const forwardNumber = process.env.FORWARD_NUMBER;
+  if (!forwardNumber) return { error: 'FORWARD_NUMBER is not configured' };
+  if (!callSid) return { error: 'Call SID unavailable — cannot forward' };
+
+  const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  try {
+    await twilio.calls(callSid).update({
+      twiml: `<Response><Dial>${forwardNumber}</Dial></Response>`
+    });
+    console.log(`📲 Call ${callSid} forwarded to ${forwardNumber}`);
+    return { success: true, forwarded_to: forwardNumber };
+  } catch (err) {
+    console.error(`❌ Failed to forward call ${callSid}:`, err.message);
+    return { error: `Failed to forward call: ${err.message}` };
+  }
+}
+
+async function executeTool(name, args, callerPhone, callSid) {
   switch (name) {
     case 'get_provider_info':
       return executeGetProviderInfo(args);
@@ -265,9 +298,11 @@ async function executeTool(name, args, callerPhone) {
       return executeCheckAvailability(args);
     case 'book_appointment':
       return executeBookAppointment(args, callerPhone);
+    case 'forward_call':
+      return executeForwardCall(callSid);
     default:
       return { error: `Unknown tool: ${name}` };
   }
 }
 
-module.exports = { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, isSchedulingEnabled, executeTool };
+module.exports = { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, FORWARD_TOOL, isSchedulingEnabled, isForwardingEnabled, executeTool };
