@@ -1,7 +1,7 @@
 // Shared tool definitions for AI agents
 // Each tool is a thin adapter wrapping an existing module
-const { tool } = require('ai');
-const { z } = require('zod');
+// Uses inputSchema (AI SDK v6 name) + jsonSchema() to bypass broken Zod v4 schema generation
+const { tool, jsonSchema } = require('ai');
 const callSummaryManager = require('../call-summary');
 const providerLoader = require('../provider-loader');
 const emailTransport = require('../email-transport');
@@ -10,16 +10,20 @@ function createTools(options = {}) {
   const tools = {
     save_call_summary: tool({
       description: 'Save a call summary to disk as a JSON file',
-      parameters: z.object({
-        callSid: z.string(),
-        callerPhone: z.string(),
-        twilioNumber: z.string(),
-        startTime: z.string(),
-        endTime: z.string(),
-        duration: z.string(),
-        summary: z.string(),
-        fullTranscript: z.string().describe('Full conversation as plain text, one line per turn, e.g. "Caller: Hi\\nAI Receptionist: Hello..."'),
-        notificationDecision: z.string().optional().describe('Brief explanation of whether a notification was sent and why')
+      inputSchema: jsonSchema({
+        type: 'object',
+        properties: {
+          callSid: { type: 'string' },
+          callerPhone: { type: 'string' },
+          twilioNumber: { type: 'string' },
+          startTime: { type: 'string' },
+          endTime: { type: 'string' },
+          duration: { type: 'string' },
+          summary: { type: 'string' },
+          fullTranscript: { type: 'string', description: 'Full conversation as plain text, one line per turn, e.g. "Caller: Hi\\nAI Receptionist: Hello..."' },
+          notificationDecision: { type: 'string', description: 'Brief explanation of whether a notification was sent and why' }
+        },
+        required: ['callSid', 'callerPhone', 'twilioNumber', 'startTime', 'endTime', 'duration', 'summary', 'fullTranscript']
       }),
       execute: async (params) => {
         console.log(`[post-call] save_call_summary args:`, JSON.stringify(params).substring(0, 300));
@@ -34,7 +38,7 @@ function createTools(options = {}) {
 
     read_provider_profiles: tool({
       description: 'Read compact provider profiles: name, email, specialties, insurance accepted',
-      parameters: z.object({}),
+      inputSchema: jsonSchema({ type: 'object', properties: {} }),
       execute: async () => {
         const allProfiles = providerLoader.getAll();
         // Extract compact info from each markdown profile to keep token count low
@@ -64,8 +68,11 @@ function createTools(options = {}) {
 
     read_call_summaries: tool({
       description: 'Read call summaries, optionally filtered by date',
-      parameters: z.object({
-        date: z.string().optional().describe('ISO date string (YYYY-MM-DD) to filter summaries')
+      inputSchema: jsonSchema({
+        type: 'object',
+        properties: {
+          date: { type: 'string', description: 'ISO date string (YYYY-MM-DD) to filter summaries' }
+        }
       }),
       execute: async ({ date }) => {
         const summaries = callSummaryManager.getAllSummaries();
@@ -78,10 +85,14 @@ function createTools(options = {}) {
 
     send_email: tool({
       description: 'Send an email to a recipient',
-      parameters: z.object({
-        to: z.string().describe('Recipient email address'),
-        subject: z.string().describe('Email subject line'),
-        body: z.string().describe('Email body text')
+      inputSchema: jsonSchema({
+        type: 'object',
+        properties: {
+          to: { type: 'string', description: 'Recipient email address' },
+          subject: { type: 'string', description: 'Email subject line' },
+          body: { type: 'string', description: 'Email body text' }
+        },
+        required: ['to', 'subject', 'body']
       }),
       execute: async ({ to, subject, body }) => {
         if (!to || to.trim() === '') {
