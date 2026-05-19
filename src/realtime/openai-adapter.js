@@ -5,7 +5,7 @@ const ProviderAdapter = require('./provider-adapter');
 const config = require('../config');
 const { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, FORWARD_TOOL, VOICEMAIL_TOOL, isSchedulingEnabled, isForwardingEnabled, isVoicemailEnabled, executeTool } = require('../agents/in-call-tools');
 
-const OPENAI_REALTIME_MODEL = process.env.OPENAI_REALTIME_MODEL || 'gpt-realtime-2025-08-28';
+const OPENAI_REALTIME_MODEL = process.env.OPENAI_REALTIME_MODEL || 'gpt-realtime-2';
 const OPENAI_REALTIME_URL = `wss://api.openai.com/v1/realtime?model=${OPENAI_REALTIME_MODEL}`;
 
 /**
@@ -37,7 +37,6 @@ class OpenAIAdapter extends ProviderAdapter {
       this.ws = new WebSocket(OPENAI_REALTIME_URL, {
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
-          'OpenAI-Beta': 'realtime=v1'
         }
       });
 
