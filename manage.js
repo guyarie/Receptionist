@@ -273,6 +273,116 @@ server {
 }
 `);
   }
+
+  // Meta Admin block
+  const metaAdminPort = parseInt(process.env.META_ADMIN_PORT || '3099', 10);
+  console.log(`
+# Meta Admin (install manager)
+# Set META_ADMIN_DOMAIN in installs/_defaults.env to customize.
+server {
+    server_name ${process.env.META_ADMIN_DOMAIN || 'admin.phone.yourdomain.com'};
+
+    location / {
+        proxy_pass http://127.0.0.1:${metaAdminPort};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        # Required for SSE streaming (chat responses)
+        proxy_buffering off;
+        proxy_cache off;
+    }
+}
+`);
+}
+
+function cmdDeployNginx() {
+  const { execSync } = require('child_process');
+  const installs = listInstalls();
+  if (installs.length === 0) { console.log('No installs found.'); return; }
+
+  let deployed = 0;
+  for (const name of installs) {
+    const confSrc = path.join(installDir(name), 'nginx.conf');
+    if (!fs.existsSync(confSrc)) {
+      console.log(`  ${name}: no nginx.conf found — run setup first`);
+      continue;
+    }
+    const confDest = `/etc/nginx/sites-available/${name}`;
+    const linkDest = `/etc/nginx/sites-enabled/${name}`;
+    fs.copyFileSync(confSrc, confDest);
+    if (!fs.existsSync(linkDest)) {
+      fs.symlinkSync(confDest, linkDest);
+    }
+    console.log(`  ✅ ${name} → ${confDest}`);
+    deployed++;
+  }
+
+  if (deployed === 0) {
+    console.log('Nothing deployed. Complete setup for each install first.');
+    return;
+  }
+
+  try {
+    execSync('nginx -t', { stdio: 'inherit' });
+    execSync('systemctl reload nginx', { stdio: 'inherit' });
+    console.log('✅ nginx reloaded');
+  } catch {
+    console.error('nginx -t failed — fix the config errors above before reloading.');
+    process.exit(1);
+  }
+}
+
+// ============================================================================
+// Meta Admin
+// ============================================================================
+
+const META_ADMIN_APP = 'receptionist-meta-admin';
+const META_ADMIN_SCRIPT = path.join(REPO_ROOT, 'meta-admin.js');
+
+async function cmdMetaAdmin(action) {
+  await pm2Connect();
+  try {
+    if (action === 'stop') {
+      try {
+        await pm2StopApp('meta-admin');
+        await pm2DeleteApp('meta-admin');
+        console.log('⏹  meta-admin stopped');
+      } catch {
+        console.log('   meta-admin was not running');
+      }
+      return;
+    }
+
+    if (action === 'status') {
+      const procs = await pm2List();
+      const proc = procs.find(p => p.name === META_ADMIN_APP);
+      if (proc) {
+        console.log(`meta-admin: ${proc.pm2_env.status}`);
+      } else {
+        console.log('meta-admin: stopped');
+      }
+      return;
+    }
+
+    // start (default)
+    const port = parseInt(process.env.META_ADMIN_PORT || '3099', 10);
+    await new Promise((resolve, reject) =>
+      pm2.start(
+        {
+          name: META_ADMIN_APP,
+          script: META_ADMIN_SCRIPT,
+          cwd: REPO_ROOT,
+          watch: false,
+          autorestart: true,
+        },
+        (err) => (err ? reject(err) : resolve())
+      )
+    );
+    console.log(`🚀 meta-admin started → http://localhost:${port}`);
+  } finally {
+    pm2Disconnect();
+  }
 }
 
 // ============================================================================
@@ -288,7 +398,9 @@ const [,, cmd, arg] = process.argv;
       case 'start':  await cmdStart(arg || 'all'); break;
       case 'stop':   await cmdStop(arg || 'all'); break;
       case 'status': await cmdStatus(); break;
-      case 'nginx':  cmdNginx(); break;
+      case 'nginx':        cmdNginx(); break;
+      case 'deploy-nginx': cmdDeployNginx(); break;
+      case 'meta-admin': await cmdMetaAdmin(arg || 'start'); break;
       default:
         console.log(`
 AI Receptionist — install manager
@@ -300,6 +412,8 @@ AI Receptionist — install manager
   node manage.js stop all        Stop all installs
   node manage.js status          List all installs and their state
   node manage.js nginx           Print nginx config for all installs
+  sudo node manage.js deploy-nginx   Deploy nginx configs and reload nginx
+  node manage.js meta-admin [start|stop|status]   Manage the meta-admin server
 `);
     }
   } catch (err) {
