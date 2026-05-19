@@ -68,21 +68,27 @@ class OpenAIAdapter extends ProviderAdapter {
         // Read VAD parameters from centralized config — no inline literals
         const { silenceDurationMs, prefixPaddingMs } = config.realtime.vad;
 
-        // Send session.update with voice, audio format, VAD, transcription, and instructions
+        // Send session.update with voice, audio format, VAD, transcription, and instructions.
+        // gpt-realtime-2 uses a nested audio config; format strings changed (g711_ulaw → audio/pcmu).
         const sessionUpdate = {
           type: 'session.update',
           session: {
-            modalities: ['text', 'audio'],
-            voice: this.voice,
-            input_audio_format: 'g711_ulaw',
-            output_audio_format: 'g711_ulaw',
-            turn_detection: {
-              type: 'server_vad',
-              silence_duration_ms: silenceDurationMs,
-              prefix_padding_ms: prefixPaddingMs
-            },
-            input_audio_transcription: {
-              model: 'whisper-1'
+            type: 'realtime',
+            output_modalities: ['audio'],
+            audio: {
+              input: {
+                format: { type: 'audio/pcmu' },
+                turn_detection: {
+                  type: 'server_vad',
+                  silence_duration_ms: silenceDurationMs,
+                  prefix_padding_ms: prefixPaddingMs
+                },
+                transcription: { model: 'whisper-1' }
+              },
+              output: {
+                format: { type: 'audio/pcmu' },
+                voice: this.voice,
+              }
             },
             tools: [
               {
@@ -164,7 +170,8 @@ class OpenAIAdapter extends ProviderAdapter {
         this._responseTextSeen = false;
         break;
 
-      case 'response.audio.delta':
+      case 'response.audio.delta':         // legacy preview API
+      case 'response.output_audio.delta':  // GA API
         this._responseAudioCount++;
         if (this.onAudioOutput && event.delta) {
           this.onAudioOutput(event.delta);
@@ -175,7 +182,8 @@ class OpenAIAdapter extends ProviderAdapter {
         this._responseTextSeen = true;
         break;
 
-      case 'response.audio_transcript.done':
+      case 'response.audio_transcript.done':        // legacy preview API
+      case 'response.output_audio_transcript.done': // GA API
         if (this.onTranscript && event.transcript) {
           this.onTranscript('assistant', event.transcript);
         }
@@ -238,7 +246,8 @@ class OpenAIAdapter extends ProviderAdapter {
               'input_audio_buffer.speech_stopped', 'conversation.item.created',
               'response.output_item.added', 'response.content_part.added',
               'response.content_part.done', 'response.output_item.done',
-              'response.audio_transcript.delta'].includes(event.type)) {
+              'response.audio_transcript.delta', 'response.output_audio_transcript.delta',
+              'response.output_audio.done', 'conversation.item.done'].includes(event.type)) {
           console.log(`[OpenAI event] ${event.type}`, JSON.stringify(event).slice(0, 200));
         }
     }

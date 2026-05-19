@@ -365,9 +365,12 @@ pm2 restart all                # restart everything
 # Survive reboots — run once after first deploy
 pm2 save
 pm2 startup                    # prints a command — run it as instructed
+sudo systemctl start pm2-receptionist
 ```
 
 PM2 process names follow the pattern `receptionist-<install-name>`.
+
+> **Running as a dedicated service user?** If PM2 is managed by a `receptionist` user, run `pm2 save` and `pm2 startup` as that user (`sudo su - receptionist`), then paste the printed command as your admin user and run `sudo systemctl start pm2-receptionist`. See [Deployment Guide](docs/DEPLOYMENT.md) for the full walkthrough.
 
 ---
 
