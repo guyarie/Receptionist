@@ -4,6 +4,16 @@ How to run the AI Phone Receptionist on a Linux VPS or droplet with auto-start o
 
 > For the full production setup including nginx, DNS, SSL, and multi-install management, see the [Production Deployment](../README.md#production-deployment) section of the README.
 
+## Quick bootstrap
+
+On a fresh Ubuntu 22.04+ server, one script installs everything (Node.js 22, nginx, certbot, PM2):
+
+```bash
+bash scripts/bootstrap-server.sh
+```
+
+Then follow the printed next-steps or continue reading below.
+
 ## Service user setup
 
 Run installs under a dedicated `receptionist` user so that file ownership stays clean and the process never runs as root.

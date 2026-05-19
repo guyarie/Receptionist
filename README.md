@@ -342,12 +342,20 @@ META_ADMIN_MODEL=openai/gpt-4o-mini         # OpenRouter model for the agent
 
 ---
 
+### Server bootstrap
+
+On a fresh Ubuntu 22.04+ server, one script installs all system dependencies (Node.js 22 LTS, nginx, certbot, PM2):
+
+```bash
+bash scripts/bootstrap-server.sh
+```
+
 ### PM2 (process manager)
 
 PM2 runs all installs as background processes and restarts them if they crash.
 
 ```bash
-# Install globally (one time)
+# Install globally (one time) — included in bootstrap-server.sh above
 npm install -g pm2
 
 # manage.js wraps PM2 — you rarely need to call pm2 directly
