@@ -22,6 +22,19 @@ const INSTALLS_DIR = path.join(REPO_ROOT, 'installs');
 const BASE_PORT = 3100; // installs get 3100, 3200, 3300 …
 const PORT_STRIDE = 100; // SETUP_PORT = PORT + 1
 
+// Load shared defaults into process.env (shell env takes precedence)
+const defaultsEnvPath = path.join(INSTALLS_DIR, '_defaults.env');
+if (fs.existsSync(defaultsEnvPath)) {
+  for (const line of fs.readFileSync(defaultsEnvPath, 'utf-8').split('\n')) {
+    const m = line.match(/^([^#=\s][^=]*)=(.*)$/);
+    if (m) {
+      const key = m[1].trim();
+      const val = m[2].trim().replace(/^"(.*)"$/, '$1');
+      if (!(key in process.env)) process.env[key] = val;
+    }
+  }
+}
+
 // ============================================================================
 // Helpers
 // ============================================================================
