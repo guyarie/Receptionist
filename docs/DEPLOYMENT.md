@@ -108,6 +108,46 @@ sudo systemctl status pm2-receptionist
 sudo systemctl restart pm2-receptionist
 ```
 
+## Enabling Meta Admin on an existing server
+
+Meta Admin is a browser-based install manager (port 3099). To enable it on a server where the main installs are already running:
+
+**1 — Set the domain in `installs/_defaults.env`**
+```env
+META_ADMIN_DOMAIN=admin.phone.yourdomain.com
+META_ADMIN_PASSWORD=your-secure-password
+META_ADMIN_SESSION_SECRET=a-random-string
+```
+
+**2 — Point DNS** — create an A record for `admin.phone.yourdomain.com` → server IP and wait for propagation.
+
+**3 — Deploy the updated nginx config** (now includes the meta admin block)
+```bash
+node manage.js nginx          # verify the meta admin block shows the right domain
+sudo node manage.js deploy-nginx
+```
+
+**4 — Add SSL for the new domain**
+```bash
+sudo certbot --nginx -d phone.yourdomain.com -d admin.phone.yourdomain.com
+```
+
+**5 — Start meta admin under the service user and persist it**
+```bash
+sudo su - receptionist
+cd /path/to/Receptionist
+node manage.js meta-admin start
+pm2 save
+exit
+```
+
+**6 — Verify**
+```bash
+sudo su - receptionist -c "pm2 status"
+# Should show both receptionist-<name> and receptionist-meta-admin as online
+curl -sk https://admin.phone.yourdomain.com/
+```
+
 ## Deploying updates
 
 ```bash
