@@ -5,7 +5,7 @@ const ProviderAdapter = require('./provider-adapter');
 const config = require('../config');
 const { PROVIDER_INFO_TOOL, SCHEDULING_TOOLS, FORWARD_TOOL, VOICEMAIL_TOOL, isSchedulingEnabled, isForwardingEnabled, isVoicemailEnabled, executeTool } = require('../agents/in-call-tools');
 
-const OPENAI_REALTIME_MODEL = process.env.OPENAI_REALTIME_MODEL || 'gpt-realtime-2';
+const OPENAI_REALTIME_MODEL = process.env.OPENAI_REALTIME_MODEL || 'gpt-realtime-2.1';
 const OPENAI_REALTIME_URL = `wss://api.openai.com/v1/realtime?model=${OPENAI_REALTIME_MODEL}`;
 
 /**
@@ -22,6 +22,7 @@ class OpenAIAdapter extends ProviderAdapter {
       this.keepaliveInterval = null;
       this._responseAudioCount = 0;
       this._responseTextSeen = false;
+      this._responseActive = false;
     }
 
 
@@ -168,6 +169,7 @@ class OpenAIAdapter extends ProviderAdapter {
       case 'response.created':
         this._responseAudioCount = 0;
         this._responseTextSeen = false;
+        this._responseActive = true;
         break;
 
       case 'response.audio.delta':         // legacy preview API
@@ -222,6 +224,7 @@ class OpenAIAdapter extends ProviderAdapter {
         break;
 
       case 'response.done':
+        this._responseActive = false;
         if (this._responseTextSeen && this._responseAudioCount === 0) {
           console.error('🚨 OpenAI returned text-only response with no audio — likely a refusal or oversized instructions');
           if (this.onTextOnlyRefusal) this.onTextOnlyRefusal();
@@ -231,13 +234,18 @@ class OpenAIAdapter extends ProviderAdapter {
         break;
 
       case 'response.cancelled':
+        this._responseActive = false;
         console.log('⚡ Response interrupted — cancelled by new speech input');
         break;
 
       case 'error':
-        console.error(`❌ OpenAI Realtime error event:`, JSON.stringify(event.error));
-        if (this.onError) {
-          this.onError(new Error(event.error?.message || 'OpenAI Realtime API error'));
+        if (event.error?.code === 'response_cancel_not_active') {
+          console.warn(`⚠️ OpenAI Realtime warning (cancel race):`, event.error.message);
+        } else {
+          console.error(`❌ OpenAI Realtime error event:`, JSON.stringify(event.error));
+          if (this.onError) {
+            this.onError(new Error(event.error?.message || 'OpenAI Realtime API error'));
+          }
         }
         break;
 
@@ -324,6 +332,7 @@ class OpenAIAdapter extends ProviderAdapter {
    */
   cancelResponse() {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    if (!this._responseActive) return;
 
     console.log('⚡ Cancelling in-progress response due to interruption');
     this.ws.send(JSON.stringify({
@@ -360,7 +369,7 @@ class OpenAIAdapter extends ProviderAdapter {
           // This is safe and idempotent - doesn't affect conversation state
           this.ws.send(JSON.stringify({
             type: 'session.update',
-            session: {}
+            session: { type: 'realtime' }
           }));
           console.log('💓 OpenAI keepalive ping sent');
         }
